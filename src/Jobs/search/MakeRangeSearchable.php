@@ -2,13 +2,12 @@
 
 namespace app\queue\redis\search;
 
-use Illuminate\Bus\Queueable;
 use Webman\RedisQueue\Consumer;
 use Erikwang2013\WebmanScout\Scout;
 
 class MakeRangeSearchable implements Consumer
 {
-    use Queueable;
+
 
     // 要消费的队列名
     public $queue = 'scout_make_range';
@@ -36,9 +35,5 @@ class MakeRangeSearchable implements Consumer
         if ($models->isEmpty()) {
             return;
         }
-
-        dispatch(new Scout::$makeSearchableJob($models))
-            ->onQueue($model->syncWithSearchUsingQueue())
-            ->onConnection($model->syncWithSearchUsing());
     }
 }
