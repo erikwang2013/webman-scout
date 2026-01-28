@@ -11,7 +11,7 @@ class Install
      */
     protected static $pathRelation = array (
         'config/plugin/erikwang2013/webman-scout' => 'config/plugin/erikwang2013/webman-scout',
-        'Jobs' => 'app/queue/redis/search'
+        'Jobs/search' => 'app/queue/redis/search'
     );
 
     /**
