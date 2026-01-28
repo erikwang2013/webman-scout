@@ -1,0 +1,39 @@
+<?php
+/**
+ *-------------------------------------------------------------------------s*
+ *
+ *-------------------------------------------------------------------------h*
+ * @copyright  Copyright (c) 2015-2022 Shopwwi Inc. (http://www.shopwwi.com)
+ *-------------------------------------------------------------------------o*
+ * @license    http://www.shopwwi.com        s h o p w w i . c o m
+ *-------------------------------------------------------------------------p*
+ * @link       http://www.shopwwi.com by 无锡豚豹科技
+ *-------------------------------------------------------------------------w*
+ * @since      shopwwi豚豹·PHP商城系统
+ *-------------------------------------------------------------------------w*
+ * @author      TycoonSong 8988354@qq.com
+ *-------------------------------------------------------------------------i*
+ */
+namespace Erikwang2013\WebmanScout\Jobs;
+
+use Illuminate\Database\Eloquent\Collection;
+use Erikwang2013\WebmanScout\Searchable;
+
+class RemoveableScoutCollection extends Collection
+{
+    /**
+     * Get the Scout identifiers for all of the entities.
+     *
+     * @return array
+     */
+    public function getQueueableIds()
+    {
+        if ($this->isEmpty()) {
+            return [];
+        }
+
+        return in_array(Searchable::class, class_uses_recursive($this->first()))
+                    ? $this->map->getScoutKey()->all()
+                    : parent::getQueueableIds();
+    }
+}
