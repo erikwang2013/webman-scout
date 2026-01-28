@@ -199,9 +199,6 @@ class OpenSearchEngine extends Engine
             'from' => (($page * $perPage) - $perPage),
             'size' => $perPage,
         ]);
-
-        $result->nbPages = $result['hits']['total']['value'] / $perPage;
-
         return $result;
     }
 
