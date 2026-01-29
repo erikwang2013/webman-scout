@@ -30,7 +30,7 @@ return [
     |
     */
 
-    'driver' => getenv('SCOUT_DRIVER', 'opensearch'),
+    'driver' => getenv('OPENSEARCH_SCOUT_DRIVER', 'opensearch'),
 
     /*
     |--------------------------------------------------------------------------
@@ -56,7 +56,7 @@ return [
     |
     */
 
-    'queue' => getenv('SCOUT_QUEUE', false),
+    'queue' => getenv('OPENSEARCH_SCOUT_QUEUE', false),
 
     /*
     |--------------------------------------------------------------------------
