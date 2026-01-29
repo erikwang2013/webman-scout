@@ -631,6 +631,8 @@ class OpenSearchEngine extends Engine
         return $this;
     }
 
+
+    
     /**
      * 动态调用 OpenSearch 客户端方法
      */
