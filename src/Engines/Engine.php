@@ -2,8 +2,7 @@
 
 namespace Erikwang2013\WebmanScout\Engines;
 
-use Erikwang2013\WebmanScout\Builder;
-use Erikwang2013\WebmanScout\AdvancedScoutBuilder;
+use Erikwang2013\WebmanScout\AdvancedScoutBuilder as Builder;
 
 abstract class Engine
 {
@@ -100,23 +99,31 @@ abstract class Engine
      * @param  string  $name
      * @return mixed
      */
-    abstract public function deleteIndex($name);
-
-    abstract public function advancedSearch(AdvancedScoutBuilder $builder);
-    abstract public function deleteIndex($name);
-    abstract public function getIndexInfo(string $index);
-    abstract public function indexExists(string $index);
-    abstract public function updateIndexSettings(string $index, array $settings);
+    abstract public function vectorSearch($vector, ?string $vectorField = null, array $options = []);
+    abstract public function advancedSearch(Builder $builder);
+    abstract public function whereAdvanced(
+        string $field,
+        string $operator,
+        $value,
+        string $boolean = 'and',
+        bool $nested = false
+    );
+    abstract public function whereRange(string $field, array $range, bool $inclusive = true);
+    abstract public function whereGeoDistance(string $field, float $lat, float $lng, float $radius);
     abstract public function updateIndexMappings(string $index, array $mappings);
-    abstract public function getClient();
-    abstract public function setBulkSize(int $size);
-    abstract public function getAggregations(AdvancedScoutBuilder $builder);
-    abstract public function getFacets(AdvancedScoutBuilder $builder);
-    abstract public function updateVectors($models, array $vectors);
-    abstract public function createVectorIndex(string $index, int $dimensions = 1536, array $settings = []);
-    abstract public function knnSearch(string $index, array $vector, int $k = 10, array $filter = null);
-    abstract public function hybridSearch(string $index, string $query, array $vector, float $alpha = 0.5, int $k = 10);
-    abstract public function getEngineInfo();
+    abstract public function fulltextSearch(string $query, array $fields = [], array $options = []);
+    abstract public function orderByVectorSimilarity(array $vector, ?string $vectorField = null);
+    abstract public function addResultProcessor(callable $processor);
+    abstract public function aggregate(string $name, string $type, string $field, array $options = []);
+    abstract public function facet(string $field, array $options = []);
+    abstract public function getAggregations();
+    abstract public function getFacets();
+    abstract public function getVectorSearch();
+    abstract public function getAdvancedWheres();
+    abstract public function getSorts();
+    abstract public function getAggregationConfig();
+    abstract public function getFacetConfig();
+    abstract public function  clearAdvancedConditions();
 
 
     /**
