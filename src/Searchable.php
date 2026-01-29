@@ -158,7 +158,7 @@ trait Searchable
      */
     public static function search($query = '', $callback = null)
     {
-        return app(static::$scoutBuilder ?? Builder::class, [
+        return app(static::$scoutBuilder ?? AdvancedScoutBuilder::class, [
             'model' => new static,
             'query' => $query,
             'callback' => $callback,
