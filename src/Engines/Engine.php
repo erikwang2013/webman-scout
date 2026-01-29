@@ -2,7 +2,7 @@
 
 namespace Erikwang2013\WebmanScout\Engines;
 
-use Erikwang2013\WebmanScout\AdvancedScoutBuilder as Builder;
+use Erikwang2013\WebmanScout\Builder;
 
 abstract class Engine
 {

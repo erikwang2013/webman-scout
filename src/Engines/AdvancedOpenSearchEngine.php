@@ -2,7 +2,7 @@
 
 namespace Erikwang2013\WebmanScout\Engines;
 
-use Erikwang2013\WebmanScout\AdvancedScoutBuilder;
+use Erikwang2013\WebmanScout\Builder as AdvancedScoutBuilder;
 use support\Log;
 use OpenSearch\Client;
 
