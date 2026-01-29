@@ -2,7 +2,7 @@
 
 namespace Erikwang2013\WebmanScout\Engines;
 
-use App\Extensions\Scout\AdvancedScoutBuilder;
+use Erikwang2013\WebmanScout\AdvancedScoutBuilder;
 use support\Log;
 
 class AdvancedTypesenseEngine extends TypesenseEngine

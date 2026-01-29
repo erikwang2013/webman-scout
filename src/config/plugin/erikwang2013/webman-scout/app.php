@@ -137,6 +137,55 @@ return [
         ],
     ],
 
+    'xunsearch' => [
+        // XunSearch 配置文件路径
+        'config_path' => getenv('XUNSEARCH_CONFIG_PATH', base_path('config/xunsearch')),
+        
+        // 默认索引配置
+        'default_index' => getenv('XUNSEARCH_DEFAULT_INDEX', 'default'),
+        
+        // 字符集
+        'charset' => getenv('XUNSEARCH_CHARSET', 'utf-8'),
+        
+        // 搜索选项
+        'search' => [
+            'fuzzy' => getenv('XUNSEARCH_FUZZY', true),
+            'auto_synonym' => getenv('XUNSEARCH_AUTO_SYNONYM', true),
+            'auto_flush' => getenv('XUNSEARCH_AUTO_FLUSH', true),
+            'batch_size' => getenv('XUNSEARCH_BATCH_SIZE', 100),
+        ],
+        
+        // 缓存配置
+        'cache' => [
+            'enabled' => getenv('XUNSEARCH_CACHE_ENABLED', true),
+            'ttl' => getenv('XUNSEARCH_CACHE_TTL', 300),
+            'store' => getenv('XUNSEARCH_CACHE_STORE', 'file'),
+        ],
+        
+        // 索引配置模板
+        'index_templates' => [
+            'default' => [
+                'project.name' => 'default',
+                'project.default_charset' => 'utf-8',
+                'server.index' => '8383',
+                'server.search' => '8384',
+                // 字段定义
+                'field.id' => [
+                    'type' => 'id',
+                ],
+                'field.title' => [
+                    'type' => 'title',
+                ],
+                'field.content' => [
+                    'type' => 'body',
+                ],
+                'field.created_at' => [
+                    'type' => 'numeric',
+                ],
+            ],
+        ],
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Meilisearch Configuration
@@ -252,6 +301,30 @@ return [
         'retries' => getenv('OPENSEARCH_RETRIES', 2),
         'connection_timeout' => getenv('OPENSEARCH_CONNECTION_TIMEOUT', 10),
         'timeout' => getenv('OPENSEARCH_TIMEOUT', 30),
+        'indices' => [
+            'products' => [
+                'settings' => [
+                    'index' => [
+                        'number_of_shards' => 1,
+                        'number_of_replicas' => 1,
+                        'knn' => true,
+                        'knn.algo_param.ef_search' => 100,
+                    ],
+                ],
+                'mappings' => [
+                    'properties' => [
+                        'vector' => [
+                            'type' => 'knn_vector',
+                            'dimension' => 1536,
+                        ],
+                        'location' => [
+                            'type' => 'geo_point',
+                        ],
+                    ],
+                ],
+                'aliases' => ['products_alias'],
+            ],
+        ],
     ]
 
 ];
