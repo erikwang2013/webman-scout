@@ -88,7 +88,7 @@ class Builder
      * @var int|null
      */
     public $limit;
-
+    public $offset;
     /**
      * The "order" that should be applied to the search.
      *

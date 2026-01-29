@@ -99,7 +99,7 @@ abstract class Engine
      * @param  string  $name
      * @return mixed
      */
-    abstract public function vectorSearch($vector, ?string $vectorField = null, array $options = []);
+/*     abstract public function vectorSearch($vector, ?string $vectorField = null, array $options = []);
     abstract public function advancedSearch(Builder $builder);
     abstract public function whereAdvanced(
         string $field,
@@ -124,7 +124,7 @@ abstract class Engine
     abstract public function getAggregationConfig();
     abstract public function getFacetConfig();
     abstract public function  clearAdvancedConditions();
-
+ */
 
     /**
      * Pluck and return the primary keys of the given results using the given key name.
