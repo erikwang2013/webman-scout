@@ -129,7 +129,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
     /**
      * 添加排序
      */
-    public function orderBy(string $field, string $direction = 'asc', array $options = []): self
+   /*  public function orderBy(string $field, string $direction = 'asc', array $options = []): self
     {
         $this->sorts[] = [
             'field' => $field,
@@ -138,7 +138,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
         ];
 
         return $this;
-    }
+    } */
 
     /**
      * 按向量相似度排序
@@ -377,7 +377,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
      * 条件构造辅助方法
      */
 
-    public function when($condition, callable $callback, ?callable $default = null): self
+    /* public function when($condition, callable $callback, ?callable $default = null): self
     {
         if ($condition) {
             return $callback($this, $condition) ?? $this;
@@ -391,7 +391,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
     public function unless($condition, callable $callback, ?callable $default = null): self
     {
         return $this->when(!$condition, $callback, $default);
-    }
+    } */
 
     /**
      * 调试方法
