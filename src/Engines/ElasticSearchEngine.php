@@ -1,19 +1,5 @@
 <?php
-/**
- *-------------------------------------------------------------------------s*
- *
- *-------------------------------------------------------------------------h*
- * @copyright  Copyright (c) 2015-2022 Shopwwi Inc. (http://www.shopwwi.com)
- *-------------------------------------------------------------------------o*
- * @license    http://www.shopwwi.com        s h o p w w i . c o m
- *-------------------------------------------------------------------------p*
- * @link       http://www.shopwwi.com by 无锡豚豹科技
- *-------------------------------------------------------------------------w*
- * @since      shopwwi豚豹·PHP商城系统
- *-------------------------------------------------------------------------w*
- * @author      TycoonSong 8988354@qq.com
- *-------------------------------------------------------------------------i*
- */
+
 namespace  Erikwang2013\WebmanScout\Engines;
 
 use Illuminate\Database\Eloquent\Collection;
@@ -65,7 +51,7 @@ class ElasticSearchEngine extends Engine
             'index' => $name,
         ];
 
-        if(empty($options) && $config = config('plugin.shopwwi.scout.app.elasticsearch.'.$name)) {
+        if(empty($options) && $config = config('plugin.erikwang2013.webman-scout.app.elasticsearch.'.$name)) {
             if (isset($config['settings'])) {
                 $params['body']['settings'] = $config['settings'];
             }

@@ -1,370 +1,638 @@
 <?php
-/**
- *-------------------------------------------------------------------------s*
- *
- *-------------------------------------------------------------------------h*
- * @copyright  Copyright (c) 2015-2022 Shopwwi Inc. (http://www.shopwwi.com)
- *-------------------------------------------------------------------------o*
- * @license    http://www.shopwwi.com        s h o p w w i . c o m
- *-------------------------------------------------------------------------p*
- * @link       http://www.shopwwi.com by 无锡豚豹科技
- *-------------------------------------------------------------------------w*
- * @since      shopwwi豚豹·PHP商城系统
- *-------------------------------------------------------------------------w*
- * @author      TycoonSong 8988354@qq.com
- *-------------------------------------------------------------------------i*
- */
-namespace  Erikwang2013\WebmanScout\Engines;
 
+namespace Erikwang2013\WebmanScout\Engines;
+
+use Erikwang2013\WebmanScout\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use  Erikwang2013\WebmanScout\Builder;
-use OpenSearch\GuzzleClientFactory;
+use Illuminate\Support\LazyCollection;
 use OpenSearch\Client;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Handler\CurlHandler;
+use support\Log;
 
 class OpenSearchEngine extends Engine
 {
     /**
-     * Elastic client.
-     *
-     * @var Client
+     * OpenSearch 客户端
      */
-    protected $opensearch;
+    protected Client $opensearch;
 
     /**
-     * Determines if soft deletes for Scout are enabled or not.
-     *
-     * @var bool
+     * 是否启用软删除
      */
-    protected $softDelete;
+    protected bool $softDelete;
 
     /**
-     * Create a new engine instance.
-     *
-     * @param Client $opensearch
-     * @return void
+     * 批量操作大小
      */
-    public function __construct(Client $opensearch, $softDelete = false)
+    protected int $bulkSize = 1000;
+
+    /**
+     * 创建新的引擎实例
+     */
+    public function __construct(Client $opensearch, bool $softDelete = false)
     {
         $this->opensearch = $opensearch;
         $this->softDelete = $softDelete;
     }
 
-    public function lazyMap(Builder $builder, $results, $model)
-    {
-        return Collection::make($results['hits']['hits'])->map(function ($hit) use ($model) {
-            return $model->newFromBuilder($hit['_source']);
-        });
-    }
-
-    public function createIndex($name, array $options = [])
-    {
-        $exists = $this->opensearch->indices()->exists(['index' => $name]);
-        if (true==$exists) {
-            return;
-        }
-        $params = [
-            'index' => $name,
-        ];
-
-        if(empty($options) && $config = config('plugin.shopwwi.scout.app.opensearch.'.$name)) {
-            if (isset($config['settings'])) {
-                $params['body']['settings'] = $config['settings'];
-            }
-            $this->opensearch->indices()->create($params);
-            if (isset($config['aliases'])) {
-                foreach ($config['aliases'] as $alias) {
-                    $this->opensearch->indices()->updateAliases([
-                        "body" => [
-                            'actions' => [
-                                [
-                                    'add' => [
-                                        'index' => $name,
-                                        'alias' => $alias
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]);
-                }
-            }
-
-            if (isset($config['mappings'])) {
-                foreach ($config['mappings'] as $type => $mapping) {
-                    $this->opensearch->indices()->putMapping([
-                        'index' => $name,
-                        'type' => $type,
-                        'body' => $mapping,
-                        "include_type_name" => true
-                    ]);
-                }
-            }
-        }else{
-            $this->opensearch->indices()->create(array_merge($params,$options));
-        }
-    }
-
-    public function deleteIndex($name)
-    {
-        $this->opensearch->indices()->delete(['index' => $name]);
-    }
-
     /**
-     * Update the given model in the index.
-     *
-     * @param  Collection  $models
-     * @return void
+     * 更新索引
      */
     public function update($models)
     {
         if ($models->isEmpty()) {
             return;
         }
-        if ($this->usesSoftDelete($models->first()) && $this->softDelete) {
-            $models->each->pushSoftDeleteMetadata();
-        }
-        $params['body'] = [];
 
-
-        $models->each(function ($model) use (&$params) {
-            if (empty($searchableData = $model->toSearchableArray())) {
-                return;
-            }
-            $params['body'][] = [
-                'update' => [
-                    '_id' => $model->getScoutKey(),
-                    '_index' => $model->searchableAs(),
-                   // '_type' => get_class($model),
-                ]
-            ];
-            $params['body'][] = [
-                'doc' => $searchableData,
-                'doc_as_upsert' => true
-            ];
-        });
-
-        $this->opensearch->bulk($params);
+        $this->bulkOperation($models, 'update');
     }
 
     /**
-     * Remove the given model from the index.
-     *
-     * @param  Collection  $models
-     * @return void
+     * 删除文档
      */
     public function delete($models)
     {
-        $params['body'] = [];
+        if ($models->isEmpty()) {
+            return;
+        }
 
-        $models->each(function ($model) use (&$params) {
-            $params['body'][] = [
-                'delete' => [
-                    '_id' => $model->getKey(),
-                    '_index' => $model->searchableAs(),
-             //       '_type' => get_class($model),
-                ]
-            ];
-        });
-
-        $this->opensearch->bulk($params);
+        $this->bulkOperation($models, 'delete');
     }
 
     /**
-     * Perform the given search on the engine.
-     *
-     * @param  Builder  $builder
-     * @return mixed
+     * 批量操作
+     */
+    protected function bulkOperation($models, string $operation): void
+    {
+        $params = ['body' => []];
+        $count = 0;
+
+        foreach ($models as $model) {
+            $index = $model->searchableAs();
+            $id = $model->getScoutKey();
+
+            switch ($operation) {
+                case 'update':
+                    // 处理软删除
+                    if ($this->usesSoftDelete($model) && $this->softDelete) {
+                        $model->pushSoftDeleteMetadata();
+                    }
+
+                    $data = $model->toSearchableArray();
+                    if (empty($data)) {
+                        continue 2;
+                    }
+
+                    $params['body'][] = [
+                        'index' => [
+                            '_index' => $index,
+                            '_id' => $id,
+                        ],
+                    ];
+                    $params['body'][] = $data;
+                    break;
+
+                case 'delete':
+                    $params['body'][] = [
+                        'delete' => [
+                            '_index' => $index,
+                            '_id' => $id,
+                        ],
+                    ];
+                    break;
+            }
+
+            $count++;
+
+            // 批量提交
+            if ($count % $this->bulkSize === 0) {
+                $this->executeBulk($params);
+                $params['body'] = [];
+            }
+        }
+
+        // 执行剩余的
+        if (!empty($params['body'])) {
+            $this->executeBulk($params);
+        }
+    }
+
+    /**
+     * 执行批量操作
+     */
+    protected function executeBulk(array $params): void
+    {
+        try {
+            $response = $this->opensearch->bulk($params);
+            
+            if ($response['errors'] ?? false) {
+                $this->handleBulkErrors($response);
+            }
+        } catch (\Exception $e) {
+            Log::error('OpenSearch bulk operation failed', [
+                'error' => $e->getMessage(),
+                'params_count' => count($params['body'] ?? []),
+            ]);
+            
+            if (config('app.debug')) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * 处理批量操作错误
+     */
+    protected function handleBulkErrors(array $response): void
+    {
+        $errors = [];
+
+        foreach ($response['items'] ?? [] as $item) {
+            $operation = array_keys($item)[0];
+            $result = $item[$operation];
+            
+            if (isset($result['error'])) {
+                $errors[] = [
+                    'operation' => $operation,
+                    'id' => $result['_id'] ?? 'unknown',
+                    'error' => is_array($result['error']) 
+                        ? json_encode($result['error'])
+                        : $result['error'],
+                    'index' => $result['_index'] ?? 'unknown',
+                ];
+            }
+        }
+
+        if (!empty($errors)) {
+            Log::error('OpenSearch bulk operation partial errors', [
+                'total_operations' => count($response['items'] ?? []),
+                'error_count' => count($errors),
+                'errors' => $errors,
+            ]);
+        }
+    }
+
+    /**
+     * 执行搜索
      */
     public function search(Builder $builder)
     {
-        return $this->performSearch($builder, array_filter([
-            'numericFilters' => $this->filters($builder),
-            'size' => $builder->limit,
-        ]));
+        return $this->performSearch($builder);
     }
 
     /**
-     * Perform the given search on the engine.
-     *
-     * @param  Builder  $builder
-     * @param  int  $perPage
-     * @param  int  $page
-     * @return mixed
+     * 分页搜索
      */
     public function paginate(Builder $builder, $perPage, $page)
     {
         $result = $this->performSearch($builder, [
-            'numericFilters' => $this->filters($builder),
-            'from' => (($page * $perPage) - $perPage),
+            'from' => ($page - 1) * $perPage,
             'size' => $perPage,
         ]);
+        
         return $result;
     }
 
     /**
-     * Perform the given search on the engine.
-     *
-     * @param  Builder  $builder
-     * @param  array  $options
-     * @return mixed
+     * 执行搜索
      */
     protected function performSearch(Builder $builder, array $options = [])
     {
         $params = [
-            'index' => $builder->model->searchableAs(),
-           // 'type' => get_class($builder->model),
+            'index' => $builder->index ?? $builder->model->searchableAs(),
             'body' => [
-                'query' => [
-                    'bool' => [
-                        'must' => [['query_string' => ['query' => "*{$builder->query}*"]]]
-                    ]
-                ]
-            ]
+                'query' => $this->buildQuery($builder),
+            ],
         ];
 
-        if ($sort = $this->sort($builder)) {
+        // 添加排序
+        if ($sort = $this->buildSort($builder)) {
             $params['body']['sort'] = $sort;
         }
 
+        // 添加分页
         if (isset($options['from'])) {
             $params['body']['from'] = $options['from'];
         }
 
         if (isset($options['size'])) {
             $params['body']['size'] = $options['size'];
+        } elseif ($builder->limit) {
+            $params['body']['size'] = $builder->limit;
         }
 
-        if (isset($options['numericFilters']) && count($options['numericFilters'])) {
-            $params['body']['query']['bool']['must'] = array_merge(
-                $params['body']['query']['bool']['must'],
-                $options['numericFilters']
-            );
+        // 添加过滤条件
+        $filters = $this->buildFilters($builder);
+        if (!empty($filters)) {
+            if (!isset($params['body']['query']['bool'])) {
+                $params['body']['query'] = ['bool' => ['must' => $params['body']['query']]];
+            }
+            $params['body']['query']['bool']['filter'] = $filters;
         }
 
+        // 自定义回调
         if ($builder->callback) {
-            return call_user_func(
-                $builder->callback,
-                $this->opensearch,
-                $builder->query,
-                $params
-            );
+            return call_user_func($builder->callback, $this->opensearch, $builder, $params);
         }
 
         return $this->opensearch->search($params);
     }
 
     /**
-     * Get the filter array for the query.
-     *
-     * @param  Builder  $builder
-     * @return array
+     * 构建查询
      */
-    protected function filters(Builder $builder)
+    protected function buildQuery(Builder $builder): array
     {
-        return collect($builder->wheres)->map(function ($value, $key) {
-            if (is_array($value)) {
-                return ['terms' => [$key => $value]];
-            }
-
-            return ['match_phrase' => [$key => $value]];
-        })->values()->all();
-    }
-
-    /**
-     * Pluck and return the primary keys of the given results.
-     *
-     * @param  mixed  $results
-     * @return \Illuminate\Support\Collection
-     */
-    public function mapIds($results)
-    {
-        return collect($results['hits']['hits'])->pluck('_id')->values();
-    }
-
-    /**
-     * Map the given results to instances of the given model.
-     *
-     * @param  mixed  $results
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return Collection
-     */
-    public function map(Builder $builder, $results, $model)
-    {
-        if ($results['hits']['total'] === 0) {
-            return $model->newCollection();
+        if (empty($builder->query)) {
+            return ['match_all' => new \stdClass()];
         }
 
-        $keys = collect($results['hits']['hits'])->pluck('_id')->values()->all();
+        $fields = $this->getSearchableFields($builder);
 
-        $modelIdPositions = array_flip($keys);
+        if (count($fields) === 1) {
+            return [
+                'match' => [
+                    $fields[0] => [
+                        'query' => $builder->query,
+                        'operator' => 'and',
+                    ],
+                ],
+            ];
+        }
 
-        return $model->getScoutModelsByIds(
-            $builder,
-            $keys
-        )->filter(function ($model) use ($keys) {
-            return in_array($model->getScoutKey(), $keys);
-        })->sortBy(function ($model) use ($modelIdPositions) {
-            return $modelIdPositions[$model->getScoutKey()];
-        })->values();
+        return [
+            'multi_match' => [
+                'query' => $builder->query,
+                'fields' => $fields,
+                'type' => 'best_fields',
+                'operator' => 'and',
+                'fuzziness' => 'AUTO',
+            ],
+        ];
     }
 
     /**
-     * Get the total count from a raw result returned by the engine.
-     *
-     * @param  mixed  $results
-     * @return int
+     * 获取可搜索字段
      */
-    public function getTotalCount($results)
+    protected function getSearchableFields(Builder $builder): array
     {
-        return $results['hits']['total']['value'];
+        // 使用模型定义的搜索字段
+        if (method_exists($builder->model, 'searchableFields')) {
+            $fields = $builder->model->searchableFields();
+            
+            // 如果是键值对格式，提取字段名
+            if (array_values($fields) !== $fields) {
+                return array_keys($fields);
+            }
+            
+            return $fields;
+        }
+
+        // 默认返回所有字段
+        return ['*'];
     }
 
     /**
-     * Flush all of the model's records from the engine.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return void
+     * 构建过滤器
      */
-    public function flush($model)
+    protected function buildFilters(Builder $builder): array
     {
-        $model->newQuery()
-            ->orderBy($model->getKeyName())
-            ->unsearchable();
+        $filters = [];
+
+        // 基本 where 条件
+        foreach ($builder->wheres as $field => $value) {
+            $filters[] = is_array($value)
+                ? ['terms' => [$field => $value]]
+                : ['term' => [$field => $value]];
+        }
+
+        // whereIn 条件
+        foreach ($builder->whereIns as $field => $values) {
+            $filters[] = ['terms' => [$field => $values]];
+        }
+
+        // whereNotIn 条件
+        foreach ($builder->whereNotIns as $field => $values) {
+            $filters[] = [
+                'bool' => [
+                    'must_not' => [
+                        ['terms' => [$field => $values]],
+                    ],
+                ],
+            ];
+        }
+
+        return $filters;
     }
 
     /**
-     * Generates the sort if theres any.
-     *
-     * @param  Builder $builder
-     * @return array|null
+     * 构建排序
      */
-    protected function sort($builder)
+    protected function buildSort(Builder $builder): ?array
     {
-        if (count($builder->orders) == 0) {
+        if (empty($builder->orders)) {
             return null;
         }
 
-        return collect($builder->orders)->map(function ($order) {
-            return [$order['column'] => $order['direction']];
-        })->toArray();
+        $sorts = [];
+
+        foreach ($builder->orders as $order) {
+            $sorts[] = [
+                $order['column'] => [
+                    'order' => $order['direction'],
+                ],
+            ];
+        }
+
+        return $sorts;
     }
+
     /**
-     * Determine if the given model uses soft deletes.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return bool
+     * 映射 ID
      */
-    protected function usesSoftDelete($model)
+    public function mapIds($results)
+    {
+        return Collection::make($results['hits']['hits'] ?? [])
+            ->pluck('_id')
+            ->values();
+    }
+
+    /**
+     * 映射结果到模型
+     */
+    public function map(Builder $builder, $results, $model)
+    {
+        if (($results['hits']['total']['value'] ?? 0) === 0) {
+            return $model->newCollection();
+        }
+
+        $objectIds = $this->mapIds($results)->all();
+        $objectIdPositions = array_flip($objectIds);
+
+        return $model->getScoutModelsByIds($builder, $objectIds)
+            ->filter(fn($model) => in_array($model->getScoutKey(), $objectIds))
+            ->sortBy(fn($model) => $objectIdPositions[$model->getScoutKey()])
+            ->values();
+    }
+
+    /**
+     * 懒加载映射
+     */
+    public function lazyMap(Builder $builder, $results, $model)
+    {
+        if (($results['hits']['total']['value'] ?? 0) === 0) {
+            return LazyCollection::make();
+        }
+
+        $objectIds = $this->mapIds($results)->all();
+
+        return LazyCollection::make(function () use ($builder, $model, $objectIds) {
+            $models = $model->getScoutModelsByIds($builder, $objectIds);
+            
+            foreach ($models as $model) {
+                if (in_array($model->getScoutKey(), $objectIds)) {
+                    yield $model;
+                }
+            }
+        });
+    }
+
+    /**
+     * 获取总数
+     */
+    public function getTotalCount($results)
+    {
+        return $results['hits']['total']['value'] ?? 0;
+    }
+
+    /**
+     * 清空索引
+     */
+    public function flush($model)
+    {
+        $index = $model->searchableAs();
+        
+        try {
+            // 删除并重新创建索引
+            $this->deleteIndex($index);
+            $this->createIndex($index);
+            
+            Log::info('OpenSearch index flushed', ['index' => $index]);
+        } catch (\Exception $e) {
+            Log::error('Failed to flush OpenSearch index', [
+                'index' => $index,
+                'error' => $e->getMessage(),
+            ]);
+            
+            if (config('app.debug')) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * 创建索引
+     */
+    public function createIndex($name, array $options = [])
+    {
+        try {
+            // 检查索引是否存在
+            if ($this->opensearch->indices()->exists(['index' => $name])) {
+                return;
+            }
+
+            $params = ['index' => $name];
+
+            // 合并配置选项
+            if (!empty($options)) {
+                $params['body'] = $options;
+            } else {
+                // 尝试从配置加载
+                $config = config("plugin.erikwang2013.webman-scout.app.opensearch.indices.{$name}", []);
+                if (!empty($config)) {
+                    $params['body'] = $config;
+                } else {
+                    // 默认配置
+                    $params['body'] = [
+                        'settings' => [
+                            'index' => [
+                                'number_of_shards' => 1,
+                                'number_of_replicas' => 1,
+                                'refresh_interval' => '1s',
+                            ],
+                        ],
+                        'mappings' => [
+                            'properties' => [
+                                'created_at' => ['type' => 'date'],
+                                'updated_at' => ['type' => 'date'],
+                            ],
+                        ],
+                    ];
+                }
+            }
+
+            $this->opensearch->indices()->create($params);
+            
+            // 设置别名
+            $this->setupAliases($name, $options['aliases'] ?? []);
+
+            Log::info('OpenSearch index created', ['index' => $name]);
+
+        } catch (\Exception $e) {
+            Log::error('Failed to create OpenSearch index', [
+                'index' => $name,
+                'error' => $e->getMessage(),
+            ]);
+            
+            if (config('app.debug')) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * 设置别名
+     */
+    protected function setupAliases(string $index, array $aliases): void
+    {
+        if (empty($aliases)) {
+            return;
+        }
+
+        $actions = [];
+        
+        foreach ($aliases as $alias) {
+            $actions[] = [
+                'add' => [
+                    'index' => $index,
+                    'alias' => $alias,
+                ],
+            ];
+        }
+
+        try {
+            $this->opensearch->indices()->updateAliases(['body' => ['actions' => $actions]]);
+        } catch (\Exception $e) {
+            Log::warning('Failed to set OpenSearch aliases', [
+                'index' => $index,
+                'aliases' => $aliases,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * 删除索引
+     */
+    public function deleteIndex($name)
+    {
+        try {
+            if ($this->opensearch->indices()->exists(['index' => $name])) {
+                $this->opensearch->indices()->delete(['index' => $name]);
+                Log::info('OpenSearch index deleted', ['index' => $name]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Failed to delete OpenSearch index', [
+                'index' => $name,
+                'error' => $e->getMessage(),
+            ]);
+            
+            if (config('app.debug')) {
+                throw $e;
+            }
+        }
+    }
+
+    /**
+     * 获取索引信息
+     */
+    public function getIndexInfo(string $index): array
+    {
+        try {
+            return $this->opensearch->indices()->get(['index' => $index]);
+        } catch (\Exception $e) {
+            return [];
+        }
+    }
+
+    /**
+     * 检查索引是否存在
+     */
+    public function indexExists(string $index): bool
+    {
+        try {
+            return $this->opensearch->indices()->exists(['index' => $index]);
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * 更新索引设置
+     */
+    public function updateIndexSettings(string $index, array $settings): bool
+    {
+        try {
+            $this->opensearch->indices()->putSettings([
+                'index' => $index,
+                'body' => $settings,
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to update OpenSearch index settings', [
+                'index' => $index,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * 更新映射
+     */
+    public function updateIndexMappings(string $index, array $mappings): bool
+    {
+        try {
+            $this->opensearch->indices()->putMapping([
+                'index' => $index,
+                'body' => $mappings,
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            Log::error('Failed to update OpenSearch index mappings', [
+                'index' => $index,
+                'error' => $e->getMessage(),
+            ]);
+            return false;
+        }
+    }
+
+    /**
+     * 检查是否使用软删除
+     */
+    protected function usesSoftDelete($model): bool
     {
         return in_array(\Illuminate\Database\Eloquent\SoftDeletes::class, class_uses_recursive($model));
     }
+
     /**
-     * Dynamically call the MeiliSearch client instance.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
+     * 获取 OpenSearch 客户端
+     */
+    public function getClient(): Client
+    {
+        return $this->opensearch;
+    }
+
+    /**
+     * 设置批量操作大小
+     */
+    public function setBulkSize(int $size): self
+    {
+        $this->bulkSize = $size;
+        return $this;
+    }
+
+    /**
+     * 动态调用 OpenSearch 客户端方法
      */
     public function __call($method, $parameters)
     {

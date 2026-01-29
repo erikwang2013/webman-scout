@@ -4,7 +4,6 @@ namespace Erikwang2013\WebmanScout\Command;
 
 use Exception;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Erikwang2013\WebmanScout\EngineManager;
