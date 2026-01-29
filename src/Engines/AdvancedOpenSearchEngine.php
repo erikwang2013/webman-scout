@@ -8,9 +8,7 @@ use OpenSearch\Client;
 
 class AdvancedOpenSearchEngine extends OpenSearchEngine
 {
-    public function __construct(Client $opensearch, bool $softDelete = false){
-        parent:: __construct($opensearch,$softDelete);
-    }
+
     /**
      * 执行高级搜索
      */

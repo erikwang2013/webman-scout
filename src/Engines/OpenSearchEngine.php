@@ -2,7 +2,7 @@
 
 namespace Erikwang2013\WebmanScout\Engines;
 
-use Erikwang2013\WebmanScout\Builder;
+use Erikwang2013\WebmanScout\AdvancedScoutBuilder as Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\LazyCollection;
 use OpenSearch\Client;

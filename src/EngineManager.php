@@ -18,7 +18,7 @@ use Meilisearch\Meilisearch;
 use Typesense\Client as Typesense;
 
 use Erikwang2013\WebmanScout\Engines\ElasticSearchEngine;
-use Erikwang2013\WebmanScout\Engines\AdvancedOpenSearchEngine;
+use Erikwang2013\WebmanScout\Engines\AdvancedOpenSearchEngine as OpenSearchEngine;
 use Elastic\Elasticsearch\Client as ElasticSearch;
 use Elastic\Elasticsearch\ClientBuilder;
 use Erikwang2013\WebmanScout\Engines\XunSearchEngine;
@@ -232,7 +232,7 @@ class EngineManager extends Manager
             $setConfig['cert'] = base_path() . $config['ssl_cert'];
             $setConfig['key'] = base_path() . $config['ssl_key'];
         }
-        return new AdvancedOpenSearchEngine(
+        return new OpenSearchEngine(
             $clientFactory->create($setConfig),
             config('plugin.erikwang2013.webman-scout.app.soft_delete', false)
         );

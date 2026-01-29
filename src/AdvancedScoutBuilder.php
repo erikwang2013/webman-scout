@@ -162,7 +162,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
      * @param array $options 排序选项
      * @return $this
      */
-    public function orderBy(string $field, string $direction = 'asc', array $options = []): self
+    /* public function orderBy(string $field, string $direction = 'asc', array $options = []): self
     {
         $this->sorts[] = [
             'field' => $field,
@@ -171,7 +171,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
         ];
 
         return $this;
-    }
+    } */
 
     /**
      * 按向量相似度排序
