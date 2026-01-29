@@ -24,27 +24,22 @@ class AdvancedScoutBuilder extends ScoutBuilder
     protected array $sorts = [];
 
     /**
-     * 结果处理回调
+     * 结果处理器
      */
     protected array $resultProcessors = [];
 
     /**
-     * 聚合查询配置
+     * 聚合配置
      */
     protected array $aggregations = [];
 
     /**
-     * 分面搜索配置
+     * 分面配置
      */
     protected array $facets = [];
 
     /**
      * 启用向量相似度搜索
-     *
-     * @param array|string $vector 向量数据或向量字段名
-     * @param string|null $vectorField 向量字段名（如果第一个参数是数组）
-     * @param array $options 向量搜索选项
-     * @return $this
      */
     public function vectorSearch($vector, ?string $vectorField = null, array $options = []): self
     {
@@ -53,7 +48,7 @@ class AdvancedScoutBuilder extends ScoutBuilder
                 'vector' => $vector,
                 'field' => $vectorField,
                 'options' => array_merge([
-                    'metric' => 'cosine', // cosine, euclidean, dotproduct
+                    'metric' => 'cosine',
                     'top_k' => 10,
                     'threshold' => 0.7,
                 ], $options),
@@ -70,13 +65,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 添加嵌套/复杂查询条件
-     *
-     * @param string $field
-     * @param string $operator
-     * @param mixed $value
-     * @param string $boolean 'and'|'or'
-     * @param bool $nested 是否嵌套查询
-     * @return $this
      */
     public function whereAdvanced(
         string $field,
@@ -98,11 +86,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 范围查询
-     *
-     * @param string $field
-     * @param array $range [min, max]
-     * @param bool $inclusive 是否包含边界
-     * @return $this
      */
     public function whereRange(string $field, array $range, bool $inclusive = true): self
     {
@@ -114,12 +97,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 地理位置查询
-     *
-     * @param string $field
-     * @param float $lat 纬度
-     * @param float $lng 经度
-     * @param float $radius 半径（公里）
-     * @return $this
      */
     public function whereGeoDistance(string $field, float $lat, float $lng, float $radius): self
     {
@@ -132,11 +109,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 全文搜索增强
-     *
-     * @param string $query
-     * @param array $fields 搜索字段
-     * @param array $options 搜索选项
-     * @return $this
      */
     public function fulltextSearch(string $query, array $fields = [], array $options = []): self
     {
@@ -156,13 +128,8 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 添加排序
-     *
-     * @param string $field 排序字段
-     * @param string $direction asc|desc
-     * @param array $options 排序选项
-     * @return $this
      */
-    /* public function orderBy(string $field, string $direction = 'asc', array $options = []): self
+    public function orderBy(string $field, string $direction = 'asc', array $options = []): self
     {
         $this->sorts[] = [
             'field' => $field,
@@ -171,14 +138,10 @@ class AdvancedScoutBuilder extends ScoutBuilder
         ];
 
         return $this;
-    } */
+    }
 
     /**
      * 按向量相似度排序
-     *
-     * @param array $vector 参考向量
-     * @param string|null $vectorField 向量字段
-     * @return $this
      */
     public function orderByVectorSimilarity(array $vector, ?string $vectorField = null): self
     {
@@ -192,10 +155,22 @@ class AdvancedScoutBuilder extends ScoutBuilder
     }
 
     /**
+     * 按地理位置距离排序
+     */
+    public function orderByGeoDistance(string $field, float $lat, float $lng, string $direction = 'asc'): self
+    {
+        $this->sorts[] = [
+            'type' => 'geo_distance',
+            'field' => $field,
+            'location' => ['lat' => $lat, 'lng' => $lng],
+            'direction' => $direction,
+        ];
+
+        return $this;
+    }
+
+    /**
      * 添加结果处理器
-     *
-     * @param callable $processor
-     * @return $this
      */
     public function addResultProcessor(callable $processor): self
     {
@@ -206,12 +181,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 添加聚合查询
-     *
-     * @param string $name 聚合名称
-     * @param string $type 聚合类型：terms, range, histogram, etc.
-     * @param string $field 聚合字段
-     * @param array $options 聚合选项
-     * @return $this
      */
     public function aggregate(string $name, string $type, string $field, array $options = []): self
     {
@@ -226,10 +195,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 添加分面搜索
-     *
-     * @param string $field 分面字段
-     * @param array $options 分面选项
-     * @return $this
      */
     public function facet(string $field, array $options = []): self
     {
@@ -240,43 +205,43 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 执行搜索并获取结果
-     *
-     * @return Collection
      */
     public function get(): Collection
     {
-        $results = parent::get();
+        $engine = $this->engine();
 
-        // 应用结果处理器
-        foreach ($this->resultProcessors as $processor) {
-            $results = $processor($results);
+        // 检查引擎是否支持高级搜索
+        if (method_exists($engine, 'advancedSearch')) {
+            $results = $engine->advancedSearch($this);
+            
+            // 应用结果处理器
+            foreach ($this->resultProcessors as $processor) {
+                $results = $processor($results);
+            }
+            
+            return $this->mapResults($results);
         }
 
-        return $results;
+        // 回退到基础搜索
+        return parent::get();
     }
 
     /**
-     * 执行搜索并获取原始引擎结果
-     *
-     * @return array
+     * 执行搜索并获取原始结果
      */
     public function raw(): array
     {
         $engine = $this->engine();
 
-        // 检查引擎是否支持高级功能
         if (method_exists($engine, 'advancedSearch')) {
             return $engine->advancedSearch($this);
         }
 
-        // 回退到原始搜索
         return parent::raw();
     }
 
     /**
      * 获取聚合结果
-     *
-     * @return array
      */
     public function getAggregations(): array
     {
@@ -291,8 +256,6 @@ class AdvancedScoutBuilder extends ScoutBuilder
 
     /**
      * 获取分面结果
-     *
-     * @return array
      */
     public function getFacets(): array
     {
@@ -306,49 +269,97 @@ class AdvancedScoutBuilder extends ScoutBuilder
     }
 
     /**
-     * 获取向量搜索参数
+     * 映射搜索结果
      */
+    protected function mapResults(array $results): Collection
+    {
+        if (empty($results['hits'])) {
+            return $this->model->newCollection();
+        }
+
+        $objectIds = collect($results['hits'])->pluck('_id')->all();
+        
+        if (empty($objectIds)) {
+            return $this->model->newCollection();
+        }
+
+        $objectIdPositions = array_flip($objectIds);
+
+        $models = $this->model->getScoutModelsByIds($this, $objectIds)
+            ->filter(fn($model) => in_array($model->getScoutKey(), $objectIds))
+            ->sortBy(fn($model) => $objectIdPositions[$model->getScoutKey()])
+            ->values();
+
+        // 添加元数据
+        foreach ($models as $index => $model) {
+            if (isset($results['hits'][$index])) {
+                $hit = $results['hits'][$index];
+                $model->_score = $hit['_score'] ?? null;
+                $model->_highlight = $hit['_highlight'] ?? null;
+                $model->_vector_score = $hit['_vector_score'] ?? null;
+            }
+        }
+
+        return $models;
+    }
+
+    /**
+     * Getter 方法
+     */
+
     public function getVectorSearch(): array
     {
         return $this->vectorSearch;
     }
 
-    /**
-     * 获取高级查询条件
-     */
     public function getAdvancedWheres(): array
     {
         return $this->advancedWheres;
     }
 
-    /**
-     * 获取排序配置
-     */
     public function getSorts(): array
     {
         return $this->sorts;
     }
 
-    /**
-     * 获取聚合配置
-     */
+    public function getResultProcessors(): array
+    {
+        return $this->resultProcessors;
+    }
+
     public function getAggregationConfig(): array
     {
         return $this->aggregations;
     }
 
-    /**
-     * 获取分面配置
-     */
     public function getFacetConfig(): array
     {
         return $this->facets;
     }
 
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
+     * Setter 方法
+     */
+
+    public function setOption(string $key, $value): self
+    {
+        $this->options[$key] = $value;
+        return $this;
+    }
+
+    public function setOptions(array $options): self
+    {
+        $this->options = array_merge($this->options, $options);
+        return $this;
+    }
+
     /**
      * 清空高级查询条件
-     *
-     * @return $this
      */
     public function clearAdvancedConditions(): self
     {
@@ -360,5 +371,48 @@ class AdvancedScoutBuilder extends ScoutBuilder
         $this->resultProcessors = [];
 
         return $this;
+    }
+
+    /**
+     * 条件构造辅助方法
+     */
+
+    public function when($condition, callable $callback, ?callable $default = null): self
+    {
+        if ($condition) {
+            return $callback($this, $condition) ?? $this;
+        } elseif ($default) {
+            return $default($this, $condition) ?? $this;
+        }
+
+        return $this;
+    }
+
+    public function unless($condition, callable $callback, ?callable $default = null): self
+    {
+        return $this->when(!$condition, $callback, $default);
+    }
+
+    /**
+     * 调试方法
+     */
+    public function debug(): array
+    {
+        return [
+            'model' => get_class($this->model),
+            'query' => $this->query,
+            'index' => $this->index,
+            'wheres' => $this->wheres,
+            'whereIns' => $this->whereIns,
+            'whereNotIns' => $this->whereNotIns,
+            'advancedWheres' => $this->advancedWheres,
+            'vectorSearch' => $this->vectorSearch,
+            'sorts' => $this->sorts,
+            'aggregations' => $this->aggregations,
+            'facets' => $this->facets,
+            'options' => $this->options,
+            'limit' => $this->limit,
+            'offset' => $this->offset,
+        ];
     }
 }
