@@ -3,6 +3,7 @@
 namespace Erikwang2013\WebmanScout\Engines;
 
 use Erikwang2013\WebmanScout\Builder;
+use Erikwang2013\WebmanScout\AdvancedScoutBuilder;
 
 abstract class Engine
 {
@@ -100,6 +101,23 @@ abstract class Engine
      * @return mixed
      */
     abstract public function deleteIndex($name);
+
+    abstract public function advancedSearch(AdvancedScoutBuilder $builder);
+    abstract public function deleteIndex($name);
+    abstract public function getIndexInfo(string $index);
+    abstract public function indexExists(string $index);
+    abstract public function updateIndexSettings(string $index, array $settings);
+    abstract public function updateIndexMappings(string $index, array $mappings);
+    abstract public function getClient();
+    abstract public function setBulkSize(int $size);
+    abstract public function getAggregations(AdvancedScoutBuilder $builder);
+    abstract public function getFacets(AdvancedScoutBuilder $builder);
+    abstract public function updateVectors($models, array $vectors);
+    abstract public function createVectorIndex(string $index, int $dimensions = 1536, array $settings = []);
+    abstract public function knnSearch(string $index, array $vector, int $k = 10, array $filter = null);
+    abstract public function hybridSearch(string $index, string $query, array $vector, float $alpha = 0.5, int $k = 10);
+    abstract public function getEngineInfo();
+
 
     /**
      * Pluck and return the primary keys of the given results using the given key name.

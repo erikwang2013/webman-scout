@@ -4,7 +4,7 @@ namespace Erikwang2013\WebmanScout;
 
 use Erikwang2013\WebmanScout\Builder as ScoutBuilder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\LazyCollection;
+
 
 class AdvancedScoutBuilder extends ScoutBuilder
 {
