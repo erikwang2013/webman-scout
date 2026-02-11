@@ -581,16 +581,6 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
         return $suggest;
     }
 
-    /**
-     * 获取总数（兼容高级搜索处理后的结果格式）
-     */
-    public function getTotalCount($results)
-    {
-        if (isset($results['total']) && is_numeric($results['total'])) {
-            return (int) $results['total'];
-        }
-        return parent::getTotalCount($results);
-    }
 
     /**
      * 处理高级搜索结果

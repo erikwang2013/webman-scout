@@ -22,7 +22,7 @@ use Erikwang2013\WebmanScout\Engines\AdvancedOpenSearchEngine as OpenSearchEngin
 use Elastic\Elasticsearch\Client as ElasticSearch;
 use Elastic\Elasticsearch\ClientBuilder;
 use Erikwang2013\WebmanScout\Engines\XunSearchEngine;
-use OpenSearch\Client  as OpenSearch;;
+use OpenSearch\Client as OpenSearch;
 use OpenSearch\GuzzleClientFactory;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Handler\CurlHandler;
@@ -115,14 +115,18 @@ class EngineManager extends Manager
 
         $headers = [];
 
-        if (! config('app.debug') &&
-            filter_var($ip = request()->ip(), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)
-        ) {
-            $headers['X-Forwarded-For'] = $ip;
-        }
-
-        if (($user = request()->user()) && method_exists($user, 'getKey')) {
-            $headers['X-Algolia-UserToken'] = $user->getKey();
+        try {
+            $request = function_exists('request') ? request() : null;
+            if ($request && ! config('app.debug')
+                && filter_var($ip = $request->ip(), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)
+            ) {
+                $headers['X-Forwarded-For'] = $ip;
+            }
+            if ($request && ($user = $request->user()) && method_exists($user, 'getKey')) {
+                $headers['X-Algolia-UserToken'] = $user->getKey();
+            }
+        } catch (\Throwable $e) {
+            // CLI 或非 HTTP 环境下无 request，忽略
         }
 
         return $headers;
@@ -159,7 +163,7 @@ class EngineManager extends Manager
         throw new Exception('Please install the suggested Meilisearch client: meilisearch/meilisearch-php.');
     }
 
-     /**
+    /**
      * Create an ElasticSearch engine instance.
      *
      * @return \Erikwang2013\WebmanScout\Engines\ElasticSearchEngine
@@ -169,23 +173,24 @@ class EngineManager extends Manager
         $config = config('plugin.erikwang2013.webman-scout.app.elasticsearch');
 
         $this->ensureElasticSearchClientIsInstalled();
-        $clientBuilder = ClientBuilder::create()->setHosts($config['hosts']);
+        $clientBuilder = ClientBuilder::create()->setHosts($config['hosts'] ?? ['http://127.0.0.1:9200']);
 
-        if(!empty($config['auth'])){
-            if(!empty($config['auth']['user']) && $config['auth']['user'] !== null &&
-                !empty($config['auth']['pass']) && $config['auth']['pass'] !== null
-            ){
+        if (!empty($config['auth'])) {
+            if (!empty($config['auth']['user']) && $config['auth']['user'] !== null
+                && !empty($config['auth']['pass']) && $config['auth']['pass'] !== null
+            ) {
                 $clientBuilder->setBasicAuthentication($config['auth']['user'], $config['auth']['pass']);
             }
             if (!empty($config['auth']['api_key']) && $config['auth']['api_key'] !== null) {
-                $clientBuilder->setApiKey( $config['auth']['api_key'],$config['auth']['api_id'] ?? null);
+                $clientBuilder->setApiKey($config['auth']['api_key'], $config['auth']['api_id'] ?? null);
             }
             if (!empty($config['auth']['cloud_id']) && $config['auth']['cloud_id'] !== null) {
-                $clientBuilder->setElasticCloudId( $config['auth']['cloud_id']);
+                $clientBuilder->setElasticCloudId($config['auth']['cloud_id']);
             }
         }
+
         return new ElasticSearchEngine(
-            $clientFactory->create($setConfig),
+            $clientBuilder->build(),
             config('plugin.erikwang2013.webman-scout.app.soft_delete', false)
         );
     }

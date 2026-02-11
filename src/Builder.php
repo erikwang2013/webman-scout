@@ -255,23 +255,6 @@ class Builder
     }
 
     /**
-     * Add an "order" for the search query.
-     *
-     * @param  string  $column
-     * @param  string  $direction
-     * @return $this
-     */
-   /*  public function orderBy($column, $direction = 'asc')
-    {
-        $this->orders[] = [
-            'column' => $column,
-            'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
-        ];
-
-        return $this;
-    } */
-
-    /**
      * Add a descending "order by" clause to the search query.
      *
      * @param  string  $column
@@ -677,10 +660,11 @@ class Builder
      */
     public function fulltextSearch(string $query, array $fields = [], array $options = []): self
     {
+        $searchFields = $fields ?: (method_exists($this->model, 'searchableFields') ? $this->model->searchableFields() : []);
         $this->advancedWheres[] = [
             'type' => 'fulltext',
             'query' => $query,
-            'fields' => $fields ?: $this->model->searchableFields(),
+            'fields' => $searchFields,
             'options' => array_merge([
                 'operator' => 'and',
                 'fuzziness' => 'auto',
@@ -692,10 +676,15 @@ class Builder
     }
 
     /**
-     * 添加排序
+     * 添加排序（同时写入 orders 与 sorts，兼容基础引擎与高级引擎）
      */
     public function orderBy(string $field, string $direction = 'asc', array $options = []): self
     {
+        $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
+        $this->orders[] = [
+            'column' => $field,
+            'direction' => $direction,
+        ];
         $this->sorts[] = [
             'field' => $field,
             'direction' => $direction,

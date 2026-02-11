@@ -325,25 +325,38 @@ class OpenSearchEngine extends Engine
     }
 
     /**
-     * 构建排序
+     * 构建排序（优先 orders，无则从 getSorts 转换，兼容高级 Builder）
      */
     protected function buildSort(Builder $builder): ?array
     {
-        if (empty($builder->orders)) {
-            return null;
+        if (!empty($builder->orders)) {
+            $sorts = [];
+            foreach ($builder->orders as $order) {
+                $sorts[] = [
+                    $order['column'] => [
+                        'order' => $order['direction'] ?? 'asc',
+                    ],
+                ];
+            }
+            return $sorts;
         }
 
-        $sorts = [];
-
-        foreach ($builder->orders as $order) {
-            $sorts[] = [
-                $order['column'] => [
-                    'order' => $order['direction'],
-                ],
-            ];
+        if (method_exists($builder, 'getSorts')) {
+            $sorts = $builder->getSorts();
+            if (!empty($sorts)) {
+                $out = [];
+                foreach ($sorts as $s) {
+                    $field = $s['field'] ?? null;
+                    $dir = isset($s['direction']) ? strtolower($s['direction']) : 'asc';
+                    if ($field !== null) {
+                        $out[] = [$field => ['order' => $dir === 'desc' ? 'desc' : 'asc']];
+                    }
+                }
+                return $out ?: null;
+            }
         }
 
-        return $sorts;
+        return null;
     }
 
     /**
@@ -397,11 +410,15 @@ class OpenSearchEngine extends Engine
     }
 
     /**
-     * 获取总数
+     * 获取总数（兼容 OpenSearch/ES 2.x：total 可为 int 或 ['value' => n, 'relation' => 'eq']）
      */
     public function getTotalCount($results)
     {
-        return $results['hits']['total']['value'] ?? 0;
+        $total = $results['hits']['total'] ?? 0;
+        if (is_array($total) && isset($total['value'])) {
+            return (int) $total['value'];
+        }
+        return (int) $total;
     }
 
     /**
