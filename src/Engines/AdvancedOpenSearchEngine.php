@@ -99,18 +99,23 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
             ];
         }
 
-        // 处理基本 where 条件
+        // 处理基本 where 条件（确保不向 OpenSearch 传入字符串 "false"/"true"，避免 query_shard_exception）
         foreach ($builder->wheres as $field => $value) {
+            $value = $this->coerceTermValue($value);
+            if ($value === null) {
+                continue;
+            }
             $query['bool']['filter'][] = is_array($value)
-                ? ['terms' => [$field => $value]]
+                ? ['terms' => [$field => array_values(array_map([$this, 'coerceTermValue'], $value))]]
                 : ['term' => [$field => $value]];
         }
 
-        // 处理高级 where 条件
+        // 处理高级 where 条件（OpenSearch bool 只支持 must/filter/should/must_not，将 and/or/not 映射过去）
         foreach ($builder->getAdvancedWheres() as $condition) {
             $queryClause = $this->buildAdvancedCondition($condition);
             if ($queryClause) {
-                $query['bool'][$condition['boolean'] ?? 'filter'][] = $queryClause;
+                $boolKey = $this->mapBooleanToBoolKey($condition['boolean'] ?? 'and');
+                $query['bool'][$boolKey][] = $queryClause;
             }
         }
 
@@ -133,6 +138,64 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
     }
 
     /**
+     * 构建 range 条件，仅包含有效数值，避免 "false"/false 导致 query_shard_exception；无效时返回 null 以跳过该条件
+     */
+    protected function buildRangeCondition(string $field, $gte, $lte, float $boost = 1.0): ?array
+    {
+        $clause = [];
+        if ($gte !== null && $gte !== false && $gte !== 'false' && (is_numeric($gte) || $gte instanceof \DateTimeInterface)) {
+            $clause['gte'] = is_numeric($gte) ? (strpos((string)$gte, '.') !== false ? (float)$gte : (int)$gte) : $gte->getTimestamp();
+        }
+        if ($lte !== null && $lte !== false && $lte !== 'false' && (is_numeric($lte) || $lte instanceof \DateTimeInterface)) {
+            $clause['lte'] = is_numeric($lte) ? (strpos((string)$lte, '.') !== false ? (float)$lte : (int)$lte) : $lte->getTimestamp();
+        }
+        if ($clause === []) {
+            return null;
+        }
+        if ($boost !== 1.0) {
+            $clause['boost'] = $boost;
+        }
+        return ['range' => [$field => $clause]];
+    }
+
+    /**
+     * 规整 term/terms 的值，避免传入 "false"/"true" 导致 query_shard_exception
+     */
+    protected function coerceTermValue(mixed $value): mixed
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (is_array($value)) {
+            return $value;
+        }
+        if ($value === false || $value === 'false') {
+            return 0;
+        }
+        if ($value === true || $value === 'true') {
+            return 1;
+        }
+        if (is_numeric($value)) {
+            return strpos((string)$value, '.') !== false ? (float)$value : (int)$value;
+        }
+        return $value;
+    }
+
+    /**
+     * 将 Laravel 风格 boolean（and/or/not）映射为 OpenSearch bool 合法键
+     * OpenSearch bool 仅支持: must, filter, should, must_not
+     */
+    protected function mapBooleanToBoolKey(string $boolean): string
+    {
+        return match (strtolower($boolean)) {
+            'or' => 'should',
+            'not' => 'must_not',
+            'and', 'must', 'filter' => 'filter',
+            default => 'filter',
+        };
+    }
+
+    /**
      * 构建高级条件
      */
     protected function buildAdvancedCondition(array $condition): ?array
@@ -143,15 +206,12 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
         $options = $condition['options'] ?? [];
 
         return match($operator) {
-            'range' => [
-                'range' => [
-                    $field => [
-                        'gte' => $value['range'][0] ?? null,
-                        'lte' => $value['range'][1] ?? null,
-                        'boost' => $options['boost'] ?? 1.0,
-                    ],
-                ],
-            ],
+            'range' => $this->buildRangeCondition(
+                $field,
+                $value['range'][0] ?? null,
+                $value['range'][1] ?? null,
+                $options['boost'] ?? 1.0
+            ),
             'date_range' => [
                 'range' => [
                     $field => [
@@ -522,6 +582,17 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
     }
 
     /**
+     * 获取总数（兼容高级搜索处理后的结果格式）
+     */
+    public function getTotalCount($results)
+    {
+        if (isset($results['total']) && is_numeric($results['total'])) {
+            return (int) $results['total'];
+        }
+        return parent::getTotalCount($results);
+    }
+
+    /**
      * 处理高级搜索结果
      */
     protected function processAdvancedResults(array $result, AdvancedScoutBuilder $builder): array
@@ -856,6 +927,17 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
         }
 
         return parent::map($builder, $results, $model);
+    }
+
+    /**
+     * 获取总数（兼容高级搜索处理后的结果格式）
+     */
+    public function getTotalCount($results)
+    {
+        if (isset($results['total']) && is_numeric($results['total'])) {
+            return (int) $results['total'];
+        }
+        return parent::getTotalCount($results);
     }
 
     /**
