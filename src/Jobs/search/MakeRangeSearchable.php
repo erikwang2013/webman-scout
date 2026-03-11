@@ -23,17 +23,22 @@ class MakeRangeSearchable implements Consumer
      */
     public function consume($data)
     {
-
-        $model = new $data['model'];
+        if (empty($data['model']) || !isset($data['start']) || !isset($data['end'])) {
+            return;
+        }
+        $model = new $data['model']();
 
         $models = $model::makeAllSearchableQuery()
-            ->whereBetween($model->getScoutKeyName(), [$data['start'], $data['end']])
+            ->whereBetween($model->getScoutKeyName(), [(int) $data['start'], (int) $data['end']])
             ->get()
-            ->filter
-            ->shouldBeSearchable();
+            ->filter(function ($m) {
+                return $m->shouldBeSearchable();
+            });
 
         if ($models->isEmpty()) {
             return;
         }
+
+        $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
     }
 }
