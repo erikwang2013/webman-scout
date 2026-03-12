@@ -117,7 +117,8 @@ class EngineManager extends Manager
 
         try {
             $request = function_exists('request') ? request() : null;
-            if ($request && ! config('app.debug')
+            if (
+                $request && ! config('app.debug')
                 && filter_var($ip = $request->ip(), FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)
             ) {
                 $headers['X-Forwarded-For'] = $ip;
@@ -176,7 +177,8 @@ class EngineManager extends Manager
         $clientBuilder = ClientBuilder::create()->setHosts($config['hosts'] ?? ['http://127.0.0.1:9200']);
 
         if (!empty($config['auth'])) {
-            if (!empty($config['auth']['user']) && $config['auth']['user'] !== null
+            if (
+                !empty($config['auth']['user']) && $config['auth']['user'] !== null
                 && !empty($config['auth']['pass']) && $config['auth']['pass'] !== null
             ) {
                 $clientBuilder->setBasicAuthentication($config['auth']['user'], $config['auth']['pass']);
@@ -234,8 +236,12 @@ class EngineManager extends Manager
         ];
 
         if (true == $config['ssl_verification']) {
-            $setConfig['cert'] = base_path() . $config['ssl_cert'];
-            $setConfig['key'] = base_path() . $config['ssl_key'];
+            if (!empty($config['ssl_cert'])) {
+                $setConfig['cert'] = str_starts_with($config['ssl_cert'], '/') ? $config['ssl_cert'] : base_path() . $config['ssl_cert'];
+            }
+            if (!empty($config['ssl_key'])) {
+                $setConfig['key'] = str_starts_with($config['ssl_key'], '/') ? $config['ssl_key'] : base_path() . $config['ssl_key'];
+            }
         }
         return new OpenSearchEngine(
             $clientFactory->create($setConfig),
