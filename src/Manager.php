@@ -102,7 +102,8 @@ abstract class Manager
         } else {
             $method = 'create'.Str::studly($driver).'Driver';
 
-            if (method_exists($this, $method)) {
+            // 驱动名恰好为 "driver" 时会生成 createDriver，与父类 createDriver($driver) 冲突，不可无参调用
+            if (method_exists($this, $method) && $method !== 'createDriver') {
                 return $this->$method();
             }
         }

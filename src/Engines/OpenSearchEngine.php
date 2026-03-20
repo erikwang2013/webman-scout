@@ -82,6 +82,11 @@ class OpenSearchEngine extends Engine
                         continue 2;
                     }
 
+                    $data = $this->sanitizeDocumentForBulk($data);
+                    if ($data === [] || $data === null) {
+                        continue 2;
+                    }
+
                     $params['body'][] = [
                         'index' => [
                             '_index' => $index,
@@ -114,6 +119,42 @@ class OpenSearchEngine extends Engine
         if (!empty($params['body'])) {
             $this->executeBulk($params);
         }
+    }
+
+    /**
+     * 清洗可索引文档，避免 json_encode 报 JSON_ERROR_CTRL_CHAR / UTF-8 问题导致 bulk 失败。
+     */
+    protected function sanitizeDocumentForBulk(mixed $data): mixed
+    {
+        if (is_array($data)) {
+            $out = [];
+            foreach ($data as $k => $v) {
+                $key = is_string($k) ? $this->sanitizeStringForOpenSearch($k) : $k;
+                $out[$key] = $this->sanitizeDocumentForBulk($v);
+            }
+
+            return $out;
+        }
+        if (is_string($data)) {
+            return $this->sanitizeStringForOpenSearch($data);
+        }
+        if (is_float($data) && (is_nan($data) || is_infinite($data))) {
+            return null;
+        }
+
+        return $data;
+    }
+
+    /**
+     * 去掉 C0 控制字符（保留 \t \n \r），并尽量修复非法 UTF-8。
+     */
+    protected function sanitizeStringForOpenSearch(string $s): string
+    {
+        if (!mb_check_encoding($s, 'UTF-8')) {
+            $s = mb_convert_encoding($s, 'UTF-8', 'UTF-8');
+        }
+
+        return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $s);
     }
 
     /**

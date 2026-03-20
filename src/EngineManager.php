@@ -374,8 +374,13 @@ class EngineManager extends Manager
      */
     public function getDefaultDriver()
     {
-        if (is_null($driver = config('plugin.erikwang2013.webman-scout.app.driver'))) {
+        $driver = config('plugin.erikwang2013.webman-scout.app.driver');
+        if ($driver === null) {
             return 'null';
+        }
+        // getenv 误用等会导致 false/空串，避免进入 Str::studly 与 createDriver 冲突
+        if ($driver === false || $driver === '') {
+            return 'opensearch';
         }
 
         return $driver;
