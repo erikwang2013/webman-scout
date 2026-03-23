@@ -240,7 +240,7 @@ class EngineManager extends Manager
                 $setConfig['cert'] = str_starts_with($config['ssl_cert'], '/') ? $config['ssl_cert'] : base_path() . $config['ssl_cert'];
             }
             if (!empty($config['ssl_key'])) {
-                $setConfig['key'] = str_starts_with($config['ssl_key'], '/') ? $config['ssl_key'] : base_path() . $config['ssl_key'];
+                $setConfig['ssl_key'] = str_starts_with($config['ssl_key'], '/') ? $config['ssl_key'] : base_path() . $config['ssl_key'];
             }
         }
         return new OpenSearchEngine(
