@@ -51,7 +51,7 @@ class ElasticSearchEngine extends Engine
             'index' => $name,
         ];
 
-        if(empty($options) && $config = config('plugin.erikwang2013.webman-scout.app.elasticsearch.'.$name)) {
+        if(empty($options) && $config = scout_config('elasticsearch.'.$name)) {
             if (isset($config['settings'])) {
                 $params['body']['settings'] = $config['settings'];
             }

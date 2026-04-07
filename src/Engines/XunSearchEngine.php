@@ -87,7 +87,7 @@ class XunSearchEngine extends Engine
         }
 
         // 刷新索引（可选，根据性能需求调整）
-        if (config('plugin.erikwang2013.webman-scout.app.xunsearch.auto_flush', true)) {
+        if (scout_config('xunsearch.auto_flush', true)) {
             $index->flushIndex();
         }
     }

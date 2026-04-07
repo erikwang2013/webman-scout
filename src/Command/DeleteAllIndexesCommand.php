@@ -34,7 +34,7 @@ class DeleteAllIndexesCommand extends Command
     {
         $engine = app(EngineManager::class)->engine();
 
-        $driver = config('plugin.erikwang2013.webman-scout.app.driver');
+        $driver = scout_config('driver');
 
         if (! method_exists($engine, 'deleteAllIndexes')) {
             return $output->writeln('The ['.$driver.'] engine does not support deleting all indexes.');

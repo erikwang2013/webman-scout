@@ -505,7 +505,7 @@ class OpenSearchEngine extends Engine
                 $params['body'] = $options;
             } else {
                 // 尝试从配置加载
-                $config = config("plugin.erikwang2013.webman-scout.app.opensearch.indices.{$name}", []);
+                $config = scout_config("opensearch.indices.{$name}", []);
                 if (!empty($config)) {
                     $params['body'] = $config;
                 } else {

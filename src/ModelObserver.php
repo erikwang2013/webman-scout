@@ -42,8 +42,8 @@ class ModelObserver
      */
     public function __construct()
     {
-        $this->afterCommit =config('plugin.erikwang2013.webman-scout.app.after_commit', false);
-        $this->usingSoftDeletes = config('plugin.erikwang2013.webman-scout.app.soft_delete', false);
+        $this->afterCommit =scout_config('after_commit', false);
+        $this->usingSoftDeletes = scout_config('soft_delete', false);
     }
 
     /**

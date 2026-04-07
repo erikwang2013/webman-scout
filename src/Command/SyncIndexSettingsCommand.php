@@ -41,7 +41,7 @@ class SyncIndexSettingsCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $driver =  $input->getOption('driver') ?: config('plugin.erikwang2013.webman-scout.app.driver');
+        $driver =  $input->getOption('driver') ?: scout_config('driver');
 
         $engine = app(EngineManager::class)->engine($driver);
 
@@ -51,7 +51,7 @@ class SyncIndexSettingsCommand extends Command
         }
 
         try {
-            $indexes = (array) config('plugin.erikwang2013.webman-scout.app.' . $driver . '.index-settings', []);
+            $indexes = (array) scout_config($driver.'.index-settings', []);
 
             if (count($indexes)) {
                 foreach ($indexes as $name => $settings) {
@@ -67,7 +67,7 @@ class SyncIndexSettingsCommand extends Command
 
                     if (
                         isset($model) &&
-                        config('plugin.erikwang2013.webman-scout.app.soft_delete', false) &&
+                        scout_config('soft_delete', false) &&
                         in_array(SoftDeletes::class, class_uses_recursive($model))
                     ) {
                         $settings = $engine->configureSoftDeleteFilter($settings);
@@ -99,7 +99,7 @@ class SyncIndexSettingsCommand extends Command
             return (new $name)->indexableAs();
         }
 
-        $prefix = config('plugin.erikwang2013.webman-scout.app.prefix');
+        $prefix = scout_config('prefix');
 
         return ! Str::startsWith($name, $prefix) ? $prefix . $name : $name;
     }

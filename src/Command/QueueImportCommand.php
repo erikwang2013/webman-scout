@@ -55,7 +55,7 @@ class QueueImportCommand extends Command
         $min = $input->getOption('min') ?? $query->min($model->getScoutKeyName());
         $max = $input->getOption('max') ?? $query->max($model->getScoutKeyName());
 
-        $chunk = max(1, (int) ($input->getOption('chunk') ?? config('plugin.erikwang2013.webman-scout.app.chunk.searchable', 500)));
+        $chunk = max(1, (int) ($input->getOption('chunk') ?? scout_config('chunk.searchable', 500)));
 
         if (! $min || ! $max) {
             $output->writeln('No records found for [' . $class . '].');
