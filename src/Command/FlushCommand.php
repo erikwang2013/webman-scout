@@ -7,10 +7,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
+use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
 use Erikwang2013\WebmanScout\Exceptions\ScoutException;
 
 class FlushCommand extends Command
 {
+    use ResolvesScoutModel;
+
     /**
      * The name and signature of the console command.
      *
@@ -38,11 +41,7 @@ class FlushCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = $input->getArgument('model');
-
-        if (! class_exists($class) && ! class_exists($class = app()->getNamespace() . "Models\\{$class}")) {
-            throw new ScoutException("Model [{$class}] not found.");
-        }
+        $class = $this->resolveModelClass((string) $input->getArgument('model'));
 
         $model = new $class;
 
