@@ -364,4 +364,8 @@ Engines such as OpenSearch expose `updateIndexMappings(string $index, array $map
 
 MIT
 
+---
+
+© erik <erik@erik.xyz> · https://erik.xyz
+
 </div>

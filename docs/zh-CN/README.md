@@ -370,4 +370,8 @@ OpenSearch 等引擎通常还提供 `updateIndexMappings(string $index, array $m
 
 MIT
 
+---
+
+© erik <erik@erik.xyz> · https://erik.xyz
+
 </div>
