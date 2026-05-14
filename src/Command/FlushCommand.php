@@ -8,7 +8,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
-use Erikwang2013\WebmanScout\Exceptions\ScoutException;
 
 class FlushCommand extends Command
 {
