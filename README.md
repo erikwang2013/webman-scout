@@ -360,6 +360,14 @@ Engines such as OpenSearch expose `updateIndexMappings(string $index, array $map
 - [shopwwi/webman-scout](https://github.com/shopwwi/webman-scout)
 
 
+## 开源不易，欢迎支持
+
+| 微信 | 支付宝 |
+|:---:|:---:|
+| ![微信](./docs/weixinpay.png "微信") | ![支付宝](./docs/alipay.png "支付宝") |
+
+---
+
 ## License
 
 MIT
