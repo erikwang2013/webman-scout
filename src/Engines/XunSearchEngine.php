@@ -10,7 +10,7 @@ use Erikwang2013\WebmanScout\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\LazyCollection;
 use Erikwang2013\WebmanScout\XunSearchClient;
-use support\Log;
+use Erikwang2013\WebmanScout\Support\Log;
 
 
 class XunSearchEngine extends Engine

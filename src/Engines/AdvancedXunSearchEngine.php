@@ -7,8 +7,8 @@
 namespace Erikwang2013\WebmanScout\Engines;
 
 use Erikwang2013\WebmanScout\Builder as AdvancedScoutBuilder;
-use support\Log;
-use support\Cache;
+use Erikwang2013\WebmanScout\Support\Log;
+use Erikwang2013\WebmanScout\Support\Cache;
 
 
 class AdvancedXunSearchEngine extends XunSearchEngine
@@ -462,7 +462,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         if (method_exists($builder, 'getFacetConfig')) {
             $facets = $builder->getFacetConfig();
             if ($facets) {
-                $results['facets'] = $this->getFacets($search, $facets);
+                $results['facets'] = $this->buildFacets($search, $facets);
             }
         }
 
@@ -470,7 +470,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         if (method_exists($builder, 'getAggregationConfig')) {
             $aggregations = $builder->getAggregationConfig();
             if ($aggregations) {
-                $results['aggregations'] = $this->getAggregations($search, $aggregations);
+                $results['aggregations'] = $this->buildAggregations($search, $aggregations);
             }
         }
 
@@ -480,7 +480,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
     /**
      * 获取分面信息
      */
-    protected function getFacets(\XSSearch $search, array $facets): array
+    protected function buildFacets(\XSSearch $search, array $facets): array
     {
         $facetResults = [];
         
@@ -500,7 +500,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
     /**
      * 获取聚合信息
      */
-    protected function getAggregations(\XSSearch $search, array $aggregations): array
+    protected function buildAggregations(\XSSearch $search, array $aggregations): array
     {
         $aggResults = [];
         
@@ -662,7 +662,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         // 应用 where 条件
         $this->applyWheres($search, $builder);
         
-        return $this->getAggregations($search, $builder->getAggregationConfig());
+        return $this->buildAggregations($search, $builder->getAggregationConfig());
     }
 
     /**
@@ -685,7 +685,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         // 应用 where 条件
         $this->applyWheres($search, $builder);
         
-        return $this->getFacets($search, $builder->getFacetConfig());
+        return $this->buildFacets($search, $builder->getFacetConfig());
     }
 
     /**

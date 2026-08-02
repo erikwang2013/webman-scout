@@ -20,7 +20,7 @@ return [
     |
     */
 
-    // getenv 仅单参数；勿写 getenv('X','default')，第二个参数是 local_only(bool)，会导致 driver=false 进而误匹配 createDriver()
+    // 使用 getenv('KEY') ?: 'default' 模式，勿用双参数 getenv('KEY', 'default')，后者第二参数为 local_only(bool)
     'driver' => getenv('SCOUT_DRIVER') ?: 'opensearch',
 
     /*
@@ -34,7 +34,7 @@ return [
     |
     */
 
-    'prefix' => getenv('SCOUT_PREFIX', ''),
+    'prefix' => getenv('SCOUT_PREFIX') ?: '',
 
     /*
     |--------------------------------------------------------------------------
@@ -47,7 +47,7 @@ return [
     |
     */
 
-    'queue' => getenv('SCOUT_QUEUE', false),
+    'queue' => getenv('SCOUT_QUEUE') ?: false,
 
     /*
     |--------------------------------------------------------------------------
@@ -104,7 +104,7 @@ return [
     |
     */
 
-    'identify' => getenv('SCOUT_IDENTIFY', false),
+    'identify' => getenv('SCOUT_IDENTIFY') ?: false,
 
     /*
     |--------------------------------------------------------------------------
@@ -118,8 +118,8 @@ return [
     */
 
     'algolia' => [
-        'id' => getenv('ALGOLIA_APP_ID', ''),
-        'secret' => getenv('ALGOLIA_SECRET', ''),
+        'id' => getenv('ALGOLIA_APP_ID') ?: '',
+        'secret' => getenv('ALGOLIA_SECRET') ?: '',
         'index-settings' => [
             // 'users' => [
             //     'searchableAttributes' => ['id', 'name', 'email'],
@@ -130,27 +130,27 @@ return [
 
     'xunsearch' => [
         // XunSearch 配置文件路径
-        'config_path' => getenv('XUNSEARCH_CONFIG_PATH', base_path('config/xunsearch')),
+        'config_path' => getenv('XUNSEARCH_CONFIG_PATH') ?: base_path('config/xunsearch'),
         
         // 默认索引配置
-        'default_index' => getenv('XUNSEARCH_DEFAULT_INDEX', 'default'),
+        'default_index' => getenv('XUNSEARCH_DEFAULT_INDEX') ?: 'default',
         
         // 字符集
-        'charset' => getenv('XUNSEARCH_CHARSET', 'utf-8'),
+        'charset' => getenv('XUNSEARCH_CHARSET') ?: 'utf-8',
         
         // 搜索选项
         'search' => [
-            'fuzzy' => getenv('XUNSEARCH_FUZZY', true),
-            'auto_synonym' => getenv('XUNSEARCH_AUTO_SYNONYM', true),
-            'auto_flush' => getenv('XUNSEARCH_AUTO_FLUSH', true),
-            'batch_size' => getenv('XUNSEARCH_BATCH_SIZE', 100),
+            'fuzzy' => getenv('XUNSEARCH_FUZZY') ?: true,
+            'auto_synonym' => getenv('XUNSEARCH_AUTO_SYNONYM') ?: true,
+            'auto_flush' => getenv('XUNSEARCH_AUTO_FLUSH') ?: true,
+            'batch_size' => getenv('XUNSEARCH_BATCH_SIZE') ?: 100,
         ],
         
         // 缓存配置
         'cache' => [
-            'enabled' => getenv('XUNSEARCH_CACHE_ENABLED', true),
-            'ttl' => getenv('XUNSEARCH_CACHE_TTL', 300),
-            'store' => getenv('XUNSEARCH_CACHE_STORE', 'file'),
+            'enabled' => getenv('XUNSEARCH_CACHE_ENABLED') ?: true,
+            'ttl' => getenv('XUNSEARCH_CACHE_TTL') ?: 300,
+            'store' => getenv('XUNSEARCH_CACHE_STORE') ?: 'file',
         ],
         
         // 索引配置模板
@@ -191,7 +191,7 @@ return [
     */
 
     'meilisearch' => [
-        'host' => getenv('MEILISEARCH_HOST', 'http://localhost:7700'),
+        'host' => getenv('MEILISEARCH_HOST') ?: 'http://localhost:7700',
         'key' => getenv('MEILISEARCH_KEY'),
         'index-settings' => [
             // 'users' => [
@@ -213,27 +213,27 @@ return [
 
     'typesense' => [
         'client-settings' => [
-            'api_key' => getenv('TYPESENSE_API_KEY', 'xyz'),
+            'api_key' => getenv('TYPESENSE_API_KEY') ?: 'xyz',
             'nodes' => [
                 [
-                    'host' => getenv('TYPESENSE_HOST', 'localhost'),
-                    'port' => getenv('TYPESENSE_PORT', '8108'),
-                    'path' => getenv('TYPESENSE_PATH', ''),
-                    'protocol' => getenv('TYPESENSE_PROTOCOL', 'http'),
+                    'host' => getenv('TYPESENSE_HOST') ?: 'localhost',
+                    'port' => getenv('TYPESENSE_PORT') ?: '8108',
+                    'path' => getenv('TYPESENSE_PATH') ?: '',
+                    'protocol' => getenv('TYPESENSE_PROTOCOL') ?: 'http',
                 ],
             ],
             'nearest_node' => [
-                'host' => getenv('TYPESENSE_HOST', 'localhost'),
-                'port' => getenv('TYPESENSE_PORT', '8108'),
-                'path' => getenv('TYPESENSE_PATH', ''),
-                'protocol' => getenv('TYPESENSE_PROTOCOL', 'http'),
+                'host' => getenv('TYPESENSE_HOST') ?: 'localhost',
+                'port' => getenv('TYPESENSE_PORT') ?: '8108',
+                'path' => getenv('TYPESENSE_PATH') ?: '',
+                'protocol' => getenv('TYPESENSE_PROTOCOL') ?: 'http',
             ],
-            'connection_timeout_seconds' => getenv('TYPESENSE_CONNECTION_TIMEOUT_SECONDS', 2),
-            'healthcheck_interval_seconds' => getenv('TYPESENSE_HEALTHCHECK_INTERVAL_SECONDS', 30),
-            'num_retries' => getenv('TYPESENSE_NUM_RETRIES', 3),
-            'retry_interval_seconds' => getenv('TYPESENSE_RETRY_INTERVAL_SECONDS', 1),
+            'connection_timeout_seconds' => getenv('TYPESENSE_CONNECTION_TIMEOUT_SECONDS') ?: 2,
+            'healthcheck_interval_seconds' => getenv('TYPESENSE_HEALTHCHECK_INTERVAL_SECONDS') ?: 30,
+            'num_retries' => getenv('TYPESENSE_NUM_RETRIES') ?: 3,
+            'retry_interval_seconds' => getenv('TYPESENSE_RETRY_INTERVAL_SECONDS') ?: 1,
         ],
-        // 'max_total_results' => getenv('TYPESENSE_MAX_TOTAL_RESULTS', 1000),
+        // 'max_total_results' => getenv('TYPESENSE_MAX_TOTAL_RESULTS') ?: 1000,
         'model-settings' => [
             // User::class => [
             //     'collection-schema' => [
@@ -258,7 +258,7 @@ return [
             //     ],
             // ],
         ],
-        'import_action' => getenv('TYPESENSE_IMPORT_ACTION', 'upsert'),
+        'import_action' => getenv('TYPESENSE_IMPORT_ACTION') ?: 'upsert',
     ],
 
 
@@ -282,16 +282,16 @@ return [
     ],
 
     'opensearch' => [
-        'host' => getenv('OPENSEARCH_HTTP_HOST', 'https://127.0.0.1:6205'),
-        'username' => getenv('OPENSEARCH_USERNAME', 'admin'),
-        'password' => getenv('OPENSEARCH_PASSWORD', 'admin'),
+        'host' => getenv('OPENSEARCH_HTTP_HOST') ?: 'https://127.0.0.1:6205',
+        'username' => getenv('OPENSEARCH_USERNAME') ?: 'admin',
+        'password' => getenv('OPENSEARCH_PASSWORD') ?: 'admin',
         'prefix' => getenv('OPENSEARCH_INDEX_PREFIX'),
-        'ssl_verification' => (boolean)getenv('OPENSEARCH_SSL_VERIFICATION', false),
-        'ssl_cert' => getenv('OPENSEARCH_SSL_CERT', ''),
-        'ssl_key' => getenv('OPENSEARCH_SSL_KEY', ''),
-        'retries' => getenv('OPENSEARCH_RETRIES', 2),
-        'connection_timeout' => getenv('OPENSEARCH_CONNECTION_TIMEOUT', 10),
-        'timeout' => getenv('OPENSEARCH_TIMEOUT', 30),
+        'ssl_verification' => (boolean)getenv('OPENSEARCH_SSL_VERIFICATION') ?: false,
+        'ssl_cert' => getenv('OPENSEARCH_SSL_CERT') ?: '',
+        'ssl_key' => getenv('OPENSEARCH_SSL_KEY') ?: '',
+        'retries' => getenv('OPENSEARCH_RETRIES') ?: 2,
+        'connection_timeout' => getenv('OPENSEARCH_CONNECTION_TIMEOUT') ?: 10,
+        'timeout' => getenv('OPENSEARCH_TIMEOUT') ?: 30,
         'indices' => [
             'products' => [
                 'settings' => [

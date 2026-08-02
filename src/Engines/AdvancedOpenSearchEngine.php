@@ -7,7 +7,7 @@
 namespace Erikwang2013\WebmanScout\Engines;
 
 use Erikwang2013\WebmanScout\Builder as AdvancedScoutBuilder;
-use support\Log;
+use Erikwang2013\WebmanScout\Support\Log;
 use OpenSearch\Client;
 
 class AdvancedOpenSearchEngine extends OpenSearchEngine

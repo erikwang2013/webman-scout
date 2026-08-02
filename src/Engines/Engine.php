@@ -103,32 +103,6 @@ abstract class Engine
      * @param  string  $name
      * @return mixed
      */
-/*     abstract public function vectorSearch($vector, ?string $vectorField = null, array $options = []);
-    abstract public function advancedSearch(Builder $builder);
-    abstract public function whereAdvanced(
-        string $field,
-        string $operator,
-        $value,
-        string $boolean = 'and',
-        bool $nested = false
-    );
-    abstract public function whereRange(string $field, array $range, bool $inclusive = true);
-    abstract public function whereGeoDistance(string $field, float $lat, float $lng, float $radius);
-    abstract public function updateIndexMappings(string $index, array $mappings);
-    abstract public function fulltextSearch(string $query, array $fields = [], array $options = []);
-    abstract public function orderByVectorSimilarity(array $vector, ?string $vectorField = null);
-    abstract public function addResultProcessor(callable $processor);
-    abstract public function aggregate(string $name, string $type, string $field, array $options = []);
-    abstract public function facet(string $field, array $options = []);
-    abstract public function getAggregations();
-    abstract public function getFacets();
-    abstract public function getVectorSearch();
-    abstract public function getAdvancedWheres();
-    abstract public function getSorts();
-    abstract public function getAggregationConfig();
-    abstract public function getFacetConfig();
-    abstract public function  clearAdvancedConditions();
- */
 
     /**
      * Pluck and return the primary keys of the given results using the given key name.

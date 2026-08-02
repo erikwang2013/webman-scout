@@ -366,6 +366,14 @@ OpenSearch 等引擎通常还提供 `updateIndexMappings(string $index, array $m
 - [shopwwi/webman-scout](https://github.com/shopwwi/webman-scout)
 
 
+## 开源不易，欢迎支持 / Support this project
+
+| WeChat Pay 微信 | Alipay 支付宝 |
+|:---:|:---:|
+| <img src="../weixinpay.png" width="130" height="130" alt="WeChat Pay 微信"> | <img src="../alipay.png" width="130" height="130" alt="Alipay 支付宝"> |
+
+感谢支持！Thank you for your support!
+
 ## 许可证
 
 MIT

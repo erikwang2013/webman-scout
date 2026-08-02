@@ -9,8 +9,8 @@ namespace Erikwang2013\WebmanScout;
 use Algolia\AlgoliaSearch\Algolia;
 use Algolia\AlgoliaSearch\Support\AlgoliaAgent as Algolia4UserAgent;
 use Algolia\AlgoliaSearch\Support\UserAgent as Algolia3UserAgent;
-use Exception;
 use Erikwang2013\WebmanScout\Engines\Algolia3Engine;
+use Erikwang2013\WebmanScout\Exceptions\ScoutException;
 use Erikwang2013\WebmanScout\Engines\Algolia4Engine;
 use Erikwang2013\WebmanScout\Engines\CollectionEngine;
 use Erikwang2013\WebmanScout\Engines\DatabaseEngine;
@@ -95,7 +95,7 @@ class EngineManager extends Manager
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws ScoutException
      */
     protected function ensureAlgoliaClientIsInstalled()
     {
@@ -103,7 +103,7 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new Exception('Please install the suggested Algolia client: algolia/algoliasearch-client-php.');
+        throw new ScoutException('Please install the suggested Algolia client: algolia/algoliasearch-client-php.');
     }
 
     /**
@@ -157,7 +157,7 @@ class EngineManager extends Manager
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws ScoutException
      */
     protected function ensureMeilisearchClientIsInstalled()
     {
@@ -165,7 +165,7 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new Exception('Please install the suggested Meilisearch client: meilisearch/meilisearch-php.');
+        throw new ScoutException('Please install the suggested Meilisearch client: meilisearch/meilisearch-php.');
     }
 
     /**
@@ -206,7 +206,7 @@ class EngineManager extends Manager
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws ScoutException
      */
     protected function ensureElasticSearchClientIsInstalled()
     {
@@ -214,7 +214,7 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new Exception('Please install the ElasticSearch client: elasticsearch/elasticsearch.');
+        throw new ScoutException('Please install the ElasticSearch client: elasticsearch/elasticsearch.');
     }
 
     public function createOpensearchDriver()
@@ -258,7 +258,7 @@ class EngineManager extends Manager
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws ScoutException
      */
     protected function ensureOpenSearchClientIsInstalled()
     {
@@ -266,7 +266,7 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new Exception('Please install the ElasticSearch client: opensearch-project/opensearch-php.');
+        throw new ScoutException('Please install the ElasticSearch client: opensearch-project/opensearch-php.');
     }
 
     /**
@@ -290,7 +290,7 @@ class EngineManager extends Manager
      *
      * @return void
      *
-     * @throws \Exception
+     * @throws ScoutException
      */
     protected function ensureXunSearchClientIsInstalled()
     {
@@ -298,7 +298,7 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new Exception('Please install the ElasticSearch client: elasticsearch/elasticsearch.');
+        throw new ScoutException('Please install the ElasticSearch client: elasticsearch/elasticsearch.');
     }
     /**
      * Create a Typesense engine instance.
@@ -320,12 +320,12 @@ class EngineManager extends Manager
      *
      * @return void
      *
-     * @throws Exception
+     * @throws ScoutException
      */
     protected function ensureTypesenseClientIsInstalled()
     {
         if (! class_exists(Typesense::class)) {
-            throw new Exception('Please install the suggested Typesense client: typesense/typesense-php.');
+            throw new ScoutException('Please install the suggested Typesense client: typesense/typesense-php.');
         }
     }
 
