@@ -21,13 +21,6 @@ abstract class Manager
     protected $container;
 
     /**
-     * The configuration repository instance.
-     *
-     * @var \Illuminate\Contracts\Config\Repository
-     */
-    protected $config;
-
-    /**
      * The registered custom driver creators.
      *
      * @var array
@@ -50,7 +43,6 @@ abstract class Manager
     public function __construct(Container $container)
     {
         $this->container = $container;
-     //   $this->config = $container->make('config');
     }
 
     /**

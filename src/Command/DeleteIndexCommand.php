@@ -32,7 +32,7 @@ class DeleteIndexCommand extends Command
 
     protected function configure()
     {
-        $this->addArgument('name', InputArgument::OPTIONAL, 'The name of the index');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the index');
     }
     /**
      * Execute the console command.

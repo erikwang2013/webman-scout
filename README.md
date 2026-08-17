@@ -60,11 +60,11 @@ Runtime integration targets applications that expose Laravel’s **`config()` he
 | Framework | Versions | Notes |
 |-----------|----------|--------|
 | **Webman** | 1.x / 2.x | Default install: plugin config under `config/plugin/erikwang2013/webman-scout/`. |
-| **Laravel** | 7.x – 11.x | Copy the plugin `app.php` array into `config/scout.php` (or `config/erikwang2013.webman-scout.php`) and set `SCOUT_CONFIG_KEY` (see below). Requires **PHP 8.0+** (Laravel 7 on PHP 8 is supported in recent 7.x releases). |
+| **Laravel** | 7.x – 12.x | Copy the plugin `app.php` array into `config/scout.php` (or `config/erikwang2013.webman-scout.php`) and set `SCOUT_CONFIG_KEY` (see below). Requires **PHP 8.0+** (Laravel 7 on PHP 8 is supported in recent 7.x releases). |
 | **Hyperf** | 2.x – 3.x | Use Hyperf’s config + DI; `Hyperf\Database\Model` is Eloquent-compatible. Map Scout options into config and set `SCOUT_CONFIG_KEY` if not using the Webman plugin path. |
 | **ThinkPHP** | 6.x / 8.x | Use when the app loads **Illuminate** `config` / `app()` (e.g. hybrid setups or `illuminate/database` Eloquent models). Native `think\Model` is **not** wired to the `Searchable` trait; call engine APIs manually or use Eloquent models for indexed entities. |
 
-Composer **requires** `illuminate/*` **^7.0 – ^11.0** and `symfony/console` **^5.4 – ^7.0** so dependency resolution matches your framework stack.
+Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **^5.4 – ^7.0** so dependency resolution matches your framework stack.
 
 
 ## Requirements
@@ -110,7 +110,7 @@ The following sections assume `composer require erikwang2013/webman-scout` is al
 4. **Models** usually extend `support\Model` (Eloquent-based) and `use Searchable`.
 5. **Queues** (optional): install/configure [webman/redis-queue](https://www.workerman.net/doc/webman/components/redis-queue.html), set `'queue' => true` in Scout config, and run consumers under `app/queue/redis/search/` (`scout_make`, `scout_remove`). If Redis Queue is missing or `queue` is false, indexing runs **synchronously** in the request/process.
 
-### Laravel (7.x – 11.x)
+### Laravel (7.x – 12.x)
 
 1. **Config file**: add `config/scout.php` that `return`s the same structure as this package’s `src/config/plugin/erikwang2013/webman-scout/app.php` (keys: `driver`, `prefix`, `opensearch`, `meilisearch`, `queue`, …).  
    - Avoid loading **both** `laravel/scout` and this package under the same `config/scout.php` unless you know how to separate them; this package is a standalone Scout-style implementation.
@@ -336,6 +336,8 @@ Use `--help` on each command for options.
 ## Queues
 
 With `queue` enabled, `searchable()` / `unsearchable()` dispatch to **Webman Redis Queue** when `Webman\RedisQueue\Redis` is available. Ensure consumers under `app/queue/redis/search` are running (e.g. `scout_make`, `scout_remove`).
+
+> The consumer classes live in the package at `src/Jobs/search/` but must be **copied into your project** at `app/queue/redis/search/` — their `app\queue\redis\search` namespace is project-specific and cannot be autoloaded from `vendor/`. The plugin installer does this automatically; for manual installs, copy `src/Jobs/search/MakeSearchable.php` and `RemoveFromSearch.php` into `app/queue/redis/search/`.
 
 
 ## Builder reference (extensions)

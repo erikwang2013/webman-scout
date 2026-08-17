@@ -20,13 +20,15 @@ class MakeSearchable implements Consumer
     public function consume($models)
     {
         $models = unserialize($models);
-        if (count($models) === 0) {
-            return;
+        if (! $models instanceof \Illuminate\Database\Eloquent\Collection || $models->isEmpty()) {
+            throw new \RuntimeException('scout_make payload is not a serialized Eloquent collection.');
         }
+
+        $models = $models->first()->makeSearchableUsing($models);
         if ($models->isEmpty()) {
             return;
         }
 
-        $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
+        $models->first()->searchableUsing()->update($models);
     }
 }

@@ -23,6 +23,10 @@ class RemoveFromSearch implements Consumer
     public function consume($models)
     {
         $models = unserialize($models);
+        if (! $models instanceof \Illuminate\Database\Eloquent\Collection || $models->isEmpty()) {
+            throw new \RuntimeException('scout_remove payload is not a serialized Eloquent collection.');
+        }
+
         $models = RemoveableScoutCollection::make($models);
         if ($models->isNotEmpty()) {
             $models->first()->searchableUsing()->delete($models);

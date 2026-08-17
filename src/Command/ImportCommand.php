@@ -37,8 +37,8 @@ class ImportCommand extends Command
     protected function configure()
     {
         $this->addArgument('model', InputArgument::OPTIONAL, 'Class name of model to bulk import');
-        $this->addOption('fresh', '--fresh', InputOption::VALUE_REQUIRED, 'The name of the primary key');
-        $this->addOption('chunk', '--chunk', InputOption::VALUE_REQUIRED, 'The name of the primary key');
+        $this->addOption('fresh', '--fresh', InputOption::VALUE_NONE, 'Remove all indexed models before importing');
+        $this->addOption('chunk', '--chunk', InputOption::VALUE_REQUIRED, 'The number of records to import at a time (Defaults to configuration value: `scout.chunk.searchable`)');
     }
     /**
      * Execute the console command.
@@ -57,12 +57,6 @@ class ImportCommand extends Command
             $key = $event->models->last()->getScoutKey();
             $output->writeln('<comment>Imported ['.$class.'] models up to ID:</comment> '.$key);
         });
-       /*  $events=app(Dispatcher::class);
-        $events->listen(ModelsImported::class, function ($event) use (&$output, $class) {
-            $key = $event->models->last()->getScoutKey();
-
-            $output->writeln('<comment>Imported [' . $class . '] models up to ID:</comment> ' . $key);
-        }); */
 
         if ($input->getOption('fresh')) {
             $model::removeAllFromSearch();

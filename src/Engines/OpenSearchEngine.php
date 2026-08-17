@@ -498,7 +498,7 @@ class OpenSearchEngine extends Engine
     {
         try {
             // 检查索引是否存在
-            if ($this->opensearch->indices()->exists(['index' => $name])) {
+            if ($this->opensearch->indices()->exists(['index' => $name])->asBool()) {
                 return;
             }
 
@@ -588,7 +588,7 @@ class OpenSearchEngine extends Engine
     public function deleteIndex($name)
     {
         try {
-            if ($this->opensearch->indices()->exists(['index' => $name])) {
+            if ($this->opensearch->indices()->exists(['index' => $name])->asBool()) {
                 $this->opensearch->indices()->delete(['index' => $name]);
                 Log::info('OpenSearch index deleted', ['index' => $name]);
             }
@@ -622,7 +622,7 @@ class OpenSearchEngine extends Engine
     public function indexExists(string $index): bool
     {
         try {
-            return $this->opensearch->indices()->exists(['index' => $index]);
+            return $this->opensearch->indices()->exists(['index' => $index])->asBool();
         } catch (\Exception $e) {
             return false;
         }

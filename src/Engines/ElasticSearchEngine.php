@@ -78,14 +78,10 @@ class ElasticSearchEngine extends Engine
             }
 
             if (isset($config['mappings'])) {
-                foreach ($config['mappings'] as $type => $mapping) {
-                    $this->elasticsearch->indices()->putMapping([
-                        'index' => $name,
-                        'type' => $type,
-                        'body' => $mapping,
-                        "include_type_name" => true
-                    ]);
-                }
+                $this->elasticsearch->indices()->putMapping([
+                    'index' => $name,
+                    'body' => $config['mappings'],
+                ]);
             }
         }else{
             $this->elasticsearch->indices()->create(array_merge($params,$options));
@@ -142,12 +138,16 @@ class ElasticSearchEngine extends Engine
      */
     public function delete($models)
     {
+        if ($models->isEmpty()) {
+            return;
+        }
+
         $params['body'] = [];
 
         $models->each(function ($model) use (&$params) {
             $params['body'][] = [
                 'delete' => [
-                    '_id' => $model->getKey(),
+                    '_id' => $model->getScoutKey(),
                     '_index' => $model->searchableAs(),
              //       '_type' => get_class($model),
                 ]
@@ -255,7 +255,7 @@ class ElasticSearchEngine extends Engine
                 return ['terms' => [$key => $value]];
             }
 
-            return ['match_phrase' => [$key => $value]];
+            return ['term' => [$key => $value]];
         })->values()->all();
     }
 
@@ -279,7 +279,7 @@ class ElasticSearchEngine extends Engine
      */
     public function map(Builder $builder, $results, $model)
     {
-        if ($results['hits']['total'] === 0) {
+        if (($results['hits']['total']['value'] ?? 0) === 0) {
             return $model->newCollection();
         }
 

@@ -766,6 +766,10 @@ class AdvancedElasticsearchEngine extends ElasticsearchEngine
      */
     protected function getScrollId(): ?string
     {
+        if (!function_exists('request')) {
+            return null;
+        }
+
         return request()->header('X-Scroll-Id') ?? null;
     }
 

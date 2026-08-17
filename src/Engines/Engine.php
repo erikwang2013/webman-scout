@@ -103,9 +103,10 @@ abstract class Engine
      * @param  string  $name
      * @return mixed
      */
+    abstract public function deleteIndex($name);
 
     /**
-     * Pluck and return the primary keys of the given results using the given key name.
+     * Get the results of the query as a Collection of primary keys.
      *
      * @param  mixed  $results
      * @param  string  $key

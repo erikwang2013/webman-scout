@@ -34,7 +34,7 @@ class SyncIndexSettingsCommand extends Command
 
     protected function configure()
     {
-        $this->addOption('driver', '--driver', InputOption::VALUE_REQUIRED, 'The number of records to import at a time (Defaults to configuration value: `scout.chunk.searchable`');
+        $this->addOption('driver', '--driver', InputOption::VALUE_REQUIRED, 'The search driver to sync (Defaults to the configured default driver)');
     }
 
     /**
@@ -59,6 +59,8 @@ class SyncIndexSettingsCommand extends Command
 
             if (count($indexes)) {
                 foreach ($indexes as $name => $settings) {
+                    unset($model);
+
                     if (! is_array($settings)) {
                         $name = $settings;
 

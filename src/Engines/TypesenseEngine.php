@@ -92,6 +92,7 @@ class TypesenseEngine extends Engine
             return array_merge(
                 $searchableData,
                 $model->scoutMetadata(),
+                ['id' => $model->getScoutKey()],
             );
         })
             ->filter()
@@ -424,6 +425,10 @@ class TypesenseEngine extends Engine
             return $value ? 'true' : 'false';
         }
 
+        if (is_string($value)) {
+            return '"' . addslashes($value) . '"';
+        }
+
         return $value;
     }
 
@@ -437,7 +442,7 @@ class TypesenseEngine extends Engine
     protected function parseWhereFilter(array|string $value, string $key): string
     {
         return is_array($value)
-            ? sprintf('%s:%s', $key, implode('', $value))
+            ? sprintf('%s:=[%s]', $key, implode(', ', $value))
             : sprintf('%s:=%s', $key, $value);
     }
 

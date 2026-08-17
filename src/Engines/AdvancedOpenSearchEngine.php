@@ -19,9 +19,13 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
     public function advancedSearch(AdvancedScoutBuilder $builder): array
     {
         $params = $this->buildAdvancedSearchParams($builder);
-        
+
+        if ($builder->callback) {
+            return call_user_func($builder->callback, $this->opensearch, $builder, $params);
+        }
+
         $result = $this->opensearch->search($params);
-        
+
         return $this->processAdvancedResults($result, $builder);
     }
 
@@ -72,11 +76,6 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
         // 添加建议
         if ($builder->options['suggest'] ?? false) {
             $params['body']['suggest'] = $this->buildSuggest($builder);
-        }
-
-        // 自定义回调
-        if ($builder->callback) {
-            return call_user_func($builder->callback, $this->opensearch, $builder, $params);
         }
 
         return $params;
@@ -133,8 +132,8 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
             $query['bool']['must_not'][] = ['terms' => [$field => $values]];
         }
 
-        // 如果没有查询条件，返回 match_all
-        if (empty($query['bool']['must']) && empty($query['bool']['filter'])) {
+        // 完全没有子句时才返回 match_all，仅含 must_not/should 的查询应保留
+        if (empty($query['bool'])) {
             return ['match_all' => new \stdClass()];
         }
 
@@ -405,10 +404,12 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
 
         // 如果需要向量相似度得分
         if ($options['include_score'] ?? true) {
-            $params['body']['_source'] = array_merge(
-                $params['body']['_source'] ?? ['*'],
-                ['_score', '_knn_score']
-            );
+            $source = $params['body']['_source'] ?? ['*'];
+            $scoreFields = ['_score', '_knn_score'];
+            // 兼容 includes/excludes 结构，避免 array_merge 压平
+            $params['body']['_source'] = array_is_list($source)
+                ? array_merge($source, $scoreFields)
+                : array_merge($source, ['includes' => array_merge($source['includes'] ?? ['*'], $scoreFields)]);
         }
 
         return $params;
@@ -547,7 +548,12 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
     protected function buildHighlight(AdvancedScoutBuilder $builder): array
     {
         $fields = [];
-        $highlightFields = $builder->options['highlight_fields'] ?? $this->getSearchFields($builder);
+        $highlightFields = $builder->options['highlight_fields'] ?? null;
+        if ($highlightFields !== null) {
+            $highlightFields = is_array($highlightFields) ? $highlightFields : explode(',', $highlightFields);
+        } else {
+            $highlightFields = $this->getSearchFields($builder);
+        }
 
         foreach ($highlightFields as $field) {
             $fields[$field] = [

@@ -219,10 +219,14 @@ class EngineManager extends Manager
 
     public function createOpensearchDriver()
     {
+        $this->ensureOpenSearchClientIsInstalled();
+
         $config = scout_config('opensearch');
         // 构建客户端
         $handlerStack = HandlerStack::create(new CurlHandler());
         $clientFactory = new GuzzleClientFactory();
+        // 兼容字符串形式的配置值（如 env 注入的 'false'）
+        $sslVerification = filter_var($config['ssl_verification'], FILTER_VALIDATE_BOOLEAN);
         $setConfig = [
             'base_uri' => $config['host'],
             'timeout'  => $config['timeout'],
@@ -234,12 +238,12 @@ class EngineManager extends Manager
                 $config['password']
             ],
             // SSL 验证（生产环境应为 true 并配置证书）
-            'verify' => $config['ssl_verification'],
+            'verify' => $sslVerification,
             // 禁用 Expect 头以避免大请求时的 100-continue 问题
             'expect' => false
         ];
 
-        if (true == $config['ssl_verification']) {
+        if ($sslVerification) {
             if (!empty($config['ssl_cert'])) {
                 $setConfig['cert'] = str_starts_with($config['ssl_cert'], '/') ? $config['ssl_cert'] : base_path() . $config['ssl_cert'];
             }
@@ -266,14 +270,14 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new ScoutException('Please install the ElasticSearch client: opensearch-project/opensearch-php.');
+        throw new ScoutException('Please install the OpenSearch client: opensearch-project/opensearch-php.');
     }
 
     /**
-     * Create an ElasticSearch engine instance.
+     * Create an XunSearch engine instance.
      *
      * @return \Erikwang2013\WebmanScout\Engines\XunSearchEngine
-     * @throws \Elastic\Elasticsearch\Exception\AuthenticationException
+     * @throws ScoutException
      */
     public function createXunsearchDriver()
     {
@@ -298,7 +302,7 @@ class EngineManager extends Manager
             return;
         }
 
-        throw new ScoutException('Please install the ElasticSearch client: elasticsearch/elasticsearch.');
+        throw new ScoutException('Please install the XunSearch client: hightman/xunsearch.');
     }
     /**
      * Create a Typesense engine instance.
@@ -382,9 +386,9 @@ class EngineManager extends Manager
         if ($driver === null) {
             return 'null';
         }
-        // getenv 误用等会导致 false/空串，避免进入 Str::studly 与 createDriver 冲突
+        // getenv 误用等会导致 false/空串，回退 null 引擎避免误打到其他服务
         if ($driver === false || $driver === '') {
-            return 'opensearch';
+            return 'null';
         }
 
         return $driver;

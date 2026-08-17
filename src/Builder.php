@@ -406,7 +406,7 @@ class Builder
                 'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
-        ])->hasMorePagesWhen(($perPage * $page) < $engine->getTotalCount($rawResults));
+        ])->hasMorePagesWhen(($perPage * $page) < $this->getTotalCount($rawResults));
 
         return $paginator->appends('query', $this->query);
     }
@@ -443,7 +443,7 @@ class Builder
                 'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
-        ])->hasMorePagesWhen(($perPage * $page) < $engine->getTotalCount($results));
+        ])->hasMorePagesWhen(($perPage * $page) < $this->getTotalCount($results));
 
         return $paginator->appends('query', $this->query);
     }
@@ -564,7 +564,11 @@ class Builder
     public function applyAfterRawSearchCallback($results)
     {
         if ($this->afterRawSearchCallback) {
-            $results = call_user_func($this->afterRawSearchCallback, $results) ?: $results;
+            $result = call_user_func($this->afterRawSearchCallback, $results);
+
+            if ($result !== null) {
+                $results = $result;
+            }
         }
 
         return $results;
@@ -848,14 +852,21 @@ class Builder
             ->sortBy(fn($model) => $objectIdPositions[$model->getScoutKey()])
             ->values();
 
-        // 添加元数据
-        foreach ($models as $index => $model) {
-            if (isset($results['hits'][$index])) {
-                $hit = $results['hits'][$index];
-                $model->_score = $hit['_score'] ?? null;
-                $model->_highlight = $hit['_highlight'] ?? null;
-                $model->_vector_score = $hit['_vector_score'] ?? null;
+        // 添加元数据（按 scout key 对齐，避免模型被 filter 后与 hits 位置错位）
+        $hitsByKey = collect($results['hits'])->keyBy('_id')->all();
+
+        foreach ($models as $model) {
+            $hit = $hitsByKey[$model->getScoutKey()] ?? null;
+            if ($hit === null) {
+                continue;
             }
+            $model->_score = $hit['_score'] ?? null;
+            $model->_highlight = $hit['_highlight'] ?? null;
+            $model->_vector_score = $hit['_vector_score'] ?? null;
+            // snapshot 元数据，避免下次 save() 把它们当列写入数据库
+            $model->syncOriginalAttribute('_score');
+            $model->syncOriginalAttribute('_highlight');
+            $model->syncOriginalAttribute('_vector_score');
         }
 
         return $models;
@@ -930,26 +941,6 @@ class Builder
 
         return $this;
     }
-
-    /**
-     * 条件构造辅助方法
-     */
-
-/*     public function when($condition, callable $callback, ?callable $default = null): self
-    {
-        if ($condition) {
-            return $callback($this, $condition) ?? $this;
-        } elseif ($default) {
-            return $default($this, $condition) ?? $this;
-        }
-
-        return $this;
-    }
-
-    public function unless($condition, callable $callback, ?callable $default = null): self
-    {
-        return $this->when(!$condition, $callback, $default);
-    } */
 
     /**
      * 调试方法

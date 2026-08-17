@@ -6,8 +6,9 @@
 
 namespace app\queue\redis\search;
 
+use Throwable;
 use Webman\RedisQueue\Consumer;
-use Erikwang2013\WebmanScout\Scout;
+use Webman\RedisQueue\Redis as QueueRedis;
 
 class MakeRangeSearchable implements Consumer
 {
@@ -28,21 +29,30 @@ class MakeRangeSearchable implements Consumer
     public function consume($data)
     {
         if (empty($data['model']) || !isset($data['start']) || !isset($data['end'])) {
-            return;
-        }
-        $model = new $data['model']();
-
-        $models = $model::makeAllSearchableQuery()
-            ->whereBetween($model->getScoutKeyName(), [(int) $data['start'], (int) $data['end']])
-            ->get()
-            ->filter(function ($m) {
-                return $m->shouldBeSearchable();
-            });
-
-        if ($models->isEmpty()) {
-            return;
+            throw new \InvalidArgumentException('scout_make_range payload is missing model/start/end.');
         }
 
-        $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
+        try {
+            $model = new $data['model']();
+
+            $models = $model::makeAllSearchableQuery()
+                ->whereBetween($model->getScoutKeyName(), [(int) $data['start'], (int) $data['end']])
+                ->get()
+                ->filter(function ($m) {
+                    return $m->shouldBeSearchable();
+                });
+
+            if ($models->isEmpty()) {
+                return;
+            }
+
+            $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
+        } catch (Throwable $e) {
+            $attempts = (int) ($data['attempts'] ?? 1);
+            if ($attempts < 5) {
+                QueueRedis::send('scout_make_range', $data + ['attempts' => $attempts + 1], 5);
+            }
+            throw $e;
+        }
     }
 }

@@ -41,7 +41,9 @@ class DeleteAllIndexesCommand extends Command
         $driver = scout_config('driver');
 
         if (! method_exists($engine, 'deleteAllIndexes')) {
-            return $output->writeln('The ['.$driver.'] engine does not support deleting all indexes.');
+            $output->writeln('The ['.$driver.'] engine does not support deleting all indexes.');
+
+            return Command::FAILURE;
         }
 
         try {

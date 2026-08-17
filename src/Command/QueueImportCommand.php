@@ -35,9 +35,9 @@ class QueueImportCommand extends Command
     protected function configure()
     {
         $this->addArgument('model', InputArgument::OPTIONAL, 'Class name of model to bulk import');
-        $this->addOption('chunk', '--chunk', InputOption::VALUE_REQUIRED, 'The number of records to import at a time (Defaults to configuration value: `scout.chunk.searchable`');
-        $this->addOption('min', '--min', InputOption::VALUE_REQUIRED, 'The number of records to import at a time (Defaults to configuration value: `scout.chunk.searchable`');
-        $this->addOption('max', '--max', InputOption::VALUE_REQUIRED, 'The number of records to import at a time (Defaults to configuration value: `scout.chunk.searchable`');
+        $this->addOption('chunk', '--chunk', InputOption::VALUE_REQUIRED, 'The number of records to import at a time (Defaults to configuration value: `scout.chunk.searchable`)');
+        $this->addOption('min', '--min', InputOption::VALUE_REQUIRED, 'The minimum primary key to start importing from (Defaults to the lowest key)');
+        $this->addOption('max', '--max', InputOption::VALUE_REQUIRED, 'The maximum primary key to import up to (Defaults to the highest key)');
     }
     /**
      * Execute the console command.
@@ -71,13 +71,16 @@ class QueueImportCommand extends Command
             return Command::FAILURE;
         }
 
+        if (! class_exists(QueueRedis::class)) {
+            $output->writeln('<error>The webman/redis-queue plugin is required for queued importing.</error>');
+
+            return Command::FAILURE;
+        }
+
         for ($start = $min; $start <= $max; $start += $chunk) {
             $end = min($start + $chunk - 1, $max);
 
-            if (class_exists(QueueRedis::class)) {
-                QueueRedis::send('scout_make_range', ['model' => $class, 'start' => $start, 'end' => $start]);
-            }
-
+            QueueRedis::send('scout_make_range', ['model' => $class, 'start' => $start, 'end' => $end]);
 
             $output->writeln('<comment>Queued [' . $class . '] models up to ID:</comment> ' . $end);
         }

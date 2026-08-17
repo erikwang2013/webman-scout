@@ -9,6 +9,7 @@ namespace Erikwang2013\WebmanScout;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection as BaseCollection;
+use Erikwang2013\WebmanScout\Support\Log;
 use Webman\RedisQueue\Redis as QueueRedis;
 
 trait Searchable
@@ -78,7 +79,14 @@ trait Searchable
 
         if (class_exists(QueueRedis::class)) {
             QueueRedis::send('scout_make', serialize($models));
+
+            return;
         }
+
+        // queue 开启但未安装 webman/redis-queue 时降级为同步，避免静默丢失
+        Log::warning('webman/redis-queue not installed; falling back to synchronous indexing.');
+
+        return $this->syncMakeSearchable($models);
     }
 
     /**
@@ -93,7 +101,12 @@ trait Searchable
             return;
         }
 
-        return $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
+        $models = $models->first()->makeSearchableUsing($models);
+        if ($models->isEmpty()) {
+            return;
+        }
+
+        return $models->first()->searchableUsing()->update($models);
     }
 
     /**
@@ -114,8 +127,14 @@ trait Searchable
 
          if (class_exists(QueueRedis::class)) {
             QueueRedis::send('scout_remove', serialize($models));
+
+            return;
         }
 
+        // queue 开启但未安装 webman/redis-queue 时降级为同步，避免静默丢失
+        Log::warning('webman/redis-queue not installed; falling back to synchronous removal.');
+
+        return $this->syncRemoveFromSearch($models);
     }
 
     /**
@@ -420,7 +439,7 @@ trait Searchable
      */
     public function syncWithSearchUsing()
     {
-        return scout_config('queue.connection') ?: config('queue.default');
+        return scout_config('queue.connection') ?: (function_exists('config') ? config('queue.default') : null);
     }
 
     /**

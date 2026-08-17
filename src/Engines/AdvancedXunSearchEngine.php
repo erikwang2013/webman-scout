@@ -118,8 +118,15 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         foreach ($builder->wheres as $field => $value) {
             if (is_array($value)) {
                 // 范围查询
-                if (count($value) === 2) {
+                if (count($value) === 2 && isset($value[0], $value[1])) {
                     $queryParts[] = "{$field}:[{$value[0]} TO {$value[1]}]";
+                } elseif (!empty($value)) {
+                    // IN 查询（XunSearch 无 IN，转为 OR 表达式）
+                    $conditions = [];
+                    foreach ($value as $item) {
+                        $conditions[] = "{$field}:{$item}";
+                    }
+                    $queryParts[] = '(' . implode(' OR ', $conditions) . ')';
                 }
             } else {
                 // 精确匹配
@@ -328,11 +335,6 @@ class AdvancedXunSearchEngine extends XunSearchEngine
             if (method_exists($search, 'setAutoSynonyms')) {
                 $search->setAutoSynonyms();
             }
-        }
-
-        // 设置查询方言
-        if ($dialect = $builder->options['dialect'] ?? null) {
-            $search->setQuery($search->getQuery(), $dialect);
         }
 
         // 设置搜索范围

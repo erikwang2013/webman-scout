@@ -11,6 +11,8 @@ use Erikwang2013\WebmanScout\Support\Log;
 
 class AdvancedTypesenseEngine extends TypesenseEngine
 {
+    public $prefix = "";
+
     /**
      * 获取查询字段（用于 query_by）
      */
@@ -39,6 +41,30 @@ class AdvancedTypesenseEngine extends TypesenseEngine
 
         // 默认搜索所有字段
         return '*';
+    }
+
+    /**
+     * 执行搜索（增强版：走完整高级参数）
+     */
+    public function search(AdvancedScoutBuilder $builder)
+    {
+        if ($builder->limit >= $this->maxPerPage) {
+            return parent::search($builder);
+        }
+
+        return $this->performSearch($builder, $this->buildTypesenseSearchParams($builder));
+    }
+
+    /**
+     * 分页搜索（增强版）
+     */
+    public function paginate(AdvancedScoutBuilder $builder, $perPage, $page)
+    {
+        $params = $this->buildTypesenseSearchParams($builder);
+        $params['per_page'] = (int) max(1, $perPage);
+        $params['page'] = (int) max(1, $page);
+
+        return $this->performSearch($builder, $params);
     }
 
     /**
@@ -205,7 +231,7 @@ class AdvancedTypesenseEngine extends TypesenseEngine
 
         // whereNotIn 条件
         foreach ($builder->whereNotIns as $field => $values) {
-            $filters[] = $field . ':![' . implode(', ', $this->formatTypesenseValues($values)) . ']';
+            $filters[] = $field . ':!=[' . implode(', ', $this->formatTypesenseValues($values)) . ']';
         }
 
         return implode(' && ', $filters);
@@ -288,7 +314,7 @@ class AdvancedTypesenseEngine extends TypesenseEngine
             'regex' => $field . ':/' . $value . '/',
             'match' => $field . ':= ' . $this->formatTypesenseValue($value),
             'in' => $field . ':[' . implode(', ', $this->formatTypesenseValues((array)$value)) . ']',
-            'not_in' => $field . ':![' . implode(', ', $this->formatTypesenseValues((array)$value)) . ']',
+            'not_in' => $field . ':!=[' . implode(', ', $this->formatTypesenseValues((array)$value)) . ']',
             'null' => $field . ':= null',
             'not_null' => $field . ':!= null',
             'empty' => $field . ':= ""',
@@ -310,26 +336,17 @@ class AdvancedTypesenseEngine extends TypesenseEngine
             $direction = $sort['direction'] ?? 'asc';
             $options = $sort['options'] ?? [];
 
-            if ($type === 'vector_similarity') {
-                $vector = $sort['vector'] ?? [];
-                $vectorField = $sort['field'] ?? 'embedding';
-                $typesenseSorts[] = sprintf(
-                    'embedding(%s):asc',
-                    implode(',', $vector)
-                );
-            } elseif ($type === 'geo_distance') {
+            if ($type === 'geo_distance') {
                 $typesenseSorts[] = sprintf(
                     'location(%s,%s):asc',
                     $sort['location']['lat'] ?? 0,
                     $sort['location']['lng'] ?? 0
                 );
-            } elseif ($type === 'random') {
-                $typesenseSorts[] = '_random_score:asc';
             } elseif ($field === '_text_match') {
                 $typesenseSorts[] = '_text_match:desc';
             } elseif ($field === '_vector_distance') {
                 $typesenseSorts[] = '_vector_distance:asc';
-            } else {
+            } elseif ($field !== null) {
                 $direction = $direction === 'desc' ? ':desc' : ':asc';
                 $typesenseSorts[] = $field . $direction;
             }
@@ -560,14 +577,9 @@ class AdvancedTypesenseEngine extends TypesenseEngine
                 $schema['fields'] = array_merge($schema['fields'], $settings['fields']);
             }
 
-            // 添加向量搜索配置
-            $schema['fields'][] = [
-                'name' => 'embedding',
-                'type' => 'float[]',
-                'num_dim' => $dimensions,
-                'optional' => $settings['optional'] ?? true,
-                'index' => $settings['index'] ?? true,
-            ];
+            // 合并可选/索引配置到基础 embedding 字段，避免重复定义
+            $schema['fields'][1]['optional'] = $settings['optional'] ?? true;
+            $schema['fields'][1]['index'] = $settings['index'] ?? true;
 
             $this->typesense->getCollections()->create($schema);
 
@@ -640,10 +652,12 @@ class AdvancedTypesenseEngine extends TypesenseEngine
     public function getDocument(string $collectionName, string $id): array
     {
         $collection = $this->typesense->getCollections()->{$collectionName};
-        
+
         try {
-            return $collection->getDocuments()[$id];
-        } catch (\Exception $e) {
+            $doc = $collection->getDocuments()[$id]->retrieve();
+
+            return is_array($doc) ? $doc : [];
+        } catch (\Throwable $e) {
             return [];
         }
     }

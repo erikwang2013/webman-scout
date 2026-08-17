@@ -39,7 +39,7 @@ class IndexCommand extends Command
 
     protected function configure()
     {
-        $this->addArgument('name', InputArgument::OPTIONAL, 'The name of the index');
+        $this->addArgument('name', InputArgument::REQUIRED, 'The name of the index');
         $this->addOption('key', '--key', InputOption::VALUE_REQUIRED, 'The name of the primary key');
     }
     /**

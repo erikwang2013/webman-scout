@@ -285,11 +285,9 @@ return [
         'host' => getenv('OPENSEARCH_HTTP_HOST') ?: 'https://127.0.0.1:6205',
         'username' => getenv('OPENSEARCH_USERNAME') ?: 'admin',
         'password' => getenv('OPENSEARCH_PASSWORD') ?: 'admin',
-        'prefix' => getenv('OPENSEARCH_INDEX_PREFIX'),
         'ssl_verification' => (boolean)getenv('OPENSEARCH_SSL_VERIFICATION') ?: false,
         'ssl_cert' => getenv('OPENSEARCH_SSL_CERT') ?: '',
         'ssl_key' => getenv('OPENSEARCH_SSL_KEY') ?: '',
-        'retries' => getenv('OPENSEARCH_RETRIES') ?: 2,
         'connection_timeout' => getenv('OPENSEARCH_CONNECTION_TIMEOUT') ?: 10,
         'timeout' => getenv('OPENSEARCH_TIMEOUT') ?: 30,
         'indices' => [

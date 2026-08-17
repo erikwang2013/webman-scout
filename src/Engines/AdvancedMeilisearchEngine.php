@@ -66,18 +66,6 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     }
 
     /**
-     * 计算页码
-     */
-    protected function calculatePage(AdvancedScoutBuilder $builder): int
-    {
-        if ($builder->limit && $builder->offset) {
-            return (int) ($builder->offset / $builder->limit) + 1;
-        }
-
-        return 1;
-    }
-
-    /**
      * 获取高亮字段
      */
     protected function getHighlightFields(AdvancedScoutBuilder $builder): array
@@ -91,26 +79,27 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     }
 
     /**
-     * 获取查询字段（用于 Meilisearch 的 query_by）
+     * 执行搜索（增强版）
      */
-    protected function getQueryByFields(AdvancedScoutBuilder $builder): string
+    public function search(AdvancedScoutBuilder $builder)
     {
-        $fields = $this->getSearchFields($builder);
+        $params = $this->buildSearchParams($builder);
+        unset($params['query']);
 
-        // 如果是权重字段（如 title^2, description^1）
-        if (method_exists($builder->model, 'searchableFields')) {
-            $modelFields = $builder->model->searchableFields();
+        return $this->performSearch($builder, $params);
+    }
 
-            if (array_values($modelFields) !== $modelFields) {
-                $weightedFields = [];
-                foreach ($modelFields as $field => $weight) {
-                    $weightedFields[] = "{$field}^{$weight}";
-                }
-                return implode(',', $weightedFields);
-            }
-        }
+    /**
+     * 分页搜索（增强版）
+     */
+    public function paginate(AdvancedScoutBuilder $builder, $perPage, $page)
+    {
+        $params = $this->buildSearchParams($builder);
+        unset($params['query'], $params['limit'], $params['offset']);
+        $params['hitsPerPage'] = (int) $perPage;
+        $params['page'] = $page;
 
-        return implode(',', $fields);
+        return $this->performSearch($builder, $params);
     }
 
     /**
@@ -159,21 +148,21 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
             $params['facets'] = array_keys($facets);
         }
 
-        // 处理地理位置搜索
-        if ($geoSearch = $this->extractGeoSearch($builder)) {
-            $params = array_merge($params, $geoSearch);
-        }
-
         // 搜索配置
         $params = array_merge($params, [
             'showRankingScore' => $builder->options['show_ranking_score'] ?? false,
             'showRankingScoreDetails' => $builder->options['show_ranking_score_details'] ?? false,
-            'q' => $builder->query,
-            'hitsPerPage' => $builder->limit ?: 20,
-            'page' => $this->calculatePage($builder),
         ]);
 
         return $params;
+    }
+
+    /**
+     * 格式化筛选值：字符串加引号并转义，数字/布尔原样
+     */
+    protected function quoteValue($value)
+    {
+        return is_string($value) ? '"' . addcslashes($value, '"\\') . '"' : $value;
     }
 
     /**
@@ -186,13 +175,10 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
         // 基本 where 条件
         foreach ($builder->wheres as $field => $value) {
             if (is_array($value)) {
-                $values = array_map(function ($v) {
-                    return is_string($v) ? '"' . $v . '"' : $v;
-                }, $value);
+                $values = array_map([$this, 'quoteValue'], $value);
                 $filters[] = $field . ' IN [' . implode(', ', $values) . ']';
             } else {
-                $filterValue = is_string($value) ? '"' . $value . '"' : $value;
-                $filters[] = $field . ' = ' . $filterValue;
+                $filters[] = $field . ' = ' . $this->quoteValue($value);
             }
         }
 
@@ -203,17 +189,13 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
 
         // whereIn 条件
         foreach ($builder->whereIns as $field => $values) {
-            $values = array_map(function ($v) {
-                return is_string($v) ? '"' . $v . '"' : $v;
-            }, $values);
+            $values = array_map([$this, 'quoteValue'], $values);
             $filters[] = $field . ' IN [' . implode(', ', $values) . ']';
         }
 
         // whereNotIn 条件
         foreach ($builder->whereNotIns as $field => $values) {
-            $values = array_map(function ($v) {
-                return is_string($v) ? '"' . $v . '"' : $v;
-            }, $values);
+            $values = array_map([$this, 'quoteValue'], $values);
             $filters[] = $field . ' NOT IN [' . implode(', ', $values) . ']';
         }
 
@@ -234,56 +216,57 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
             'range' => sprintf(
                 '%s >= %s AND %s <= %s',
                 $field,
-                $value['range'][0] ?? 'null',
+                $this->quoteValue($value['range'][0] ?? 'null'),
                 $field,
-                $value['range'][1] ?? 'null'
+                $this->quoteValue($value['range'][1] ?? 'null')
             ),
             'date_range' => sprintf(
                 '%s >= %s AND %s <= %s',
                 $field,
-                $value['range'][0] ?? 'null',
+                $this->quoteValue($value['range'][0] ?? 'null'),
                 $field,
-                $value['range'][1] ?? 'null'
+                $this->quoteValue($value['range'][1] ?? 'null')
             ),
-            '>' => sprintf('%s > %s', $field, $value),
-            '>=' => sprintf('%s >= %s', $field, $value),
-            '<' => sprintf('%s < %s', $field, $value),
-            '<=' => sprintf('%s <= %s', $field, $value),
-            '!=' => sprintf('%s != %s', $field, $value),
+            '>' => sprintf('%s > %s', $field, $this->quoteValue($value)),
+            '>=' => sprintf('%s >= %s', $field, $this->quoteValue($value)),
+            '<' => sprintf('%s < %s', $field, $this->quoteValue($value)),
+            '<=' => sprintf('%s <= %s', $field, $this->quoteValue($value)),
+            '!=' => sprintf('%s != %s', $field, $this->quoteValue($value)),
             'geo_radius' => sprintf(
                 '_geoRadius(%s, %s, %s)',
-                json_encode([$value['lng'], $value['lat']]),
-                $value['radius'],
-                $field
+                $value['lat'],
+                $value['lng'],
+                $value['radius']
             ),
             'geo_bounding_box' => sprintf(
-                '_geoBoundingBox(%s, %s, %s)',
-                json_encode([$value['top_left']['lng'], $value['top_left']['lat']]),
-                json_encode([$value['bottom_right']['lng'], $value['bottom_right']['lat']]),
-                $field
+                '_geoBoundingBox([%s, %s, %s, %s])',
+                $value['top_left']['lat'],
+                $value['top_left']['lng'],
+                $value['bottom_right']['lat'],
+                $value['bottom_right']['lng']
             ),
             'exists' => $field . ' EXISTS',
             'missing' => $field . ' NOT EXISTS',
-            'contains' => sprintf('%s CONTAINS "%s"', $field, $value),
-            'starts_with' => sprintf('%s STARTS WITH "%s"', $field, $value),
-            'ends_with' => sprintf('%s ENDS WITH "%s"', $field, $value),
-            'match' => sprintf('%s = "%s"', $field, $value),
+            'contains' => sprintf('%s CONTAINS %s', $field, $this->quoteValue($value)),
+            'starts_with' => sprintf('%s STARTS WITH %s', $field, $this->quoteValue($value)),
+            'ends_with' => sprintf('%s ENDS WITH %s', $field, $this->quoteValue($value)),
+            'match' => sprintf('%s = %s', $field, $this->quoteValue($value)),
             'in' => sprintf(
                 '%s IN [%s]',
                 $field,
-                implode(', ', array_map(fn($v) => is_string($v) ? '"' . $v . '"' : $v, (array)$value))
+                implode(', ', array_map([$this, 'quoteValue'], (array)$value))
             ),
             'not_in' => sprintf(
                 '%s NOT IN [%s]',
                 $field,
-                implode(', ', array_map(fn($v) => is_string($v) ? '"' . $v . '"' : $v, (array)$value))
+                implode(', ', array_map([$this, 'quoteValue'], (array)$value))
             ),
-            'regex' => sprintf('%s MATCHES "%s"', $field, $value),
+            'regex' => sprintf('%s MATCHES %s', $field, $this->quoteValue($value)),
             'null' => $field . ' IS NULL',
             'not_null' => $field . ' IS NOT NULL',
             'empty' => $field . ' IS EMPTY',
             'not_empty' => $field . ' IS NOT EMPTY',
-            default => $field . ' = ' . (is_string($value) ? '"' . $value . '"' : $value),
+            default => $field . ' = ' . $this->quoteValue($value),
         };
     }
 
@@ -301,19 +284,12 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
             $options = $sort['options'] ?? [];
 
             if ($type === 'geo_distance') {
+                $direction = $direction === 'desc' ? 'desc' : 'asc';
                 $meilisearchSorts[] = sprintf(
                     '_geoPoint(%s, %s):%s',
-                    $sort['location']['lng'] ?? 0,
                     $sort['location']['lat'] ?? 0,
-                    $field
-                );
-            } elseif ($type === 'vector_similarity') {
-                // Meilisearch v1.3+ 支持向量排序
-                $vector = $sort['vector'] ?? [];
-                $meilisearchSorts[] = sprintf(
-                    '_vector(%s):%s',
-                    json_encode($vector),
-                    'desc' // 相似度越高越好
+                    $sort['location']['lng'] ?? 0,
+                    $direction
                 );
             } elseif ($type === 'random') {
                 $meilisearchSorts[] = '_random:asc';
@@ -343,12 +319,14 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
             return $params;
         }
 
-        // Meilisearch v1.3+ 支持向量搜索
+        // Meilisearch v1.3+ 支持向量搜索，hybrid 必须是 embedder 对象
         $params['vector'] = $vector;
-        $params['hybrid'] = $options['hybrid'] ?? true;
+        $params['hybrid'] = $options['hybrid'] ?? [
+            'embedder' => $options['embedder'] ?? 'default',
+        ];
 
-        if (isset($options['embedder'])) {
-            $params['embedder'] = $options['embedder'];
+        if (isset($options['semantic_ratio'])) {
+            $params['hybrid']['semanticRatio'] = $options['semantic_ratio'];
         }
 
         if (isset($options['similarity_threshold'])) {
@@ -360,40 +338,6 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
         }
 
         return $params;
-    }
-
-    /**
-     * 提取地理位置搜索（增强版）
-     */
-    protected function extractGeoSearch(AdvancedScoutBuilder $builder): array
-    {
-        $geoParams = [];
-
-        foreach ($builder->getAdvancedWheres() as $condition) {
-            if ($condition['operator'] === 'geo_radius') {
-                $value = $condition['value'];
-                $geoParams = array_merge($geoParams, [
-                    'aroundLatLng' => $value['lat'] . ',' . $value['lng'],
-                    'aroundRadius' => $value['radius'],
-                    'aroundPrecision' => $condition['options']['precision'] ?? 1,
-                ]);
-            } elseif ($condition['operator'] === 'geo_bounding_box') {
-                $value = $condition['value'];
-                $geoParams = array_merge($geoParams, [
-                    'insideBoundingBox' => [
-                        [$value['top_left']['lng'], $value['top_left']['lat']],
-                        [$value['bottom_right']['lng'], $value['bottom_right']['lat']],
-                    ],
-                ]);
-            } elseif ($condition['operator'] === 'geo_polygon') {
-                $value = $condition['value'];
-                $geoParams = array_merge($geoParams, [
-                    'insidePolygon' => $value['points'],
-                ]);
-            }
-        }
-
-        return $geoParams;
     }
 
     /**
@@ -420,17 +364,11 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
                 // 添加高亮
                 if (isset($hit['_formatted'])) {
                     $document['_highlight'] = $hit['_formatted'];
-                    unset($document['_formatted']);
                 }
 
                 // 添加匹配位置
                 if (isset($hit['_matchesPosition'])) {
                     $document['_matches_position'] = $hit['_matchesPosition'];
-                }
-
-                // 添加裁剪结果
-                if (isset($hit['_formatted'])) {
-                    $document['_formatted'] = $hit['_formatted'];
                 }
 
                 return $document;
@@ -509,10 +447,10 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
         }
 
         try {
-            $index->updateDocuments($documents);
+            $task = $index->updateDocuments($documents);
 
             // 等待任务完成
-            $this->waitForTaskCompletion($index);
+            $this->waitForTaskCompletion($index, $task['taskUid'] ?? null);
         } catch (\Exception $e) {
             Log::error('Failed to update vectors in Meilisearch', [
                 'error' => $e->getMessage(),
@@ -526,18 +464,13 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     /**
      * 等待任务完成
      */
-    protected function waitForTaskCompletion($index, int $maxAttempts = 30, int $sleep = 1000): void
+    protected function waitForTaskCompletion($index, ?int $taskUid = null, int $maxAttempts = 30, int $sleep = 1000): void
     {
         $attempts = 0;
 
-        // 获取最新的任务
-        $tasks = $index->getTasks(['limit' => 1]);
-
-        if (empty($tasks['results'])) {
+        if ($taskUid === null) {
             return;
         }
-
-        $taskUid = $tasks['results'][0]['uid'];
 
         while ($attempts < $maxAttempts) {
             $task = $index->getTask($taskUid);

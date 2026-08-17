@@ -91,7 +91,7 @@ class XunSearchEngine extends Engine
         }
 
         // 刷新索引（可选，根据性能需求调整）
-        if (scout_config('xunsearch.auto_flush', true)) {
+        if (scout_config('xunsearch.search.auto_flush', true)) {
             $index->flushIndex();
         }
     }
@@ -340,24 +340,25 @@ class XunSearchEngine extends Engine
     /**
      * 映射 ID
      */
-    public function mapIds($results)
+    public function mapIds($results, $keyName = null)
     {
         if (empty($results['hits'])) {
             return Collection::make();
         }
 
-        $modelKeyName = null;
         $ids = [];
 
         foreach ($results['hits'] as $hit) {
             if (isset($hit['data'])) {
-                // 尝试从数据中提取主键
+                if ($keyName !== null && array_key_exists($keyName, $hit['data'])) {
+                    $ids[] = $hit['data'][$keyName];
+                    continue;
+                }
+
+                // 回退：从数据中提取主键
                 foreach ($hit['data'] as $key => $value) {
                     if (strpos($key, '_id') !== false || $key === 'id') {
                         $ids[] = $value;
-                        if (!$modelKeyName) {
-                            $modelKeyName = $key;
-                        }
                         break;
                     }
                 }
@@ -376,8 +377,8 @@ class XunSearchEngine extends Engine
             return $model->newCollection();
         }
 
-        $objectIds = $this->mapIds($results)->all();
-        
+        $objectIds = $this->mapIds($results, $model->getKeyName())->all();
+
         if (empty($objectIds)) {
             return $model->newCollection();
         }
@@ -399,7 +400,7 @@ class XunSearchEngine extends Engine
             return LazyCollection::make();
         }
 
-        $objectIds = $this->mapIds($results)->all();
+        $objectIds = $this->mapIds($results, $model->getKeyName())->all();
 
         if (empty($objectIds)) {
             return LazyCollection::make();
