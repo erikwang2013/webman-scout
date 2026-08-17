@@ -55,7 +55,7 @@ Driver-based full-text search for **Eloquent** models, inspired by [Laravel Scou
 
 ## Framework support
 
-Runtime integration targets applications that expose Laravel’s **`config()` helper** and an **Illuminate container** (`app()`), with **Eloquent** (`Illuminate\Database\Eloquent\Model`) models.
+Runtime integration targets applications that expose Laravel’s **`config()` helper** and an **Illuminate container** (`app()`), with **Eloquent** (`Illuminate\Database\Eloquent\Model`) models. For Yii2/Yii3 the package provides the `config()` polyfill itself (see below), so only Eloquent + an Illuminate container are required.
 
 | Framework | Versions | Notes |
 |-----------|----------|--------|
@@ -63,6 +63,8 @@ Runtime integration targets applications that expose Laravel’s **`config()` he
 | **Laravel** | 7.x – 12.x | Copy the plugin `app.php` array into `config/scout.php` (or `config/erikwang2013.webman-scout.php`) and set `SCOUT_CONFIG_KEY` (see below). Requires **PHP 8.0+** (Laravel 7 on PHP 8 is supported in recent 7.x releases). |
 | **Hyperf** | 2.x – 3.x | Use Hyperf’s config + DI; `Hyperf\Database\Model` is Eloquent-compatible. Map Scout options into config and set `SCOUT_CONFIG_KEY` if not using the Webman plugin path. |
 | **ThinkPHP** | 6.x / 8.x | Use when the app loads **Illuminate** `config` / `app()` (e.g. hybrid setups or `illuminate/database` Eloquent models). Native `think\Model` is **not** wired to the `Searchable` trait; call engine APIs manually or use Eloquent models for indexed entities. |
+| **Yii2** | 2.x | `config()` polyfill reads `Yii::$app->params['scout']`; cache/log route through `Yii::$app->cache` and `Yii::info\|warning\|error`; console bridge `yii scout/*`. |
+| **Yii3** | 3.x | Config plugin (`ScoutConfigProvider`) injects default `scout` params; PSR-16 cache + PSR-3 logger; register the Symfony commands under `yiisoft/yii-console`. |
 
 Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **^5.4 – ^7.0** so dependency resolution matches your framework stack.
 
@@ -80,7 +82,7 @@ Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **
 composer require erikwang2013/webman-scout
 ```
 
-The Composer **autoload `files`** entry loads `helpers.php`, which defines `app()`, `event()`, and `scout_config()` when needed and registers `EngineManager`.
+The Composer **autoload `files`** entry loads `helpers.php`, which defines `app()`, `event()`, `config()` (Yii2/Yii3 only), and `scout_config()` when needed and registers `EngineManager`.
 
 ### Webman
 
@@ -158,14 +160,61 @@ The following sections assume `composer require erikwang2013/webman-scout` is al
 3. **Pure ThinkPHP models**: index data by calling **`app(EngineManager::class)->engine()`** (or the concrete engine class) `update` / `delete` / `search` with arrays you build yourself, or maintain a thin Eloquent model mapped to the same table for search-only usage.
 4. **Config**: ThinkPHP’s `config('scout.driver')` works if you define `config/scout.php` (or the version your major version uses) with the same array shape as this package’s `app.php`.
 
+### Yii2 (2.x)
+
+1. **Config**: put the Scout array under `'scout'` in `config/params.php`, with the same keys as this package’s `src/config/plugin/erikwang2013/webman-scout/app.php` (copy it). `helpers.php` provides a `config()` polyfill that reads `Yii::$app->params` via dot notation, so `scout_config('driver')` resolves `params['scout']['driver']` automatically — no `SCOUT_CONFIG_KEY` needed.
+2. **Models**: use real Eloquent models (`Illuminate\Database\Eloquent\Model` with `use Searchable`) booted via an `illuminate/database` Capsule; the package does **not** depend on `Yii::$app->db`.
+3. **Console**: register the bridge in `config/console.php`:
+
+   ```php
+   'controllerMap' => [
+       'scout' => \Erikwang2013\WebmanScout\Yii\ScoutController::class,
+   ],
+   ```
+
+   Then `yii scout/import "App\Models\Product"`, `yii scout/flush "App\Models\Product"`, `yii scout/index --name=posts [--key=id]`, `yii scout/delete-index --name=posts`, `yii scout/queue-import`, `yii scout/sync-index-settings [--driver=...]`, `yii scout/delete-all-indexes`. Action params map to the Symfony options, e.g. `yii scout/import "App\Models\Product" --chunk=500 --fresh=1`.
+4. **Cache/Log**: engines automatically route `Support\Cache` / `Support\Log` through `Yii::$app->cache` (any `yii\caching\Cache` component) and `Yii::info|warning|error` when Yii2 is detected.
+5. **Queues**: same as other frameworks — keep `'queue' => false` (synchronous) or implement custom async jobs.
+
+### Yii3 (3.x)
+
+1. **Config plugin**: register the provider in `config-plugin.php`:
+
+   ```php
+   'providers' => [
+       // ...
+       'erikwang2013/webman-scout' => [\Erikwang2013\WebmanScout\Yii3\ScoutConfigProvider::class],
+   ],
+   ```
+
+   The provider injects default `scout` params (the package’s webman `app.php` array) and wires the config/cache/log seams to the container: `scout_config()` reads the merged `params['scout']`, cache uses the PSR-16 `CacheInterface`, logging uses the PSR-3 `LoggerInterface`. Override by setting your own `'scout' => [...]` in the app params.
+2. **Console**: register the Symfony commands in `params['yiisoft/yii-console']['commands']`:
+
+   ```php
+   'yiisoft/yii-console' => [
+       'commands' => [
+           'scout:import' => \Erikwang2013\WebmanScout\Command\ImportCommand::class,
+           'scout:queue-import' => \Erikwang2013\WebmanScout\Command\QueueImportCommand::class,
+           'scout:index' => \Erikwang2013\WebmanScout\Command\IndexCommand::class,
+           'scout:flush' => \Erikwang2013\WebmanScout\Command\FlushCommand::class,
+           'scout:sync-index-settings' => \Erikwang2013\WebmanScout\Command\SyncIndexSettingsCommand::class,
+           'scout:delete-index' => \Erikwang2013\WebmanScout\Command\DeleteIndexCommand::class,
+           'scout:delete-all-indexes' => \Erikwang2013\WebmanScout\Command\DeleteAllIndexesCommand::class,
+       ],
+   ],
+   ```
+
+3. **Models**: same as Yii2 — Eloquent models via an `illuminate/database` Capsule.
+4. **Queues**: same as other frameworks — `'queue' => false` or custom async jobs.
+
 ### Quick checklist
 
-| Step | Webman | Laravel | Hyperf | ThinkPHP (Eloquent/hybrid) |
-|------|--------|---------|--------|-----------------------------|
-| Scout config file | `config/plugin/.../app.php` | `config/scout.php` | `config/autoload/scout.php` | `config/scout.php` (or equivalent) |
-| `SCOUT_CONFIG_KEY` | Usually omit | `scout` | `scout` | `scout` (if not using plugin path) |
-| Console | `php webman scout:*` | `php artisan scout:*` (after registration) | Hyperf command registration | Per your console setup |
-| Async indexing | Redis Queue + consumers | `queue` false or custom jobs | `queue` false or custom jobs | `queue` false or custom jobs |
+| Step | Webman | Laravel | Hyperf | ThinkPHP (Eloquent/hybrid) | Yii2 | Yii3 |
+|------|--------|---------|--------|-----------------------------|------|------|
+| Scout config file | `config/plugin/.../app.php` | `config/scout.php` | `config/autoload/scout.php` | `config/scout.php` (or equivalent) | `params['scout']` | `params['scout']` (provider-injected) |
+| `SCOUT_CONFIG_KEY` | Usually omit | `scout` | `scout` | `scout` (if not using plugin path) | Usually omit | Usually omit |
+| Console | `php webman scout:*` | `php artisan scout:*` (after registration) | Hyperf command registration | Per your console setup | `yii scout/*` (controllerMap) | Symfony commands in `yiisoft/yii-console` |
+| Async indexing | Redis Queue + consumers | `queue` false or custom jobs | `queue` false or custom jobs | `queue` false or custom jobs | `queue` false or custom jobs | `queue` false or custom jobs |
 
 
 ## Configuration

@@ -55,6 +55,36 @@ if (! function_exists('scout_config')) {
     }
 }
 
+if (! function_exists('config')) {
+    /**
+     * Laravel-style config() polyfill for hosts without one (Yii2 / Yii3).
+     *
+     * Yii2: reads Yii::$app->params via dot notation.
+     * Yii3: reads the params source registered by ScoutConfig::setSource()
+     * (see Erikwang2013\WebmanScout\Yii3\ScoutConfigProvider).
+     */
+    function config($key = null, $default = null)
+    {
+        if (class_exists(\yii\base\Application::class) && isset(\Yii::$app)) {
+            if ($key === 'app.debug') {
+                return (bool) \Yii::$app->debug;
+            }
+
+            $params = \Yii::$app->params;
+            foreach (explode('.', (string) $key) as $segment) {
+                if (! is_array($params) || ! array_key_exists($segment, $params)) {
+                    return $default;
+                }
+                $params = $params[$segment];
+            }
+
+            return $params;
+        }
+
+        return \Erikwang2013\WebmanScout\ScoutConfig::getSource((string) $key, $default);
+    }
+}
+
 if (class_exists(MeilisearchClient::class)) {
     app()->singleton(MeilisearchClient::class, function () {
         $c = scout_config('meilisearch', []);

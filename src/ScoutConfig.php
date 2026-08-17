@@ -16,9 +16,55 @@ class ScoutConfig
 {
     protected static ?string $resolvedBase = null;
 
+    /**
+     * Custom resolver: fn(string $key, $default) => mixed. Set by Yii3's ConfigProvider
+     * (and consumed by the Yii2/3 `config()` polyfill in helpers.php).
+     * No callable type declaration — property types for callable need PHP 8.4+.
+     *
+     * @var callable|null
+     */
+    protected static $customSource = null;
+
     public static function resetResolvedBase(): void
     {
         static::$resolvedBase = null;
+    }
+
+    public static function setSource(?callable $resolver): void
+    {
+        static::$customSource = $resolver;
+        static::resetResolvedBase();
+    }
+
+    public static function getSource(string $key, $default = null)
+    {
+        $resolver = static::$customSource;
+        if ($resolver === null) {
+            return $default;
+        }
+
+        try {
+            return $resolver($key, $default);
+        } catch (\Throwable $e) {
+            return $default;
+        }
+    }
+
+    protected static function resolve(string $key, $default = null)
+    {
+        if (static::$customSource !== null) {
+            return static::getSource($key, $default);
+        }
+
+        if (! function_exists('config')) {
+            return $default;
+        }
+
+        try {
+            return config($key, $default);
+        } catch (\Throwable $e) {
+            return $default;
+        }
     }
 
     public static function baseKey(): string
@@ -32,27 +78,19 @@ class ScoutConfig
             return static::$resolvedBase = rtrim($override, '.');
         }
 
-        if (! function_exists('config')) {
+        if (static::$customSource === null && ! function_exists('config')) {
             return static::$resolvedBase = 'plugin.erikwang2013.webman-scout.app';
         }
 
-        try {
-            $webman = config('plugin.erikwang2013.webman-scout.app');
-            if (is_array($webman)) {
-                return static::$resolvedBase = 'plugin.erikwang2013.webman-scout.app';
-            }
-        } catch (\Throwable $e) {
-            //
+        $webman = static::resolve('plugin.erikwang2013.webman-scout.app');
+        if (is_array($webman)) {
+            return static::$resolvedBase = 'plugin.erikwang2013.webman-scout.app';
         }
 
         foreach (['scout', 'erikwang2013.webman-scout'] as $candidate) {
-            try {
-                $v = config($candidate);
-                if (is_array($v) && (array_key_exists('driver', $v) || array_key_exists('prefix', $v))) {
-                    return static::$resolvedBase = $candidate;
-                }
-            } catch (\Throwable $e) {
-                //
+            $v = static::resolve($candidate);
+            if (is_array($v) && (array_key_exists('driver', $v) || array_key_exists('prefix', $v))) {
+                return static::$resolvedBase = $candidate;
             }
         }
 
@@ -68,17 +106,9 @@ class ScoutConfig
         $base = static::baseKey();
 
         if ($relativeKey === null || $relativeKey === '') {
-            try {
-                return config($base, $default);
-            } catch (\Throwable $e) {
-                return $default;
-            }
+            return static::resolve($base, $default);
         }
 
-        try {
-            return config($base.'.'.$relativeKey, $default);
-        } catch (\Throwable $e) {
-            return $default;
-        }
+        return static::resolve($base.'.'.$relativeKey, $default);
     }
 }
