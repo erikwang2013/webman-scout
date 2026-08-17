@@ -7,21 +7,25 @@
 namespace Erikwang2013\WebmanScout\Command;
 
 use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
+use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
 use Erikwang2013\WebmanScout\Contracts\UpdatesIndexSettings;
 use Erikwang2013\WebmanScout\EngineManager;
 use Erikwang2013\WebmanScout\Engines\Engine;
 use Erikwang2013\WebmanScout\Exceptions\NotSupportedException;
 
 
+#[AsCommand(name: 'scout:index', description: 'Create an index')]
 class IndexCommand extends Command
 {
+    use ResolvesScoutModel;
+
     /**
      * The name and signature of the console command.
      *
@@ -59,7 +63,8 @@ class IndexCommand extends Command
             }
 
             if (class_exists($modelName = $input->getArgument('name'))) {
-                $model = new $modelName;
+                $reflection = new \ReflectionClass($modelName);
+                $model = $reflection->isInstantiable() ? $reflection->newInstance() : null;
             }
 
             $name = $this->indexName($input->getArgument('name'));
@@ -113,20 +118,4 @@ class IndexCommand extends Command
         }
     }
 
-    /**
-     * Get the fully-qualified index name for the given index.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function indexName($name)
-    {
-        if (class_exists($name)) {
-            return (new $name)->indexableAs();
-        }
-
-        $prefix = scout_config('prefix');
-
-        return ! Str::startsWith($name, $prefix) ? $prefix . $name : $name;
-    }
 }

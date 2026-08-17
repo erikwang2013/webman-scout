@@ -412,13 +412,17 @@ class TypesenseEngine extends Engine
     /**
      * Parse the given filter value.
      *
-     * @param  array|string|bool|int|float  $value
+     * @param  array|string|bool|int|float|null  $value
      * @return array|bool|float|int|string
      */
-    protected function parseFilterValue(array|string|bool|int|float $value)
+    protected function parseFilterValue(array|string|bool|int|float|null $value)
     {
         if (is_array($value)) {
             return array_map([$this, 'parseFilterValue'], $value);
+        }
+
+        if ($value === null) {
+            return 'null';
         }
 
         if (gettype($value) == 'boolean') {

@@ -205,7 +205,7 @@ class ElasticSearchEngine extends Engine
             'body' => [
                 'query' => [
                     'bool' => [
-                        'must' => [['query_string' => ['query' => "*{$builder->query}*"]]]
+                        'must' => [['query_string' => ['query' => '*'.$this->escapeQueryString($builder->query).'*']]]
                     ]
                 ]
             ]
@@ -240,6 +240,42 @@ class ElasticSearchEngine extends Engine
         }
 
         return $this->elasticsearch->search($params);
+    }
+
+    /**
+     * Lucene query_string 特殊字符转义表（\\ 必须放在最前，strtr 按最长键优先匹配）
+     */
+    protected array $queryStringEscapes = [
+        '\\' => '\\\\',
+        '+' => '\\+',
+        '-' => '\\-',
+        '=' => '\\=',
+        '&&' => '\\&&',
+        '||' => '\\||',
+        '>' => '\\>',
+        '<' => '\\<',
+        '!' => '\\!',
+        '(' => '\\(',
+        ')' => '\\)',
+        '{' => '\\{',
+        '}' => '\\}',
+        '[' => '\\[',
+        ']' => '\\]',
+        '^' => '\\^',
+        '"' => '\\"',
+        '~' => '\\~',
+        '*' => '\\*',
+        '?' => '\\?',
+        ':' => '\\:',
+        '/' => '\\/',
+    ];
+
+    /**
+     * 转义 Lucene query_string 元字符，防止用户输入改写查询语义
+     */
+    protected function escapeQueryString(string $query): string
+    {
+        return strtr($query, $this->queryStringEscapes);
     }
 
     /**

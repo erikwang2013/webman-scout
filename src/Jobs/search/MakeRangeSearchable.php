@@ -50,7 +50,8 @@ class MakeRangeSearchable implements Consumer
         } catch (Throwable $e) {
             $attempts = (int) ($data['attempts'] ?? 1);
             if ($attempts < 5) {
-                QueueRedis::send('scout_make_range', $data + ['attempts' => $attempts + 1], 5);
+                $data['attempts'] = $attempts + 1;
+                QueueRedis::send('scout_make_range', $data, 5);
             }
             throw $e;
         }

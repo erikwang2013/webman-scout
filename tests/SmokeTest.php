@@ -9,6 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 class SmokeTest extends TestCase
 {
+    protected function tearDown(): void
+    {
+        ScoutConfig::setSource(null);
+        ScoutConfig::resetResolvedBase();
+    }
+
     public function testVersionConstant(): void
     {
         $this->assertSame('10.23.0', Scout::VERSION);
@@ -41,9 +47,6 @@ class SmokeTest extends TestCase
         $this->assertSame('http://127.0.0.1:7700', ScoutConfig::get('meilisearch.host'));
         $this->assertNull(ScoutConfig::get('missing.key'));
         $this->assertSame('fallback', ScoutConfig::get('missing.key', 'fallback'));
-
-        ScoutConfig::setSource(null);
-        ScoutConfig::resetResolvedBase();
     }
 
     public function testConfigPolyfillYii3Branch(): void
@@ -71,9 +74,6 @@ class SmokeTest extends TestCase
 
         $this->assertSame('typesense', config('scout.driver'));
         $this->assertNull(config('scout.missing'));
-
-        ScoutConfig::setSource(null);
-        ScoutConfig::resetResolvedBase();
     }
 
     public function testBuilderDefaults(): void

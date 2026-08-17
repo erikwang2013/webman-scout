@@ -7,17 +7,21 @@
 namespace Erikwang2013\WebmanScout\Command;
 
 use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
+use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
 use Erikwang2013\WebmanScout\Contracts\UpdatesIndexSettings;
 use Erikwang2013\WebmanScout\EngineManager;
 
+#[AsCommand(name: 'scout:sync-index-settings', description: 'Sync your configured index settings with your search engine (Meilisearch)')]
 class SyncIndexSettingsCommand extends Command
 {
+    use ResolvesScoutModel;
+
     /**
      * The name and signature of the console command.
      *
@@ -93,20 +97,4 @@ class SyncIndexSettingsCommand extends Command
         }
     }
 
-    /**
-     * Get the fully-qualified index name for the given index.
-     *
-     * @param  string  $name
-     * @return string
-     */
-    protected function indexName($name)
-    {
-        if (class_exists($name)) {
-            return (new $name)->indexableAs();
-        }
-
-        $prefix = scout_config('prefix');
-
-        return ! Str::startsWith($name, $prefix) ? $prefix . $name : $name;
-    }
 }

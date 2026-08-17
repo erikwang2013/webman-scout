@@ -308,10 +308,10 @@ class AdvancedTypesenseEngine extends TypesenseEngine
             ),
             'exists' => $field . ':*',
             'missing' => '!' . $field . ':*',
-            'contains' => $field . ':*' . $value . '*',
-            'starts_with' => $field . ':' . $value . '*',
-            'ends_with' => $field . ':*' . $value,
-            'regex' => $field . ':/' . $value . '/',
+            'contains' => $field . ':*' . $this->formatTypesenseValue($value) . '*',
+            'starts_with' => $field . ':' . $this->formatTypesenseValue($value) . '*',
+            'ends_with' => $field . ':*' . $this->formatTypesenseValue($value),
+            'regex' => $field . ':/' . addcslashes((string) $value, '"\\/') . '/',
             'match' => $field . ':= ' . $this->formatTypesenseValue($value),
             'in' => $field . ':[' . implode(', ', $this->formatTypesenseValues((array)$value)) . ']',
             'not_in' => $field . ':!=[' . implode(', ', $this->formatTypesenseValues((array)$value)) . ']',
@@ -658,6 +658,12 @@ class AdvancedTypesenseEngine extends TypesenseEngine
 
             return is_array($doc) ? $doc : [];
         } catch (\Throwable $e) {
+            Log::error('Failed to get Typesense document', [
+                'collection' => $collectionName,
+                'id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
             return [];
         }
     }
@@ -670,9 +676,14 @@ class AdvancedTypesenseEngine extends TypesenseEngine
         $collection = $this->typesense->getCollections()->{$collectionName};
         
         try {
-            $filter = 'id:[' . implode(', ', array_map(fn($id) => '"' . $id . '"', $ids)) . ']';
+            $filter = 'id:[' . implode(', ', $this->formatTypesenseValues($ids)) . ']';
             return $collection->getDocuments()->search(['filter_by' => $filter]);
         } catch (\Exception $e) {
+            Log::error('Failed to get Typesense documents', [
+                'collection' => $collectionName,
+                'error' => $e->getMessage(),
+            ]);
+
             return [];
         }
     }

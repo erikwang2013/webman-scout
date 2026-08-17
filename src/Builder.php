@@ -433,7 +433,7 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = $this->applyAfterRawSearchCallback($engine->paginate($this, $perPage, $page));
+        $results = $this->applyAfterRawSearchCallback($rawResults = $engine->paginate($this, $perPage, $page));
 
         $paginator = Container::getInstance()->makeWith(Paginator::class, [
             'items' => $results,
@@ -443,7 +443,7 @@ class Builder
                 'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
-        ])->hasMorePagesWhen(($perPage * $page) < $this->getTotalCount($results));
+        ])->hasMorePagesWhen(($perPage * $page) < $this->getTotalCount($rawResults));
 
         return $paginator->appends('query', $this->query);
     }
@@ -510,11 +510,11 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = $this->applyAfterRawSearchCallback($engine->paginate($this, $perPage, $page));
+        $results = $this->applyAfterRawSearchCallback($rawResults = $engine->paginate($this, $perPage, $page));
 
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
             'items' => $results,
-            'total' => $this->getTotalCount($results),
+            'total' => $this->getTotalCount($rawResults),
             'perPage' => $perPage,
             'currentPage' => $page,
             'options' => [

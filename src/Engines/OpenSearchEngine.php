@@ -177,10 +177,8 @@ class OpenSearchEngine extends Engine
                 'error' => $e->getMessage(),
                 'params_count' => count($params['body'] ?? []),
             ]);
-            
-            if (config('app.debug')) {
-                throw $e;
-            }
+
+            throw $e;
         }
     }
 
@@ -484,10 +482,8 @@ class OpenSearchEngine extends Engine
                 'index' => $index,
                 'error' => $e->getMessage(),
             ]);
-            
-            if (config('app.debug')) {
-                throw $e;
-            }
+
+            throw $e;
         }
     }
 
@@ -544,10 +540,8 @@ class OpenSearchEngine extends Engine
                 'index' => $name,
                 'error' => $e->getMessage(),
             ]);
-            
-            if (config('app.debug')) {
-                throw $e;
-            }
+
+            throw $e;
         }
     }
 
@@ -597,10 +591,8 @@ class OpenSearchEngine extends Engine
                 'index' => $name,
                 'error' => $e->getMessage(),
             ]);
-            
-            if (config('app.debug')) {
-                throw $e;
-            }
+
+            throw $e;
         }
     }
 

@@ -6,6 +6,8 @@
 
 namespace Erikwang2013\WebmanScout\Command;
 
+use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -14,6 +16,7 @@ use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
 use Symfony\Component\Console\Input\InputOption;
 use Webman\RedisQueue\Redis as QueueRedis;
 
+#[AsCommand(name: 'scout:queue-import', description: 'Import the given model into the search index via chunked, queued jobs')]
 class QueueImportCommand extends Command
 {
     use ResolvesScoutModel;
@@ -48,44 +51,49 @@ class QueueImportCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = $this->resolveModelClass((string) $input->getArgument('model'));
+        try {
+            $class = $this->resolveModelClass((string) $input->getArgument('model'));
 
-        $model = new $class;
+            $model = new $class;
 
-        $query = $model::makeAllSearchableQuery();
+            $query = $model::makeAllSearchableQuery();
 
-        $min = $input->getOption('min') ?? $query->min($model->getScoutKeyName());
-        $max = $input->getOption('max') ?? $query->max($model->getScoutKeyName());
+            $min = $input->getOption('min') ?? $query->min($model->getScoutKeyName());
+            $max = $input->getOption('max') ?? $query->max($model->getScoutKeyName());
 
-        $chunk = max(1, (int) ($input->getOption('chunk') ?? scout_config('chunk.searchable', 500)));
+            $chunk = max(1, (int) ($input->getOption('chunk') ?? scout_config('chunk.searchable', 500)));
 
-        if (! $min || ! $max) {
-            $output->writeln('No records found for [' . $class . '].');
+            if (! $min || ! $max) {
+                $output->writeln('No records found for [' . $class . '].');
 
+                return Command::FAILURE;
+            }
+
+            if (! is_numeric($min) || ! is_numeric($max)) {
+                $output->writeln('The primary key for [' . $class . '] is not numeric.');
+
+                return Command::FAILURE;
+            }
+
+            if (! class_exists(QueueRedis::class)) {
+                $output->writeln('<error>The webman/redis-queue plugin is required for queued importing.</error>');
+
+                return Command::FAILURE;
+            }
+
+            for ($start = $min; $start <= $max; $start += $chunk) {
+                $end = min($start + $chunk - 1, $max);
+
+                QueueRedis::send('scout_make_range', ['model' => $class, 'start' => $start, 'end' => $end]);
+
+                $output->writeln('<comment>Queued [' . $class . '] models up to ID:</comment> ' . $end);
+            }
+
+            $output->writeln('All [' . $class . '] records have been queued for importing.');
+            return Command::SUCCESS;
+        } catch (Exception $exception) {
+            $output->writeln($exception->getMessage());
             return Command::FAILURE;
         }
-
-        if (! is_numeric($min) || ! is_numeric($max)) {
-            $output->writeln('The primary key for [' . $class . '] is not numeric.');
-
-            return Command::FAILURE;
-        }
-
-        if (! class_exists(QueueRedis::class)) {
-            $output->writeln('<error>The webman/redis-queue plugin is required for queued importing.</error>');
-
-            return Command::FAILURE;
-        }
-
-        for ($start = $min; $start <= $max; $start += $chunk) {
-            $end = min($start + $chunk - 1, $max);
-
-            QueueRedis::send('scout_make_range', ['model' => $class, 'start' => $start, 'end' => $end]);
-
-            $output->writeln('<comment>Queued [' . $class . '] models up to ID:</comment> ' . $end);
-        }
-
-        $output->writeln('All [' . $class . '] records have been queued for importing.');
-        return Command::SUCCESS;
     }
 }

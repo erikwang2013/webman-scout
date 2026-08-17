@@ -235,7 +235,7 @@ class XunSearchEngine extends Engine
             } else {
                 // 精确匹配：添加到查询字符串
                 $currentQuery = $search->getQuery();
-                $search->setQuery($currentQuery . " {$field}:{$value}");
+                $search->setQuery($currentQuery . ' ' . sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\')));
             }
         }
 
@@ -259,7 +259,7 @@ class XunSearchEngine extends Engine
         if (!empty($values)) {
             $conditions = [];
             foreach ($values as $value) {
-                $conditions[] = "{$field}:{$value}";
+                $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
             }
             
             $currentQuery = $search->getQuery();
@@ -282,7 +282,7 @@ class XunSearchEngine extends Engine
         if (!empty($values)) {
             $conditions = [];
             foreach ($values as $value) {
-                $conditions[] = "{$field}:{$value}";
+                $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
             }
             
             $currentQuery = $search->getQuery();
@@ -449,10 +449,8 @@ class XunSearchEngine extends Engine
                 'index' => $name,
                 'error' => $e->getMessage(),
             ]);
-            
-            if (config('app.debug')) {
-                throw $e;
-            }
+
+            throw $e;
         }
     }
 

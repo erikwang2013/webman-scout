@@ -6,6 +6,8 @@
 
 namespace Erikwang2013\WebmanScout\Command;
 
+use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -13,6 +15,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
 
+#[AsCommand(name: 'scout:flush', description: "Flush all of the model's records from the index")]
 class FlushCommand extends Command
 {
     use ResolvesScoutModel;
@@ -44,13 +47,18 @@ class FlushCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = $this->resolveModelClass((string) $input->getArgument('model'));
+        try {
+            $class = $this->resolveModelClass((string) $input->getArgument('model'));
 
-        $model = new $class;
+            $model = new $class;
 
-        $model::removeAllFromSearch();
+            $model::removeAllFromSearch();
 
-        $output->writeln('All [' . $class . '] records have been flushed.');
-        return Command::SUCCESS;
+            $output->writeln('All [' . $class . '] records have been flushed.');
+            return Command::SUCCESS;
+        } catch (Exception $exception) {
+            $output->writeln($exception->getMessage());
+            return Command::FAILURE;
+        }
     }
 }

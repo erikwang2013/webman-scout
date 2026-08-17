@@ -6,6 +6,7 @@
 
 namespace Erikwang2013\WebmanScout\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -16,6 +17,7 @@ use Erikwang2013\WebmanScout\Events\ModelsImported;
 use Illuminate\Events\Dispatcher;
 
 
+#[AsCommand(name: 'scout:import', description: 'Import the given model into the search index')]
 class ImportCommand extends Command
 {
     use ResolvesScoutModel;

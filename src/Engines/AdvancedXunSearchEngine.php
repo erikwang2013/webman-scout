@@ -104,7 +104,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
                 // 添加字段限制
                 $fields = $this->getQueryFields($builder);
                 if ($fields) {
-                    $queryParts[] = "{$fields}:{$builder->query}";
+                    $queryParts[] = sprintf('%s:"%s"', $fields, addcslashes($builder->query, '"\\'));
                 } else {
                     $queryParts[] = $builder->query;
                 }
@@ -124,13 +124,13 @@ class AdvancedXunSearchEngine extends XunSearchEngine
                     // IN 查询（XunSearch 无 IN，转为 OR 表达式）
                     $conditions = [];
                     foreach ($value as $item) {
-                        $conditions[] = "{$field}:{$item}";
+                        $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $item, '"\\'));
                     }
                     $queryParts[] = '(' . implode(' OR ', $conditions) . ')';
                 }
             } else {
                 // 精确匹配
-                $queryParts[] = "{$field}:{$value}";
+                $queryParts[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
             }
         }
 
@@ -205,19 +205,19 @@ class AdvancedXunSearchEngine extends XunSearchEngine
             'date_range' => $this->buildDateRangeQuery($field, $value, $options),
             'in' => $this->buildInQuery($field, (array)$value),
             'not_in' => $this->buildNotInQuery($field, (array)$value),
-            '>' => "{$field}:>{$value}",
-            '>=' => "{$field}:>={$value}",
-            '<' => "{$field}:<{$value}",
-            '<=' => "{$field}:<={$value}",
-            '!=' => "NOT {$field}:{$value}",
-            'like' => "{$field}:*{$value}*",
-            'starts_with' => "{$field}:{$value}*",
-            'ends_with' => "{$field}:*{$value}",
+            '>' => sprintf('%s:>"%s"', $field, addcslashes((string) $value, '"\\')),
+            '>=' => sprintf('%s:>="%s"', $field, addcslashes((string) $value, '"\\')),
+            '<' => sprintf('%s:<"%s"', $field, addcslashes((string) $value, '"\\')),
+            '<=' => sprintf('%s:<="%s"', $field, addcslashes((string) $value, '"\\')),
+            '!=' => sprintf('NOT %s:"%s"', $field, addcslashes((string) $value, '"\\')),
+            'like' => sprintf('%s:*"%s"*', $field, addcslashes((string) $value, '"\\')),
+            'starts_with' => sprintf('%s:"%s"*', $field, addcslashes((string) $value, '"\\')),
+            'ends_with' => sprintf('%s:*"%s"', $field, addcslashes((string) $value, '"\\')),
             'exists' => "{$field}:[* TO *]",
             'missing' => "NOT {$field}:[* TO *]",
             'fuzzy' => $this->buildFuzzyQuery($field, $value, $options),
             'proximity' => $this->buildProximityQuery($field, $value, $options),
-            default => "{$field}:{$value}",
+            default => sprintf('%s:%s%s', $field, $operator, addcslashes((string) $value, '"\\')),
         };
     }
 
@@ -279,9 +279,9 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         
         $conditions = [];
         foreach ($values as $value) {
-            $conditions[] = "{$field}:{$value}";
+            $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
         }
-        
+
         return '(' . implode(' OR ', $conditions) . ')';
     }
 
@@ -293,10 +293,10 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         if (empty($values)) {
             return '';
         }
-        
+
         $conditions = [];
         foreach ($values as $value) {
-            $conditions[] = "{$field}:{$value}";
+            $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
         }
         
         return 'NOT (' . implode(' OR ', $conditions) . ')';
@@ -308,7 +308,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
     protected function buildFuzzyQuery(string $field, $value, array $options): string
     {
         $distance = $options['distance'] ?? 1;
-        return "{$field}:{$value}~{$distance}";
+        return sprintf('%s:%s~%s', $field, addcslashes((string) $value, '"\\'), $distance);
     }
 
     /**
@@ -317,7 +317,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
     protected function buildProximityQuery(string $field, $value, array $options): string
     {
         $distance = $options['distance'] ?? 5;
-        return "\"{$field}:{$value}\"~{$distance}";
+        return sprintf('"%s:%s"~%s', $field, addcslashes((string) $value, '"\\'), $distance);
     }
 
     /**
@@ -705,7 +705,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
             } else {
                 // 精确匹配：添加到查询字符串
                 $currentQuery = $search->getQuery();
-                $search->setQuery($currentQuery . " {$field}:{$value}");
+                $search->setQuery($currentQuery . ' ' . sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\')));
             }
         }
 

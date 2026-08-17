@@ -645,6 +645,12 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
         try {
             return $index->getDocument($id);
         } catch (\Exception $e) {
+            Log::error('Failed to get Meilisearch document', [
+                'index' => $indexName,
+                'id' => $id,
+                'error' => $e->getMessage(),
+            ]);
+
             return [];
         }
     }
@@ -658,9 +664,14 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
 
         try {
             return $index->getDocuments([
-                'filter' => 'id IN [' . implode(', ', array_map(fn($id) => '"' . $id . '"', $ids)) . ']',
+                'filter' => 'id IN [' . implode(', ', array_map([$this, 'quoteValue'], $ids)) . ']',
             ]);
         } catch (\Exception $e) {
+            Log::error('Failed to get Meilisearch documents', [
+                'index' => $indexName,
+                'error' => $e->getMessage(),
+            ]);
+
             return [];
         }
     }

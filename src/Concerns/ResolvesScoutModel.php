@@ -7,6 +7,7 @@
 namespace Erikwang2013\WebmanScout\Concerns;
 
 use Erikwang2013\WebmanScout\Exceptions\ScoutException;
+use Illuminate\Support\Str;
 
 /**
  * Webman 的 app() 多为 Illuminate\Container\Container，无 getNamespace()；
@@ -44,5 +45,22 @@ trait ResolvesScoutModel
         }
 
         return 'app\\';
+    }
+
+    /**
+     * Get the fully-qualified index name for the given index.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function indexName($name)
+    {
+        if (class_exists($name)) {
+            return (new $name)->indexableAs();
+        }
+
+        $prefix = scout_config('prefix');
+
+        return ! Str::startsWith($name, $prefix) ? $prefix . $name : $name;
     }
 }

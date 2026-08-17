@@ -22,7 +22,9 @@ class YiiCacheStore implements Store
 
     public function get($key)
     {
-        return $this->cache->get($key) ?: null;
+        $value = $this->cache->get($key);
+
+        return $value === false ? null : $value;
     }
 
     public function many(array $keys)

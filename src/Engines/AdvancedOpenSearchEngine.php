@@ -407,7 +407,7 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
             $source = $params['body']['_source'] ?? ['*'];
             $scoreFields = ['_score', '_knn_score'];
             // 兼容 includes/excludes 结构，避免 array_merge 压平
-            $params['body']['_source'] = array_is_list($source)
+            $params['body']['_source'] = $source === array_values($source)
                 ? array_merge($source, $scoreFields)
                 : array_merge($source, ['includes' => array_merge($source['includes'] ?? ['*'], $scoreFields)]);
         }

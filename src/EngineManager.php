@@ -9,6 +9,9 @@ namespace Erikwang2013\WebmanScout;
 use Algolia\AlgoliaSearch\Algolia;
 use Algolia\AlgoliaSearch\Support\AlgoliaAgent as Algolia4UserAgent;
 use Algolia\AlgoliaSearch\Support\UserAgent as Algolia3UserAgent;
+use Erikwang2013\WebmanScout\Engines\AdvancedMeilisearchEngine;
+use Erikwang2013\WebmanScout\Engines\AdvancedTypesenseEngine;
+use Erikwang2013\WebmanScout\Engines\AdvancedXunSearchEngine;
 use Erikwang2013\WebmanScout\Engines\Algolia3Engine;
 use Erikwang2013\WebmanScout\Exceptions\ScoutException;
 use Erikwang2013\WebmanScout\Engines\Algolia4Engine;
@@ -169,6 +172,21 @@ class EngineManager extends Manager
     }
 
     /**
+     * Create an Advanced Meilisearch engine instance.
+     *
+     * @return \Erikwang2013\WebmanScout\Engines\AdvancedMeilisearchEngine
+     */
+    public function createAdvancedMeilisearchDriver()
+    {
+        $this->ensureMeilisearchClientIsInstalled();
+
+        return new AdvancedMeilisearchEngine(
+            $this->container->make(MeilisearchClient::class),
+            scout_config('soft_delete', false)
+        );
+    }
+
+    /**
      * Create an ElasticSearch engine instance.
      *
      * @return \Erikwang2013\WebmanScout\Engines\ElasticSearchEngine
@@ -226,7 +244,7 @@ class EngineManager extends Manager
         $handlerStack = HandlerStack::create(new CurlHandler());
         $clientFactory = new GuzzleClientFactory();
         // 兼容字符串形式的配置值（如 env 注入的 'false'）
-        $sslVerification = filter_var($config['ssl_verification'], FILTER_VALIDATE_BOOLEAN);
+        $sslVerification = filter_var($config['ssl_verification'] ?? true, FILTER_VALIDATE_BOOLEAN);
         $setConfig = [
             'base_uri' => $config['host'],
             'timeout'  => $config['timeout'],
@@ -304,6 +322,21 @@ class EngineManager extends Manager
 
         throw new ScoutException('Please install the XunSearch client: hightman/xunsearch.');
     }
+
+    /**
+     * Create an Advanced XunSearch engine instance.
+     *
+     * @return \Erikwang2013\WebmanScout\Engines\AdvancedXunSearchEngine
+     */
+    public function createAdvancedXunsearchDriver()
+    {
+        $this->ensureXunSearchClientIsInstalled();
+
+        return new AdvancedXunSearchEngine(
+            new XunSearchClient(),
+            scout_config('soft_delete', false)
+        );
+    }
     /**
      * Create a Typesense engine instance.
      *
@@ -331,6 +364,19 @@ class EngineManager extends Manager
         if (! class_exists(Typesense::class)) {
             throw new ScoutException('Please install the suggested Typesense client: typesense/typesense-php.');
         }
+    }
+
+    /**
+     * Create an Advanced Typesense engine instance.
+     *
+     * @return \Erikwang2013\WebmanScout\Engines\AdvancedTypesenseEngine
+     */
+    public function createAdvancedTypesenseDriver()
+    {
+        $config = scout_config('typesense');
+        $this->ensureTypesenseClientIsInstalled();
+
+        return new AdvancedTypesenseEngine(new Typesense($config['client-settings']), $config['max_total_results'] ?? 1000);
     }
 
     /**
