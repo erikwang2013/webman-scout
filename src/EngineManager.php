@@ -73,7 +73,7 @@ class EngineManager extends Manager
         return Algolia3Engine::make(
             config: scout_config('algolia'),
             headers: $this->defaultAlgoliaHeaders(),
-            softDelete: scout_config('soft_delete')
+            softDelete: scout_config('soft_delete', false)
         );
     }
 
@@ -89,7 +89,7 @@ class EngineManager extends Manager
         return Algolia4Engine::make(
             config: scout_config('algolia'),
             headers: $this->defaultAlgoliaHeaders(),
-            softDelete: scout_config('soft_delete')
+            softDelete: scout_config('soft_delete', false)
         );
     }
 
@@ -150,8 +150,24 @@ class EngineManager extends Manager
         $this->ensureMeilisearchClientIsInstalled();
 
         return new MeilisearchEngine(
-            $this->container->make(MeilisearchClient::class),
+            $this->resolveMeilisearchClient(),
             scout_config('soft_delete', false)
+        );
+    }
+
+    /**
+     * Resolve the Meilisearch client, falling back to config defaults when the
+     * container has no explicit binding (webman / ThinkPHP / Hyperf hosts).
+     */
+    protected function resolveMeilisearchClient(): MeilisearchClient
+    {
+        if (method_exists($this->container, 'bound') && $this->container->bound(MeilisearchClient::class)) {
+            return $this->container->make(MeilisearchClient::class);
+        }
+
+        return new MeilisearchClient(
+            scout_config('meilisearch.host', 'http://127.0.0.1:7700'),
+            scout_config('meilisearch.key')
         );
     }
 
@@ -181,7 +197,7 @@ class EngineManager extends Manager
         $this->ensureMeilisearchClientIsInstalled();
 
         return new AdvancedMeilisearchEngine(
-            $this->container->make(MeilisearchClient::class),
+            $this->resolveMeilisearchClient(),
             scout_config('soft_delete', false)
         );
     }
@@ -228,7 +244,7 @@ class EngineManager extends Manager
      */
     protected function ensureElasticSearchClientIsInstalled()
     {
-        if (class_exists(ElasticSearch::class)) {
+        if (class_exists(ClientBuilder::class)) {
             return;
         }
 
@@ -246,14 +262,14 @@ class EngineManager extends Manager
         // 兼容字符串形式的配置值（如 env 注入的 'false'）
         $sslVerification = filter_var($config['ssl_verification'] ?? true, FILTER_VALIDATE_BOOLEAN);
         $setConfig = [
-            'base_uri' => $config['host'],
-            'timeout'  => $config['timeout'],
-            'connect_timeout' => $config['connection_timeout'],
+            'base_uri' => $config['host'] ?? 'http://127.0.0.1:9200',
+            'timeout'  => $config['timeout'] ?? 30,
+            'connect_timeout' => $config['connection_timeout'] ?? 5,
             'handler' => $handlerStack, // 使用我们创建的标准堆栈
             // 认证配置
             'auth' => [
-                $config['username'],
-                $config['password']
+                $config['username'] ?? '',
+                $config['password'] ?? ''
             ],
             // SSL 验证（生产环境应为 true 并配置证书）
             'verify' => $sslVerification,
@@ -284,11 +300,12 @@ class EngineManager extends Manager
      */
     protected function ensureOpenSearchClientIsInstalled()
     {
-        if (class_exists(OpenSearch::class)) {
+        // GuzzleClientFactory 为 opensearch-php ^2.0 独有，1.x 会在此处崩溃
+        if (class_exists(OpenSearch::class) && class_exists(GuzzleClientFactory::class)) {
             return;
         }
 
-        throw new ScoutException('Please install the OpenSearch client: opensearch-project/opensearch-php.');
+        throw new ScoutException('Please install the OpenSearch client (^2.0): opensearch-project/opensearch-php.');
     }
 
     /**
@@ -349,7 +366,7 @@ class EngineManager extends Manager
         $config = scout_config('typesense');
         $this->ensureTypesenseClientIsInstalled();
 
-        return new TypesenseEngine(new Typesense($config['client-settings']), $config['max_total_results'] ?? 1000);
+        return new TypesenseEngine(new Typesense($config['client-settings'] ?? []), $config['max_total_results'] ?? 1000);
     }
 
     /**
@@ -376,7 +393,7 @@ class EngineManager extends Manager
         $config = scout_config('typesense');
         $this->ensureTypesenseClientIsInstalled();
 
-        return new AdvancedTypesenseEngine(new Typesense($config['client-settings']), $config['max_total_results'] ?? 1000);
+        return new AdvancedTypesenseEngine(new Typesense($config['client-settings'] ?? []), $config['max_total_results'] ?? 1000);
     }
 
     /**

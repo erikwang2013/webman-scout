@@ -42,7 +42,6 @@ class Algolia4Engine extends AlgoliaEngine
         $configuration = (new Algolia4SearchConfig(array_merge([
             'appId' => $config['id'],
             'apiKey' => $config['secret'],
-        ]), array_filter([
             'batchSize' => transform(Arr::get($config, 'batch_size'), fn ($batchSize) => is_int($batchSize) ? $batchSize : null),
         ])))->setDefaultHeaders($headers);
 

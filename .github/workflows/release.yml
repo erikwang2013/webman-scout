@@ -1,0 +1,63 @@
+name: Auto Release
+
+# 推送规则：push 到 main 后，基于最新版本 tag 增量创建新 tag 与 GitHub release。
+# bump 规则：默认 patch+1；提交信息含 [minor] 则 minor+1 并清 0 patch；
+# 含 [major] 则 major+1 并清 0 minor/patch。
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: auto-release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Bump version from latest tag
+        id: version
+        run: |
+          git fetch --tags --force origin
+          latest="$(git tag --sort=-v:refname | head -1 || true)"
+          if [ -z "$latest" ]; then
+            echo "tag=v1.0.0" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "latest=$latest"
+          read -r major minor patch < <(echo "${latest#v}" | tr '.' ' ')
+          major=${major:-0}; minor=${minor:-0}; patch=${patch:-0}
+          log="$(git log "${latest}..HEAD" --format=%s || true)"
+          if [ -z "$(git rev-parse --verify -q "$latest")" ] || [ "$(git rev-parse "$latest")" = "$(git rev-parse HEAD)" ]; then
+            echo "HEAD already released ($latest); skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          if echo "$log" | grep -q '\[major\]'; then
+            major=$((major + 1)); minor=0; patch=0
+          elif echo "$log" | grep -q '\[minor\]'; then
+            minor=$((minor + 1)); patch=0
+          else
+            patch=$((patch + 1))
+          fi
+          echo "tag=v${major}.${minor}.${patch}" >> "$GITHUB_OUTPUT"
+      - name: Create tag and release
+        if: steps.version.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="${{ steps.version.outputs.tag }}"
+          if git rev-parse --verify -q "refs/tags/$tag" > /dev/null; then
+            echo "Tag $tag already exists; skipping."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "$tag"
+          git push origin "$tag"
+          gh release create "$tag" --generate-notes --latest

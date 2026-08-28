@@ -149,14 +149,13 @@ class XunSearchEngine extends Engine
             'page' => max(0, ($page ?? 1) - 1), // 修正页码计算
         ]);
 
-        // 获取总记录数
-        $search = $this->xunsearch->getSearch();
-        $total = $search->getLastCount() ?? 0;
-        
+        // 回调搜索的原始结果没有 total，回退到 XSSearch 最近一次搜索的命中数
+        $total = $result['total'] ?? $this->xunsearch->getSearch()->getLastCount() ?? 0;
+
         $result['total'] = $total;
         $result['per_page'] = $perPage;
         $result['current_page'] = $page;
-        $result['last_page'] = $total > 0 ? ceil($total / $perPage) : 1;
+        $result['last_page'] = $total > 0 ? (int) ceil($total / $perPage) : 1;
 
         return $result;
     }
@@ -211,10 +210,27 @@ class XunSearchEngine extends Engine
         }
 
         // 执行搜索
-        $results = $search->setLimit($limit, $offset)->search();
+        $search->setLimit($limit, $offset);
+        $results = $search->search();
 
         // 处理搜索结果
         return $this->processSearchResults($results, $search, $options);
+    }
+
+    /**
+     * 校验字段名是否合法（防查询注入）
+     */
+    protected function isValidField(string $field): bool
+    {
+        return preg_match('/^[A-Za-z0-9_]+$/', $field) === 1;
+    }
+
+    /**
+     * 转义范围查询值（防 ] TO 注入）
+     */
+    protected function escapeRangeValue($value): string
+    {
+        return addcslashes((string) $value, '[]"\\');
     }
 
     /**
@@ -224,6 +240,9 @@ class XunSearchEngine extends Engine
     {
         // 处理基本 where 条件
         foreach ($builder->wheres as $field => $value) {
+            if (! $this->isValidField($field)) {
+                continue;
+            }
             if (is_array($value)) {
                 // 数组条件：范围查询
                 if (count($value) === 2 && isset($value[0], $value[1])) {
@@ -235,65 +254,100 @@ class XunSearchEngine extends Engine
             } else {
                 // 精确匹配：添加到查询字符串
                 $currentQuery = $search->getQuery();
-                $search->setQuery($currentQuery . ' ' . sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\')));
+                $search->setQuery($currentQuery . ' ' . $this->exactMatchQuery($field, $value));
             }
         }
 
         // 处理 whereIn 条件
         foreach ($builder->whereIns as $field => $values) {
+            if (! $this->isValidField($field)) {
+                continue;
+            }
             $this->applyInCondition($search, $field, $values);
         }
 
         // 处理 whereNotIn 条件
         foreach ($builder->whereNotIns as $field => $values) {
+            if (! $this->isValidField($field)) {
+                continue;
+            }
             $this->applyNotInCondition($search, $field, $values);
         }
     }
 
     /**
-     * 应用 IN 条件
+     * 应用 IN 条件（XunSearch 不支持 IN，转换为 OR 查询）
      */
     protected function applyInCondition(\XSSearch $search, string $field, array $values): void
     {
-        // XunSearch 不支持直接的 IN 查询，可以转换为 OR 查询
-        if (!empty($values)) {
-            $conditions = [];
-            foreach ($values as $value) {
-                $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
-            }
-            
-            $currentQuery = $search->getQuery();
-            $orQuery = '(' . implode(' OR ', $conditions) . ')';
-            
-            if ($currentQuery) {
-                $search->setQuery("({$currentQuery}) AND {$orQuery}");
-            } else {
-                $search->setQuery($orQuery);
-            }
+        $this->applyOrCondition($search, $this->buildInQuery($field, $values));
+    }
+
+    /**
+     * 应用 NOT IN 条件（XunSearch 不支持 NOT IN，转换为 NOT 查询）
+     */
+    protected function applyNotInCondition(\XSSearch $search, string $field, array $values): void
+    {
+        $this->applyOrCondition($search, $this->buildNotInQuery($field, $values));
+    }
+
+    /**
+     * 将生成的 OR 子句与现有查询合并
+     */
+    protected function applyOrCondition(\XSSearch $search, string $orQuery): void
+    {
+        if ($orQuery === '') {
+            return;
+        }
+
+        $currentQuery = $search->getQuery();
+
+        if ($currentQuery) {
+            $search->setQuery("({$currentQuery}) AND {$orQuery}");
+        } else {
+            $search->setQuery($orQuery);
         }
     }
 
     /**
-     * 应用 NOT IN 条件
+     * 构建 IN 查询
      */
-    protected function applyNotInCondition(\XSSearch $search, string $field, array $values): void
+    protected function buildInQuery(string $field, array $values): string
     {
-        // XunSearch 不支持 NOT IN，可以转换为 NOT 查询
-        if (!empty($values)) {
-            $conditions = [];
-            foreach ($values as $value) {
-                $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
-            }
-            
-            $currentQuery = $search->getQuery();
-            $notQuery = 'NOT (' . implode(' OR ', $conditions) . ')';
-            
-            if ($currentQuery) {
-                $search->setQuery("({$currentQuery}) AND {$notQuery}");
-            } else {
-                $search->setQuery($notQuery);
-            }
+        return $this->buildOrQuery($field, $values, '');
+    }
+
+    /**
+     * 构建 NOT IN 查询
+     */
+    protected function buildNotInQuery(string $field, array $values): string
+    {
+        return $this->buildOrQuery($field, $values, 'NOT ');
+    }
+
+    /**
+     * 构建 OR 查询（$prefix 为空即 IN，为 'NOT ' 即 NOT IN）
+     */
+    protected function buildOrQuery(string $field, array $values, string $prefix): string
+    {
+        if (empty($values)) {
+            return '';
         }
+
+        $conditions = [];
+        foreach ($values as $value) {
+            $conditions[] = $this->exactMatchQuery($field, $value);
+        }
+
+        return $prefix . '(' . implode(' OR ', $conditions) . ')';
+    }
+
+    /**
+     * 构建精确匹配子句
+     */
+    protected function exactMatchQuery(string $field, $value): string
+    {
+        return sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
     }
 
     /**
@@ -306,7 +360,12 @@ class XunSearchEngine extends Engine
             $order = $builder->orders[0];
             $field = $order['column'];
             $direction = $order['direction'];
-            
+
+            if (! $this->isValidField($field)) {
+                Log::warning('Invalid sort field for XunSearch', ['field' => $field]);
+                return;
+            }
+
             // XunSearch 使用 setSort() 方法，第二个参数为 true 表示降序
             $search->setSort($field, $direction === 'desc');
         }
@@ -408,10 +467,16 @@ class XunSearchEngine extends Engine
 
         return LazyCollection::make(function () use ($builder, $model, $objectIds) {
             $models = $model->getScoutModelsByIds($builder, $objectIds);
-            
-            foreach ($models as $model) {
-                if (in_array($model->getScoutKey(), $objectIds)) {
-                    yield $model;
+
+            $byKey = [];
+            foreach ($models as $m) {
+                $byKey[(string) $m->getScoutKey()] = $m;
+            }
+
+            // 按命中顺序产出，与 map() 排序一致
+            foreach ($objectIds as $id) {
+                if (isset($byKey[(string) $id])) {
+                    yield $byKey[(string) $id];
                 }
             }
         });
@@ -470,6 +535,8 @@ class XunSearchEngine extends Engine
                 'index' => $name,
                 'error' => $e->getMessage(),
             ]);
+
+            throw $e;
         }
     }
 
@@ -490,6 +557,11 @@ class XunSearchEngine extends Engine
                 'custom_data' => $index->getCustomData(),
             ];
         } catch (\Exception $e) {
+            Log::error('Failed to get XunSearch index info', [
+                'index' => $name,
+                'error' => $e->getMessage(),
+            ]);
+
             return [];
         }
     }

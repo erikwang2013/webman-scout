@@ -33,6 +33,23 @@ class SearchableScope implements Scope
      * @param  \Illuminate\Database\Eloquent\Builder  $builder
      * @return void
      */
+    /**
+     * chunkById 的第 4 个 $alias 参数为 Laravel 8 新增，Laravel 7 只有 3 参，
+     * 按运行时版本决定是否传递，保证 illuminate ^7.0 兼容。
+     */
+    protected static ?bool $chunkByIdSupportsAlias = null;
+
+    protected function chunkByIdArguments(EloquentBuilder $builder, string $scoutKeyName): array
+    {
+        $args = [$builder->qualifyColumn($scoutKeyName)];
+
+        if (static::$chunkByIdSupportsAlias ??= (new \ReflectionMethod($builder->getQuery(), 'chunkById'))->getNumberOfParameters() >= 4) {
+            $args[] = $scoutKeyName;
+        }
+
+        return $args;
+    }
+
     public function extend(EloquentBuilder $builder)
     {
         $builder->macro('searchable', function (EloquentBuilder $builder, $chunk = null) {
@@ -42,7 +59,7 @@ class SearchableScope implements Scope
                 $models->filter->shouldBeSearchable()->searchable();
 
                 event(new ModelsImported($models));
-            }, $builder->qualifyColumn($scoutKeyName), $scoutKeyName);
+            }, ...$this->chunkByIdArguments($builder, $scoutKeyName));
         });
 
         $builder->macro('unsearchable', function (EloquentBuilder $builder, $chunk = null) {
@@ -52,7 +69,7 @@ class SearchableScope implements Scope
                 $models->unsearchable();
 
                 event(new ModelsFlushed($models));
-            }, $builder->qualifyColumn($scoutKeyName), $scoutKeyName);
+            }, ...$this->chunkByIdArguments($builder, $scoutKeyName));
         });
 
         if (method_exists(HasManyThrough::class, 'chunkById')) {

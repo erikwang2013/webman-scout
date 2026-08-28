@@ -58,7 +58,8 @@ final class ScoutConfigProvider implements ConfigProviderInterface
 
     /**
      * Prefer the merged app params (so app-level `scout` overrides win);
-     * fall back to the bundled defaults when the config is not in the container.
+     * fall back to the bundled defaults wrapped under the `scout` key when the
+     * config is not in the container, so lookups always resolve the same way.
      */
     private function resolveParams(?ContainerInterface $container): array
     {
@@ -66,13 +67,15 @@ final class ScoutConfigProvider implements ConfigProviderInterface
             try {
                 $params = $container->get(ConfigInterface::class)->get('params');
 
-                return is_array($params) ? $params : $this->defaultParams;
+                if (is_array($params) && array_key_exists('scout', $params)) {
+                    return $params;
+                }
             } catch (\Throwable $e) {
                 // fall through to defaults
             }
         }
 
-        return $this->defaultParams;
+        return ['scout' => $this->defaultParams];
     }
 
     public function getDefinitions(): array

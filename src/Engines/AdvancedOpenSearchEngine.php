@@ -12,6 +12,8 @@ use OpenSearch\Client;
 
 class AdvancedOpenSearchEngine extends OpenSearchEngine
 {
+    use \Erikwang2013\WebmanScout\Concerns\RestoresBuilderPagination;
+
 
     /**
      * 执行高级搜索
@@ -768,7 +770,7 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
     /**
      * 执行 KNN 搜索
      */
-    public function knnSearch(string $index, array $vector, int $k = 10, array $filter = null): array
+    public function knnSearch(string $index, array $vector, int $k = 10, ?array $filter = null): array
     {
         $query = [
             'knn' => [
@@ -896,11 +898,7 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
      */
     public function search($builder)
     {
-        if ($builder instanceof AdvancedScoutBuilder) {
-            return $this->advancedSearch($builder);
-        }
-
-        return parent::search($builder);
+        return $this->advancedSearch($builder);
     }
 
     /**
@@ -908,13 +906,9 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
      */
     public function paginate($builder, $perPage, $page)
     {
-        if ($builder instanceof AdvancedScoutBuilder) {
-            $builder->limit = $perPage;
-            $builder->offset = ($page - 1) * $perPage;
+        return $this->paginateWithoutMutatingBuilder($builder, $perPage, $page, function ($builder) {
             return $this->advancedSearch($builder);
-        }
-
-        return parent::paginate($builder, $perPage, $page);
+        });
     }
 
     /**
@@ -922,11 +916,7 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
      */
     public function map($builder, $results, $model)
     {
-        if ($builder instanceof AdvancedScoutBuilder) {
-            return $this->mapAdvancedResults($builder, $results, $model);
-        }
-
-        return parent::map($builder, $results, $model);
+        return $this->mapAdvancedResults($builder, $results, $model);
     }
 
     /**

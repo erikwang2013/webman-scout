@@ -75,6 +75,9 @@ class QueueImportCommand extends Command
                 return Command::FAILURE;
             }
 
+            $min = (int) $min;
+            $max = (int) $max;
+
             if (! class_exists(QueueRedis::class)) {
                 $output->writeln('<error>The webman/redis-queue plugin is required for queued importing.</error>');
 

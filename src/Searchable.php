@@ -22,6 +22,13 @@ trait Searchable
     protected $scoutMetadata = [];
 
     /**
+     * The custom Scout builder class to use for searches.
+     *
+     * @var string|null
+     */
+    protected static $scoutBuilder = null;
+
+    /**
      * Boot the trait.
      *
      * @return void

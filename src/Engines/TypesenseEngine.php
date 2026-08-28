@@ -41,7 +41,7 @@ class TypesenseEngine extends Engine
      *
      * @var int
      */
-    private int $maxPerPage = 250;
+    protected int $maxPerPage = 250;
 
     /**
      * The maximum number of results that can be fetched during pagination.

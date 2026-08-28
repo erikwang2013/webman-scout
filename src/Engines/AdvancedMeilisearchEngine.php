@@ -346,7 +346,7 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     protected function processMeilisearchResults(array $result, AdvancedScoutBuilder $builder): array
     {
         $processedResults = [
-            'hits' => array_map(function ($hit) use ($builder) {
+            'hits' => array_map(function ($hit) {
                 $document = $hit;
 
                 // 提取 ID
@@ -598,7 +598,7 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     /**
      * 执行原始搜索
      */
-    public function rawSearch(array $params): array
+    public function rawSearch(array $params)
     {
         $index = $this->meilisearch->index($params['index'] ?? '');
 
@@ -610,7 +610,7 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     /**
      * 获取任务状态
      */
-    public function getTaskStatus(int $taskUid): array
+    public function getTaskStatus(int $taskUid)
     {
         $index = $this->meilisearch->index(''); // 任意索引
 
@@ -658,7 +658,7 @@ class AdvancedMeilisearchEngine extends MeilisearchEngine
     /**
      * 批量获取文档
      */
-    public function getDocuments(string $indexName, array $ids): array
+    public function getDocuments(string $indexName, array $ids)
     {
         $index = $this->meilisearch->index($indexName);
 

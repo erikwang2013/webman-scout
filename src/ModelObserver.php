@@ -46,7 +46,7 @@ class ModelObserver
      */
     public function __construct()
     {
-        $this->afterCommit =scout_config('after_commit', false);
+        $this->afterCommit = scout_config('after_commit', false);
         $this->usingSoftDeletes = scout_config('soft_delete', false);
     }
 

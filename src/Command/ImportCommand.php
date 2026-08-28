@@ -14,6 +14,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 use Erikwang2013\WebmanScout\Concerns\ResolvesScoutModel;
 use Erikwang2013\WebmanScout\Events\ModelsImported;
+use Exception;
 use Illuminate\Events\Dispatcher;
 
 
@@ -51,24 +52,29 @@ class ImportCommand extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $class = $this->resolveModelClass((string) $input->getArgument('model'));
+        try {
+            $class = $this->resolveModelClass((string) $input->getArgument('model'));
 
-        $model = new $class;
-         $provider = app(Dispatcher::class);
-        $provider->listen(ModelsImported::class, function ($event) use (&$output, $class) {
-            $key = $event->models->last()->getScoutKey();
-            $output->writeln('<comment>Imported ['.$class.'] models up to ID:</comment> '.$key);
-        });
+            $model = new $class;
+            $provider = app(Dispatcher::class);
+            $provider->listen(ModelsImported::class, function ($event) use (&$output, $class) {
+                $key = $event->models->last()->getScoutKey();
+                $output->writeln('<comment>Imported ['.$class.'] models up to ID:</comment> '.$key);
+            });
 
-        if ($input->getOption('fresh')) {
-            $model::removeAllFromSearch();
+            if ($input->getOption('fresh')) {
+                $model::removeAllFromSearch();
+            }
+
+            $model::makeAllSearchable($input->getOption('chunk'));
+
+            $provider->forget(ModelsImported::class);
+
+            $output->writeln('All [' . $class . '] records have been imported.');
+            return Command::SUCCESS;
+        } catch (Exception $exception) {
+            $output->writeln($exception->getMessage());
+            return Command::FAILURE;
         }
-
-        $model::makeAllSearchable($input->getOption('chunk'));
-
-        $provider->forget(ModelsImported::class);
-
-        $output->writeln('All [' . $class . '] records have been imported.');
-        return Command::SUCCESS;
     }
 }

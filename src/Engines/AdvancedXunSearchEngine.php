@@ -13,6 +13,8 @@ use Erikwang2013\WebmanScout\Support\Cache;
 
 class AdvancedXunSearchEngine extends XunSearchEngine
 {
+    use \Erikwang2013\WebmanScout\Concerns\RestoresBuilderPagination;
+
     /**
      * 高级查询条件处理器
      */
@@ -116,10 +118,13 @@ class AdvancedXunSearchEngine extends XunSearchEngine
 
         // 添加基础 where 条件
         foreach ($builder->wheres as $field => $value) {
+            if (! $this->isValidField($field)) {
+                continue;
+            }
             if (is_array($value)) {
                 // 范围查询
                 if (count($value) === 2 && isset($value[0], $value[1])) {
-                    $queryParts[] = "{$field}:[{$value[0]} TO {$value[1]}]";
+                    $queryParts[] = "{$field}:[{$this->escapeRangeValue($value[0])} TO {$this->escapeRangeValue($value[1])}]";
                 } elseif (!empty($value)) {
                     // IN 查询（XunSearch 无 IN，转为 OR 表达式）
                     $conditions = [];
@@ -131,6 +136,26 @@ class AdvancedXunSearchEngine extends XunSearchEngine
             } else {
                 // 精确匹配
                 $queryParts[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
+            }
+        }
+
+        // 添加 whereIn 条件
+        foreach ($builder->whereIns as $field => $values) {
+            if (! $this->isValidField($field)) {
+                continue;
+            }
+            if ($conditions = $this->buildInQuery($field, (array) $values)) {
+                $queryParts[] = $conditions;
+            }
+        }
+
+        // 添加 whereNotIn 条件
+        foreach ($builder->whereNotIns as $field => $values) {
+            if (! $this->isValidField($field)) {
+                continue;
+            }
+            if ($conditions = $this->buildNotInQuery($field, (array) $values)) {
+                $queryParts[] = $conditions;
             }
         }
 
@@ -152,15 +177,11 @@ class AdvancedXunSearchEngine extends XunSearchEngine
      */
     protected function isBooleanQuery(string $query): bool
     {
-        $booleanOperators = ['AND', 'OR', 'NOT', '(', ')', 'NEAR', 'SENTENCE', 'PARAGRAPH'];
-        
-        foreach ($booleanOperators as $operator) {
-            if (stripos($query, $operator) !== false) {
-                return true;
-            }
+        if (str_contains($query, '(') || str_contains($query, ')')) {
+            return true;
         }
-        
-        return false;
+
+        return preg_match('/\b(?:AND|OR|NOT|NEAR|SENTENCE|PARAGRAPH)\b/i', $query) === 1;
     }
 
     /**
@@ -194,6 +215,11 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         $operator = $condition['operator'];
         $value = $condition['value'];
         $options = $condition['options'] ?? [];
+
+        if (! $this->isValidField($field)) {
+            Log::warning('Invalid field name in XunSearch condition', ['field' => $field]);
+            return '';
+        }
 
         // 检查是否有自定义处理器
         if (isset($this->conditionHandlers[$operator])) {
@@ -230,13 +256,13 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         $max = $range['range'][1] ?? null;
         
         if ($min !== null && $max !== null) {
-            return "{$field}:[{$min} TO {$max}]";
+            return "{$field}:[{$this->escapeRangeValue($min)} TO {$this->escapeRangeValue($max)}]";
         } elseif ($min !== null) {
-            return "{$field}:>={$min}";
+            return "{$field}:>={$this->escapeRangeValue($min)}";
         } elseif ($max !== null) {
-            return "{$field}:<={$max}";
+            return "{$field}:<={$this->escapeRangeValue($max)}";
         }
-        
+
         return '';
     }
 
@@ -248,58 +274,20 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         $min = $range['range'][0] ?? null;
         $max = $range['range'][1] ?? null;
         $format = $options['format'] ?? 'Y-m-d';
-        
+
         if ($min instanceof \DateTime) {
             $min = $min->format($format);
+        } elseif ($min === '') {
+            $min = null;
         }
-        
+
         if ($max instanceof \DateTime) {
             $max = $max->format($format);
-        }
-        
-        if ($min && $max) {
-            return "{$field}:[{$min} TO {$max}]";
-        } elseif ($min) {
-            return "{$field}:>={$min}";
-        } elseif ($max) {
-            return "{$field}:<={$max}";
-        }
-        
-        return '';
-    }
-
-    /**
-     * 构建 IN 查询
-     */
-    protected function buildInQuery(string $field, array $values): string
-    {
-        if (empty($values)) {
-            return '';
-        }
-        
-        $conditions = [];
-        foreach ($values as $value) {
-            $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
+        } elseif ($max === '') {
+            $max = null;
         }
 
-        return '(' . implode(' OR ', $conditions) . ')';
-    }
-
-    /**
-     * 构建 NOT IN 查询
-     */
-    protected function buildNotInQuery(string $field, array $values): string
-    {
-        if (empty($values)) {
-            return '';
-        }
-
-        $conditions = [];
-        foreach ($values as $value) {
-            $conditions[] = sprintf('%s:"%s"', $field, addcslashes((string) $value, '"\\'));
-        }
-        
-        return 'NOT (' . implode(' OR ', $conditions) . ')';
+        return $this->buildRangeQuery($field, ['range' => [$min, $max]]);
     }
 
     /**
@@ -384,7 +372,8 @@ class AdvancedXunSearchEngine extends XunSearchEngine
             $field = $sort['field'] ?? null;
             
             if ($field) {
-                if ($sort['type'] === 'relevance' || $field === '_score') {
+                $type = $sort['type'] ?? null;
+                if ($type === 'relevance' || $field === '_score') {
                     // 相关度排序（默认）
                     $search->setSort('_score', $sort['direction'] === 'desc');
                 } elseif ($field === 'random') {
@@ -900,11 +889,7 @@ class AdvancedXunSearchEngine extends XunSearchEngine
      */
     public function search($builder)
     {
-        if ($builder instanceof AdvancedScoutBuilder) {
-            return $this->advancedSearch($builder);
-        }
-
-        return parent::search($builder);
+        return $this->advancedSearch($builder);
     }
 
     /**
@@ -912,13 +897,9 @@ class AdvancedXunSearchEngine extends XunSearchEngine
      */
     public function paginate($builder, $perPage, $page)
     {
-        if ($builder instanceof AdvancedScoutBuilder) {
-            $builder->limit = $perPage;
-            $builder->offset = ($page - 1) * $perPage;
+        return $this->paginateWithoutMutatingBuilder($builder, $perPage, $page, function ($builder) {
             return $this->advancedSearch($builder);
-        }
-
-        return parent::paginate($builder, $perPage, $page);
+        });
     }
 
     /**

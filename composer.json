@@ -59,7 +59,7 @@
         "meilisearch/meilisearch-php": "Required to use the Meilisearch engine (^1.0).",
         "typesense/typesense-php": "Required to use the Typesense engine (^4.9).",
         "hightman/xunsearch": "Required to use the XunSearch engine.",
-        "opensearch-project/opensearch-php": "Required to use the OpenSearch engine.",
+        "opensearch-project/opensearch-php": "Required to use the OpenSearch engine (^2.0).",
         "yiisoft/yii2": "Required to use Scout in Yii2 (config() polyfill, cache/log adapters, console bridge).",
         "yiisoft/yii3": "Required to use Scout in Yii3 (config plugin, PSR-3/PSR-16 adapters)."
     },
