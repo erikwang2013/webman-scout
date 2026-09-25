@@ -42,6 +42,22 @@ if (! function_exists('event')) {
     }
 }
 
+if (! function_exists('base_path')) {
+    /**
+     * Webman / Laravel 提供 base_path()，其他宿主（Hyperf / ThinkPHP / Yii / 原生 PHP）没有，
+     * 而包内 src/config/.../app.php 会用它取 XunSearch 配置目录，缺了就 fatal。
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function base_path($path = '')
+    {
+        $base = getcwd();
+
+        return $path === '' ? $base : rtrim($base, '/\\') . '/' . ltrim($path, '/');
+    }
+}
+
 if (! function_exists('scout_config')) {
     /**
      * Read a Scout option relative to the active config root (see ScoutConfig).

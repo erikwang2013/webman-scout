@@ -218,7 +218,7 @@ Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **
 composer require erikwang2013/webman-scout
 ```
 
-The Composer **autoload `files`** entry loads `helpers.php`, which defines `app()`, `event()`, `config()` (Yii2/Yii3 and plain PHP) and `scout_config()` when the host does not provide them, and binds `EngineManager` on the container.
+The Composer **autoload `files`** entry loads `helpers.php`, which defines `app()`, `event()`, `config()` (Yii2/Yii3 and plain PHP), `base_path()` and `scout_config()` when the host does not provide them, and binds `EngineManager` on the container.
 
 ### Webman
 
@@ -386,7 +386,7 @@ Behaviour on this path:
 - **Config** — `Scout::configure()` pins the root to `scout`, so `scout_config('driver')` and `config('scout.driver')` read your array. If the driver is missing/empty, the `null` engine is used instead of silently hitting a service.
 - **Logging** — with no logger component, `Support\Log` writes to `error_log()` (prefix `[webman-scout]`) instead of throwing. Hand it a PSR-3 logger instead: `Log::setLoggerResolver(fn () => $myLogger)`.
 - **Cache** — with no cache component, `Support\Cache` falls back to a per-process array store (`Support\ArrayStore`). Hand it a real cache instead: `Cache::setPsr16Resolver(fn () => $myPsr16Cache)`.
-- **Certificate paths** — relative `ssl_cert` / `ssl_key` paths resolve against `base_path()` when the host provides one, otherwise against the current working directory.
+- **Paths** — `helpers.php` supplies a `base_path()` fallback, so the shipped `app.php` (which reads `base_path('config/xunsearch')`) loads on hosts that have no such helper; relative `ssl_cert` / `ssl_key` paths resolve against `base_path()` or, failing that, the current working directory.
 - **Queue** — leave `'queue' => false`; the Webman Redis Queue path is skipped automatically (and logged) when the queue class is absent.
 - **Events** — `Illuminate\Events\Dispatcher` is bound on the container, so `ModelsImported` / `ModelsFlushed` progress events fire and `scout:import` works.
 

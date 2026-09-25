@@ -93,9 +93,11 @@ namespace Yiisoft\Config {
 
 namespace {
     if (! function_exists('base_path')) {
-        function base_path()
+        function base_path($path = '')
         {
-            return getenv('WEBMAN_SCOUT_TEST_BASE') ?: sys_get_temp_dir() . '/webman-scout-test-base';
+            $base = getenv('WEBMAN_SCOUT_TEST_BASE') ?: sys_get_temp_dir() . '/webman-scout-test-base';
+
+            return $path === '' ? $base : rtrim($base, '/\\') . '/' . ltrim($path, '/');
         }
     }
 

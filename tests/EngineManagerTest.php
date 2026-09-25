@@ -5,6 +5,7 @@ namespace Erikwang2013\WebmanScout\Tests;
 use Erikwang2013\WebmanScout\EngineManager;
 use Erikwang2013\WebmanScout\Engines\AdvancedMeilisearchEngine;
 use Erikwang2013\WebmanScout\Engines\AdvancedTypesenseEngine;
+use Erikwang2013\WebmanScout\Engines\Algolia3Engine;
 use Erikwang2013\WebmanScout\Engines\Algolia4Engine;
 use Erikwang2013\WebmanScout\Engines\CollectionEngine;
 use Erikwang2013\WebmanScout\Engines\DatabaseEngine;
@@ -131,14 +132,20 @@ class EngineManagerTest extends TestCase
         $this->assertInstanceOf(AdvancedTypesenseEngine::class, $manager->driver('advanced-typesense'));
     }
 
-    public function testAlgoliaDriverUsesV4Engine(): void
+    public function testAlgoliaDriverPicksEngineMatchingInstalledClient(): void
     {
         $this->setConfig(['scout' => ['driver' => 'algolia', 'soft_delete' => false, 'algolia' => ['id' => 'test-id', 'secret' => 'test-secret']]]);
 
         $manager = new EngineManager($this->container);
         $engine = $manager->driver('algolia');
 
-        $this->assertInstanceOf(Algolia4Engine::class, $engine);
+        // 客户端版本决定引擎实现：algolia v3 在 PHP 8.0 上仍是可安装的最新版，
+        // 本地（PHP 8.3）解析到 v4，CI 的 8.0 任务解析到 v3，两边都要能通过。
+        $expected = version_compare(\Algolia\AlgoliaSearch\Algolia::VERSION, '4.0.0', '>=')
+            ? Algolia4Engine::class
+            : Algolia3Engine::class;
+
+        $this->assertInstanceOf($expected, $engine);
     }
 
     public function testElasticsearchMissingClientThrows(): void

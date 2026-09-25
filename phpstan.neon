@@ -1,4 +1,13 @@
+includes:
+    - phpstan-baseline.neon
+
 parameters:
     level: 4
     paths:
         - src
+    # 可选依赖（webman/redis-queue、yii2、yii3，都在 suggest 里）在 CI 里不安装，
+    # 用测试桩把它们声明的符号提供给 PHPStan，否则会报 "unknown class/interface"。
+    scanFiles:
+        - tests/Support/WebmanStubs.php
+    # 基线未匹配到的条目不算失败：PHP 版本 / 依赖版本不同，"未知类"的数量会变化
+    reportUnmatchedIgnoredErrors: false

@@ -221,7 +221,7 @@ Composer 依赖 **`illuminate/*` ^7.0–^12.0**、**`symfony/console` ^5.4–^7.
 composer require erikwang2013/webman-scout
 ```
 
-Composer 的 **autoload `files`** 会加载 `helpers.php`：宿主没有时定义 `app()`、`event()`、`config()`（Yii2 / Yii3 / 原生 PHP）与 `scout_config()`，并把 `EngineManager` 绑定到容器。
+Composer 的 **autoload `files`** 会加载 `helpers.php`：宿主没有时定义 `app()`、`event()`、`config()`（Yii2 / Yii3 / 原生 PHP）、`base_path()` 与 `scout_config()`，并把 `EngineManager` 绑定到容器。
 
 安装后（Webman）执行插件安装，会复制配置与队列消费者：
 
@@ -388,7 +388,7 @@ $products = Product::search('手机')->where('status', 1)->paginate(15);
 - **配置**：`Scout::configure()` 会把配置根固定为 `scout`，`scout_config('driver')` 与 `config('scout.driver')` 都能读到；driver 缺失或为空时回退 `null` 引擎，而不是误打到其他服务。
 - **日志**：没有日志组件时 `Support\Log` 写入 `error_log()`（前缀 `[webman-scout]`），不再抛异常；要接自己的 PSR-3：`Log::setLoggerResolver(fn () => $myLogger)`。
 - **缓存**：没有缓存组件时 `Support\Cache` 退回进程内数组缓存（`Support\ArrayStore`）；要接 PSR-16：`Cache::setPsr16Resolver(fn () => $myPsr16)`。
-- **证书路径**：`ssl_cert` / `ssl_key` 的相对路径优先按宿主的 `base_path()` 展开，宿主没有该函数时按当前工作目录展开。
+- **路径**：`helpers.php` 提供了 `base_path()` 兜底，因此包内 `app.php`（会读 `base_path('config/xunsearch')`）在没有该 helper 的宿主机上也能正常加载；`ssl_cert` / `ssl_key` 的相对路径优先按 `base_path()` 展开，没有则按当前工作目录展开。
 - **队列**：保持 `'queue' => false`；缺少队列类时会自动跳过 Webman Redis Queue 并记录日志。
 - **事件**：容器上已绑定 `Illuminate\Events\Dispatcher`，`ModelsImported` / `ModelsFlushed` 进度事件与 `scout:import` 命令都可用。
 
