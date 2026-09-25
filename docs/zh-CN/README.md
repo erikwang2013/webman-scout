@@ -643,7 +643,7 @@ php webman scout:about      # Laravel 下为 php artisan scout:about
 
 - [Laravel Scout 文档](https://laravel.com/docs/scout)
 - [shopwwi/webman-scout](https://github.com/shopwwi/webman-scout)
-- [审查报告 REVIEW_REPORT.md](../REVIEW_REPORT.md) —— 逐轮记录发现、修复与待决策项
+- [审查报告 REVIEW_REPORT.md](../../REVIEW_REPORT.md) —— 逐轮记录发现、修复与待决策项
 
 
 ## 开源不易，欢迎支持 / Support this project
