@@ -9,6 +9,7 @@ namespace Erikwang2013\WebmanScout;
 use Algolia\AlgoliaSearch\Algolia;
 use Algolia\AlgoliaSearch\Support\AlgoliaAgent as Algolia4UserAgent;
 use Algolia\AlgoliaSearch\Support\UserAgent as Algolia3UserAgent;
+use Erikwang2013\WebmanScout\Engines\AdvancedElasticsearchEngine;
 use Erikwang2013\WebmanScout\Engines\AdvancedMeilisearchEngine;
 use Erikwang2013\WebmanScout\Engines\AdvancedTypesenseEngine;
 use Erikwang2013\WebmanScout\Engines\AdvancedXunSearchEngine;
@@ -209,9 +210,20 @@ class EngineManager extends Manager
      */
     public function createElasticsearchDriver()
     {
-        $config = scout_config('elasticsearch');
-
         $this->ensureElasticSearchClientIsInstalled();
+
+        return new ElasticSearchEngine(
+            $this->elasticsearchClient(),
+            scout_config('soft_delete', false)
+        );
+    }
+
+    /**
+     * Build the Elasticsearch client from scout_config('elasticsearch').
+     */
+    protected function elasticsearchClient()
+    {
+        $config = scout_config('elasticsearch');
         $clientBuilder = ClientBuilder::create()->setHosts($config['hosts'] ?? ['http://127.0.0.1:9200']);
 
         if (!empty($config['auth'])) {
@@ -229,10 +241,7 @@ class EngineManager extends Manager
             }
         }
 
-        return new ElasticSearchEngine(
-            $clientBuilder->build(),
-            scout_config('soft_delete', false)
-        );
+        return $clientBuilder->build();
     }
 
     /**
@@ -279,10 +288,10 @@ class EngineManager extends Manager
 
         if ($sslVerification) {
             if (!empty($config['ssl_cert'])) {
-                $setConfig['cert'] = str_starts_with($config['ssl_cert'], '/') ? $config['ssl_cert'] : base_path() . $config['ssl_cert'];
+                $setConfig['cert'] = $this->resolvePath($config['ssl_cert']);
             }
             if (!empty($config['ssl_key'])) {
-                $setConfig['ssl_key'] = str_starts_with($config['ssl_key'], '/') ? $config['ssl_key'] : base_path() . $config['ssl_key'];
+                $setConfig['ssl_key'] = $this->resolvePath($config['ssl_key']);
             }
         }
         return new OpenSearchEngine(
@@ -306,6 +315,31 @@ class EngineManager extends Manager
         }
 
         throw new ScoutException('Please install the OpenSearch client (^2.0): opensearch-project/opensearch-php.');
+    }
+
+    /**
+     * 把证书类的相对路径按宿主根目录展开。
+     *
+     * Webman / Laravel 提供 base_path()；Hyperf / ThinkPHP / Yii / 原生 PHP 没有，
+     * 退回当前工作目录。base_path() 存在但不可用（例如只加载了 Laravel 的
+     * helpers 却没有 booted Application）时同样退回，避免直接 fatal。
+     */
+    protected function resolvePath(string $path): string
+    {
+        if (str_starts_with($path, '/') || str_starts_with($path, '\\') || preg_match('#^[A-Za-z]:[\\\\/]#', $path)) {
+            return $path;
+        }
+
+        $base = null;
+        if (function_exists('base_path')) {
+            try {
+                $base = base_path();
+            } catch (\Throwable $e) {
+                $base = null;
+            }
+        }
+
+        return rtrim((string) ($base ?: getcwd()), '/\\') . '/' . ltrim($path, '/');
     }
 
     /**
@@ -381,6 +415,35 @@ class EngineManager extends Manager
         if (! class_exists(Typesense::class)) {
             throw new ScoutException('Please install the suggested Typesense client: typesense/typesense-php.');
         }
+    }
+
+    /**
+     * Create an Advanced Elasticsearch engine instance.
+     *
+     * 与 advanced_meilisearch / advanced_typesense / advanced_xunsearch 一致：
+     * 需要聚合、分面、高亮、向量检索时使用该驱动。
+     *
+     * @return \Erikwang2013\WebmanScout\Engines\AdvancedElasticsearchEngine
+     */
+    public function createAdvancedElasticsearchDriver()
+    {
+        $this->ensureElasticSearchClientIsInstalled();
+
+        return new AdvancedElasticsearchEngine(
+            $this->elasticsearchClient(),
+            scout_config('soft_delete', false)
+        );
+    }
+
+    /**
+     * Create an OpenSearch engine instance (the opensearch driver already uses the
+     * advanced implementation; this alias exists so advanced_* names work uniformly).
+     *
+     * @return \Erikwang2013\WebmanScout\Engines\AdvancedOpenSearchEngine
+     */
+    public function createAdvancedOpensearchDriver()
+    {
+        return $this->createOpensearchDriver();
     }
 
     /**

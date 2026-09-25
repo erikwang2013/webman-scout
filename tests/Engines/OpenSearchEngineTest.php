@@ -277,6 +277,22 @@ class OpenSearchEngineTest extends TestCase
         $this->assertSame(['5', '9'], $this->makeEngine()->mapIds($this->rawHits([5, 9]))->all());
     }
 
+    public function testMapIdsHandlesAdvancedProcessedResults(): void
+    {
+        // AdvancedOpenSearchEngine::search() 返回的是处理过的扁平 hits（文档数组直接带 _id），
+        // 与原始 ES 响应的 hits.hits 结构不同；取不到主键会让 keys() / 分页 total 变成 0。
+        $processed = [
+            'hits' => [
+                ['_id' => '5', '_score' => 1.2, 'title' => 'a'],
+                ['_id' => '9', '_score' => 0.8, 'title' => 'b'],
+            ],
+            'total' => 2,
+        ];
+
+        $this->assertSame(['5', '9'], $this->makeEngine()->mapIds($processed)->all());
+        $this->assertTrue($this->makeEngine()->mapIds(['hits' => []])->isEmpty());
+    }
+
     public function testGetTotalCountHandlesIntAndArrayTotals(): void
     {
         $this->assertSame(12, $this->makeEngine()->getTotalCount(['hits' => ['total' => ['value' => 12]]]));

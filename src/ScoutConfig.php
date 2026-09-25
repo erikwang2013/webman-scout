@@ -36,6 +36,39 @@ class ScoutConfig
         static::resetResolvedBase();
     }
 
+    /**
+     * Use a plain PHP array as the configuration source — no framework required.
+     *
+     * The array is exposed under $root (default "scout"), so the same dot keys used
+     * on every other host keep working: scout_config('driver') → $config['driver'],
+     * config('scout.opensearch.host') → $config['opensearch']['host'].
+     */
+    public static function setArraySource(array $config, string $root = 'scout'): void
+    {
+        static::setSource(static function (string $key, $default = null) use ($config, $root) {
+            if ($key === $root) {
+                return $config;
+            }
+
+            if (! str_starts_with($key, $root.'.')) {
+                return $default;
+            }
+
+            $value = $config;
+            foreach (explode('.', substr($key, strlen($root) + 1)) as $segment) {
+                if (! is_array($value) || ! array_key_exists($segment, $value)) {
+                    return $default;
+                }
+                $value = $value[$segment];
+            }
+
+            return $value;
+        });
+
+        // 固定配置根：数组里没有 driver/prefix 时，baseKey() 也不该回退到 Webman 插件路径
+        static::$resolvedBase = $root;
+    }
+
     public static function getSource(string $key, $default = null)
     {
         $resolver = static::$customSource;

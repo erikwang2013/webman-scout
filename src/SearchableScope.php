@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Events\Dispatcher;
 use Erikwang2013\WebmanScout\Events\ModelsFlushed;
 use Erikwang2013\WebmanScout\Events\ModelsImported;
 
@@ -50,6 +51,18 @@ class SearchableScope implements Scope
         return $args;
     }
 
+    /**
+     * 派发进度事件。
+     *
+     * 不走全局 event()：Webman 的 event 插件、Laravel 的 helpers 都会定义同名函数，
+     * 且签名各不相同（按事件名派发），会把事件对象当成字符串事件名。
+     * 容器里的 Illuminate\Events\Dispatcher 在各宿主上都是同一个实例。
+     */
+    protected static function dispatch($event): void
+    {
+        app(Dispatcher::class)->dispatch($event);
+    }
+
     public function extend(EloquentBuilder $builder)
     {
         $builder->macro('searchable', function (EloquentBuilder $builder, $chunk = null) {
@@ -58,7 +71,7 @@ class SearchableScope implements Scope
             $builder->chunkById($chunk ?: scout_config('chunk.searchable', 500), function ($models) {
                 $models->filter->shouldBeSearchable()->searchable();
 
-                event(new ModelsImported($models));
+                static::dispatch(new ModelsImported($models));
             }, ...$this->chunkByIdArguments($builder, $scoutKeyName));
         });
 
@@ -68,7 +81,7 @@ class SearchableScope implements Scope
             $builder->chunkById($chunk ?: scout_config('chunk.unsearchable', 500), function ($models) {
                 $models->unsearchable();
 
-                event(new ModelsFlushed($models));
+                static::dispatch(new ModelsFlushed($models));
             }, ...$this->chunkByIdArguments($builder, $scoutKeyName));
         });
 
@@ -78,7 +91,7 @@ class SearchableScope implements Scope
                 $this->chunkById($chunk ?: scout_config('chunk.searchable', 500), function ($models) {
                     $models->filter->shouldBeSearchable()->searchable();
 
-                    event(new ModelsImported($models));
+                    static::dispatch(new ModelsImported($models));
                 });
             });
 
@@ -87,7 +100,7 @@ class SearchableScope implements Scope
                 $this->chunkById($chunk ?: scout_config('chunk.unsearchable', 500), function ($models) {
                     $models->unsearchable();
 
-                    event(new ModelsFlushed($models));
+                    static::dispatch(new ModelsFlushed($models));
                 });
             });
         }

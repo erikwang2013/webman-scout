@@ -408,18 +408,23 @@ class XunSearchEngine extends Engine
         $ids = [];
 
         foreach ($results['hits'] as $hit) {
-            if (isset($hit['data'])) {
-                if ($keyName !== null && array_key_exists($keyName, $hit['data'])) {
-                    $ids[] = $hit['data'][$keyName];
-                    continue;
-                }
+            // 基础引擎的命中是 ['data' => [...]]；AdvancedXunSearchEngine 是 ['_doc' => [...]]
+            $data = $hit['data'] ?? $hit['_doc'] ?? null;
 
-                // 回退：从数据中提取主键
-                foreach ($hit['data'] as $key => $value) {
-                    if (strpos($key, '_id') !== false || $key === 'id') {
-                        $ids[] = $value;
-                        break;
-                    }
+            if (! is_array($data)) {
+                continue;
+            }
+
+            if ($keyName !== null && array_key_exists($keyName, $data)) {
+                $ids[] = $data[$keyName];
+                continue;
+            }
+
+            // 回退：从数据中提取主键
+            foreach ($data as $key => $value) {
+                if (strpos($key, '_id') !== false || $key === 'id') {
+                    $ids[] = $value;
+                    break;
                 }
             }
         }

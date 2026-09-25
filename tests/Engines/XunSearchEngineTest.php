@@ -251,6 +251,16 @@ class XunSearchEngineTest extends TestCase
 
         $this->assertSame([2], $engine->mapIds(['hits' => [['data' => ['_id' => 2]]]])->all());
         $this->assertTrue($engine->mapIds(['hits' => []])->isEmpty());
+
+        // AdvancedXunSearchEngine 的命中把字段放在 _doc 下（见 advancedSearch），
+        // 只认 'data' 会让 keys() / 分页 total 变成 0
+        $this->assertSame([2, 1], $engine->mapIds([
+            'hits' => [
+                ['_doc' => ['id' => 2]],
+                ['_doc' => ['id' => 1]],
+            ],
+        ])->all());
+        $this->assertSame([2], $engine->mapIds(['hits' => [['_doc' => ['_id' => 2]]]])->all());
     }
 
     public function testMapRestoresModelsInOrder(): void

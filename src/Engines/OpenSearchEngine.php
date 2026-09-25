@@ -407,7 +407,9 @@ class OpenSearchEngine extends Engine
      */
     public function mapIds($results)
     {
-        return Collection::make($results['hits']['hits'] ?? [])
+        // 原始响应是 hits.hits，高级引擎（AdvancedOpenSearchEngine）返回的是
+        // 处理过的扁平 hits —— 两种结构都要能取到主键，否则 keys()/分页 total 会变成 0。
+        return Collection::make($results['hits']['hits'] ?? $results['hits'] ?? [])
             ->pluck('_id')
             ->values();
     }

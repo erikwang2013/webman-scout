@@ -13,6 +13,8 @@ use Psr\SimpleCache\CacheInterface;
  * Delegates to Webman's support\Cache when available, otherwise falls back to
  * the Illuminate Cache facade. Under Yii2/Yii3 the host cache is wrapped into
  * an Illuminate Store so existing callers (Cache::store()->get/put) work unchanged.
+ * Hosts with no cache component at all (plain PHP, Hyperf, ThinkPHP) get a
+ * per-process ArrayStore instead of an exception.
  */
 class Cache
 {
@@ -61,7 +63,17 @@ class Cache
             return $instance;
         }
 
-        return \Illuminate\Support\Facades\Cache::store($store);
+        // Illuminate 的 Cache facade 需要 illuminate/cache 与已绑定的 'cache'；
+        // 原生 PHP 与未装缓存组件的宿主退回进程内数组缓存，而不是抛异常。
+        if (class_exists(\Illuminate\Support\Facades\Cache::class)) {
+            try {
+                return \Illuminate\Support\Facades\Cache::store($store);
+            } catch (\Throwable $e) {
+                // 未绑定 'cache' → 走下面的兜底
+            }
+        }
+
+        return ArrayStore::instance();
     }
 
     public static function __callStatic($name, $arguments)
@@ -75,6 +87,14 @@ class Cache
             return $instance->$name(...$arguments);
         }
 
-        return \Illuminate\Support\Facades\Cache::$name(...$arguments);
+        if (class_exists(\Illuminate\Support\Facades\Cache::class)) {
+            try {
+                return \Illuminate\Support\Facades\Cache::$name(...$arguments);
+            } catch (\Throwable $e) {
+                // 未绑定 'cache' → 走下面的兜底
+            }
+        }
+
+        return ArrayStore::instance()->$name(...$arguments);
     }
 }

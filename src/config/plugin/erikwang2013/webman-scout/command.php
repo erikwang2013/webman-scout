@@ -4,6 +4,7 @@
  * Copyright (c) erik <erik@erik.xyz> (https://erik.xyz). All Rights Reserved.
  */
 
+use Erikwang2013\WebmanScout\Command\AboutCommand;
 use Erikwang2013\WebmanScout\Command\DeleteIndexCommand;
 use Erikwang2013\WebmanScout\Command\FlushCommand;
 use Erikwang2013\WebmanScout\Command\ImportCommand;
@@ -19,5 +20,6 @@ return [
     DeleteIndexCommand::class,
     DeleteAllIndexesCommand::class,
     QueueImportCommand::class,
-    SyncIndexSettingsCommand::class
+    SyncIndexSettingsCommand::class,
+    AboutCommand::class
 ];

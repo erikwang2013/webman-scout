@@ -373,15 +373,17 @@ class AdvancedXunSearchEngine extends XunSearchEngine
             
             if ($field) {
                 $type = $sort['type'] ?? null;
+                // orderByVectorSimilarity / orderByGeoDistance 不写 direction，缺省按升序处理
+                $descending = ($sort['direction'] ?? 'asc') === 'desc';
                 if ($type === 'relevance' || $field === '_score') {
                     // 相关度排序（默认）
-                    $search->setSort('_score', $sort['direction'] === 'desc');
+                    $search->setSort('_score', $descending);
                 } elseif ($field === 'random') {
                     // 随机排序 - XunSearch 不支持，这里不做处理
                     Log::warning('XunSearch does not support random sorting');
                 } else {
                     // 字段排序
-                    $search->setSort($field, $sort['direction'] === 'desc');
+                    $search->setSort($field, $descending);
                 }
             }
         }
@@ -610,6 +612,14 @@ class AdvancedXunSearchEngine extends XunSearchEngine
         
         if (method_exists($builder, 'getSorts')) {
             $params['sorts'] = $builder->getSorts();
+        }
+
+        // 分面 / 聚合结果也在缓存里，配置不同必须区分缓存键，否则会命中别的配置的结果
+        if (method_exists($builder, 'getFacetConfig')) {
+            $params['facets'] = $builder->getFacetConfig();
+        }
+        if (method_exists($builder, 'getAggregationConfig')) {
+            $params['aggregations'] = $builder->getAggregationConfig();
         }
 
         return $this->cachePrefix . md5(serialize($params));

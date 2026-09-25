@@ -453,19 +453,65 @@ class BuilderTest extends TestCase
         $this->assertSame([
             'vector' => [1.0, 2.0],
             'field' => 'embedding',
-            'options' => ['metric' => 'cosine', 'top_k' => 10, 'threshold' => 0.9],
+            'options' => [
+                'metric' => 'cosine',
+                'top_k' => 10,
+                'threshold' => 0.9,
+                // 引擎读的名字与 Builder 默认名互为别名
+                'k' => 10,
+                'similarity_threshold' => 0.9,
+            ],
         ], $builder->getVectorSearch());
     }
 
-    public function testVectorSearchWithFieldName(): void
+    public function testVectorSearchOptionAliasesReachTheEngineNames(): void
+    {
+        $builder = $this->makeBuilder();
+        $builder->vectorSearch([1.0], 'embedding', ['top_k' => 50, 'similarity_threshold' => 0.4]);
+        $options = $builder->getVectorSearch()['options'];
+
+        $this->assertSame(50, $options['k'], 'OpenSearch reads k');
+        $this->assertSame(50, $options['top_k']);
+        $this->assertSame(0.4, $options['similarity_threshold'], 'Meilisearch reads similarity_threshold');
+        $this->assertSame(0.4, $options['threshold']);
+
+        // 显式传 k 时不被 top_k 覆盖
+        $builder2 = $this->makeBuilder();
+        $builder2->vectorSearch([1.0], 'embedding', ['k' => 7, 'top_k' => 50]);
+        $this->assertSame(7, $builder2->getVectorSearch()['options']['k']);
+    }
+
+    public function testVectorSearchKeepsNonArrayVector(): void
     {
         $builder = $this->makeBuilder();
         $builder->vectorSearch('embedding', null, ['metric' => 'euclidean']);
 
-        $this->assertSame([
-            'field' => 'embedding',
-            'options' => ['metric' => 'euclidean'],
-        ], $builder->getVectorSearch());
+        $search = $builder->getVectorSearch();
+
+        $this->assertSame('embedding', $search['vector'], 'engines read "vector", not "field"');
+        $this->assertNull($search['field']);
+        $this->assertSame('euclidean', $search['options']['metric']);
+    }
+
+    public function testGetAppliesAfterRawSearchCallbackInAdvancedMode(): void
+    {
+        $this->engine = Mockery::mock(\Erikwang2013\WebmanScout\Engines\AdvancedXunSearchEngine::class);
+        $this->engine->shouldReceive('advancedSearch')->once()->andReturn(['hits' => []]);
+
+        $model = $this->baseModelMock();
+        $model->shouldReceive('getScoutModelsByIds')->never();
+
+        $builder = new Builder($model, 'foo');
+        $seen = null;
+        $builder->withRawResults(function ($results) use (&$seen) {
+            $seen = $results;
+
+            return null;
+        });
+
+        $builder->get();
+
+        $this->assertSame(['hits' => []], $seen, 'get() must expose raw results in advanced mode too');
     }
 
     public function testOrderByVectorSimilarityAppendsSort(): void

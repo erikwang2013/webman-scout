@@ -598,26 +598,30 @@ class Builder
      */
     public function vectorSearch($vector, ?string $vectorField = null, array $options = []): self
     {
-        if (is_array($vector)) {
-            $this->vectorSearch = [
-                'vector' => $vector,
-                'field' => $vectorField,
-                'options' => array_merge([
-                    'metric' => 'cosine',
-                    'top_k' => 10,
-                    'threshold' => 0.7,
-                ], $options),
-            ];
-        } else {
-            $this->vectorSearch = [
-                'field' => $vector,
-                'options' => $options,
-            ];
-        }
+        $options = array_merge([
+            'metric' => 'cosine',
+            'top_k' => 10,
+            'threshold' => 0.7,
+        ], $options);
+
+        // 引擎侧的名字：OpenSearch 读 k，Meilisearch 读 similarity_threshold。
+        // 与 Builder 的历史默认名互为别名，避免调用方按错名字传值后被静默忽略（例如
+        // 传 top_k => 50 却仍用默认 10）。两个名字始终写成同一个值，引擎侧优先。
+        $k = $options['k'] ?? $options['top_k'];
+        $threshold = $options['similarity_threshold'] ?? $options['threshold'];
+        $options['k'] = $options['top_k'] = $k;
+        $options['similarity_threshold'] = $options['threshold'] = $threshold;
+
+        // 引擎统一读 $vectorSearch['vector']；不按类型分叉，否则非数组向量只会落到
+        // 'field' 上，被引擎当成"没传向量"忽略。
+        $this->vectorSearch = [
+            'vector' => $vector,
+            'field' => $vectorField,
+            'options' => $options,
+        ];
 
         return $this;
     }
-
 
     /**
      * 添加嵌套/复杂查询条件
@@ -774,13 +778,13 @@ class Builder
 
         // 检查引擎是否支持高级搜索
         if (method_exists($engine, 'advancedSearch')) {
-            $results = $engine->advancedSearch($this);
-            
+            $results = $this->applyAfterRawSearchCallback($engine->advancedSearch($this));
+
             // 应用结果处理器
             foreach ($this->resultProcessors as $processor) {
                 $results = $processor($results);
             }
-            
+
             return $this->mapResults($results);
         }
 
@@ -848,7 +852,7 @@ class Builder
         $objectIdPositions = array_flip($objectIds);
 
         $models = $this->model->getScoutModelsByIds($this, $objectIds)
-            ->filter(fn($model) => in_array($model->getScoutKey(), $objectIds))
+            ->filter(fn($model) => isset($objectIdPositions[$model->getScoutKey()]))
             ->sortBy(fn($model) => $objectIdPositions[$model->getScoutKey()])
             ->values();
 

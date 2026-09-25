@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="362" viewBox="0 0 320 362" role="img" aria-labelledby="petTitle petDesc">
+  <title id="petTitle">Sniffy — the webman-scout mascot</title>
+  <desc id="petDesc">探探，一只拿着放大镜的侦察犬。A scout dog holding a magnifier: it sniffs out documents, indexes them, and tracks them back down for you.</desc>
+
+  <style>
+    .ink { stroke: #24303f; stroke-linejoin: round; stroke-linecap: round; }
+    #glow { opacity: .55; }
+    #magnifier, #docCard, #eyes, #tail, #shine { transform-box: fill-box; }
+    #magnifier { transform-origin: 50% 50%; animation: float 6.5s ease-in-out infinite; }
+    #docCard   { transform-origin: 50% 50%; animation: drift 7.5s ease-in-out infinite; }
+    #tail      { transform-origin: 100% 100%; animation: wag 1.6s ease-in-out infinite; }
+    #eyes      { transform-origin: 50% 50%; animation: blink 6s ease-in-out infinite; }
+    #shine     { transform-origin: 50% 50%; animation: shine 5s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-7px) rotate(-1.5deg); } }
+    @keyframes drift { 0%,100% { transform: translateY(0) rotate(-14deg); } 50% { transform: translateY(-6px) rotate(-8deg); } }
+    @keyframes wag   { 0%,100% { transform: rotate(5deg); } 50% { transform: rotate(-7deg); } }
+    @keyframes blink { 0%,93%,100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+    @keyframes shine { 0%,100% { opacity: .18; transform: translate(-5px,0); } 50% { opacity: .6; transform: translate(7px,0); } }
+    @media (prefers-reduced-motion: reduce) {
+      #magnifier, #docCard, #eyes, #tail, #shine { animation: none; }
+    }
+  </style>
+
+  <defs>
+    <radialGradient id="glowGrad" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#ffd9a8" stop-opacity=".55"/>
+      <stop offset="70%" stop-color="#ddf4ff" stop-opacity=".35"/>
+      <stop offset="100%" stop-color="#ddf4ff" stop-opacity="0"/>
+    </radialGradient>
+    <clipPath id="lensClip"><circle cx="246" cy="176" r="40"/></clipPath>
+  </defs>
+
+  <ellipse id="glow" cx="160" cy="176" rx="152" ry="156" fill="url(#glowGrad)"/>
+
+  <!-- ground shadow -->
+  <ellipse cx="160" cy="344" rx="98" ry="13" fill="#24303f" opacity=".1"/>
+
+  <!-- tail (behind the body) -->
+  <g id="tail">
+    <path d="M 106 300 C 74 296 54 272 58 244" fill="none" class="ink" stroke-width="30"/>
+    <path d="M 106 300 C 74 296 54 272 58 244" fill="none" stroke="#f0b37e" stroke-width="22" stroke-linecap="round"/>
+  </g>
+
+  <!-- ears -->
+  <path d="M 104 86 C 68 74 44 110 50 158 C 54 194 76 206 90 190 C 102 176 100 124 104 86 Z"
+        fill="#d98e52" class="ink" stroke-width="5"/>
+  <path d="M 216 86 C 252 74 276 110 270 158 C 266 194 244 206 230 190 C 218 176 220 124 216 86 Z"
+        fill="#d98e52" class="ink" stroke-width="5"/>
+
+  <!-- body -->
+  <path d="M 106 234 C 88 280 92 316 106 334 L 214 334 C 228 316 232 280 214 234 Z"
+        fill="#f0b37e" class="ink" stroke-width="5"/>
+  <ellipse cx="160" cy="300" rx="46" ry="40" fill="#fff6ec"/>
+  <ellipse cx="122" cy="332" rx="30" ry="16" fill="#fff6ec" class="ink" stroke-width="4.5"/>
+  <ellipse cx="198" cy="332" rx="30" ry="16" fill="#fff6ec" class="ink" stroke-width="4.5"/>
+  <path d="M 112 328 L 112 336 M 122 327 L 122 337 M 132 328 L 132 336" class="ink" stroke-width="2.6" opacity=".45"/>
+  <path d="M 188 328 L 188 336 M 198 327 L 198 337 M 208 328 L 208 336" class="ink" stroke-width="2.6" opacity=".45"/>
+
+  <!-- collar + tag -->
+  <path d="M 92 220 Q 160 250 228 220 L 228 244 Q 160 274 92 244 Z"
+        fill="#0969da" class="ink" stroke-width="5"/>
+  <circle cx="160" cy="286" r="19" fill="#58a6ff" class="ink" stroke-width="4.5"/>
+  <ellipse cx="160" cy="290" rx="7.5" ry="6" fill="#0b3a6b"/>
+  <circle cx="152" cy="279" r="3.4" fill="#0b3a6b"/>
+  <circle cx="160" cy="276" r="3.4" fill="#0b3a6b"/>
+  <circle cx="168" cy="279" r="3.4" fill="#0b3a6b"/>
+
+  <!-- head -->
+  <ellipse cx="160" cy="150" rx="86" ry="80" fill="#f0b37e" class="ink" stroke-width="5"/>
+  <ellipse cx="108" cy="170" rx="11" ry="8" fill="#ef8f6b" opacity=".35"/>
+  <ellipse cx="212" cy="170" rx="11" ry="8" fill="#ef8f6b" opacity=".35"/>
+
+  <ellipse cx="160" cy="192" rx="50" ry="36" fill="#fff6ec" class="ink" stroke-width="4.5"/>
+  <path d="M 144 170 Q 160 162 176 170 Q 173 188 160 191 Q 147 188 144 170 Z" fill="#2b3038"/>
+  <path d="M 160 191 Q 152 204 139 199 M 160 191 Q 168 204 181 199" fill="none" class="ink" stroke-width="4.2"/>
+
+  <!-- eyes -->
+  <g id="eyes">
+    <ellipse cx="126" cy="138" rx="11.5" ry="13" fill="#2b3038"/>
+    <ellipse cx="194" cy="138" rx="11.5" ry="13" fill="#2b3038"/>
+    <circle cx="122" cy="133" r="4" fill="#ffffff" opacity=".9"/>
+    <circle cx="190" cy="133" r="4" fill="#ffffff" opacity=".9"/>
+  </g>
+  <path d="M 110 116 Q 126 106 142 116 M 178 116 Q 194 106 210 116" fill="none" class="ink" stroke-width="4.5"/>
+
+  <!-- floating document card -->
+  <g id="docCard" transform="rotate(-14 76 78)">
+    <rect x="56" y="52" width="42" height="52" rx="7" fill="#ffffff" class="ink" stroke-width="4"/>
+    <rect x="66" y="64" width="22" height="5" rx="2.5" fill="#0969da"/>
+    <rect x="66" y="76" width="22" height="4" rx="2" fill="#b6c2cf"/>
+    <rect x="66" y="86" width="14" height="4" rx="2" fill="#b6c2cf"/>
+  </g>
+  <path d="M 262 96 l 4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z" fill="#58a6ff" opacity=".85"/>
+
+  <!-- magnifier -->
+  <g id="magnifier">
+    <path d="M 275 210 L 301 254" class="ink" stroke-width="28"/>
+    <path d="M 275 210 L 301 254" stroke="#0969da" stroke-width="19" stroke-linecap="round"/>
+    <circle cx="246" cy="176" r="44" fill="#dff0ff" opacity=".75"/>
+    <circle cx="246" cy="176" r="40" fill="#eaf6ff"/>
+    <g clip-path="url(#lensClip)">
+      <rect x="224" y="146" width="44" height="58" rx="7" fill="#ffffff" class="ink" stroke-width="3.6"/>
+      <rect x="232" y="158" width="28" height="5" rx="2.5" fill="#0969da"/>
+      <rect x="232" y="170" width="28" height="4" rx="2" fill="#b6c2cf"/>
+      <rect x="232" y="180" width="28" height="4" rx="2" fill="#b6c2cf"/>
+      <rect x="232" y="190" width="18" height="4" rx="2" fill="#b6c2cf"/>
+      <ellipse id="shine" cx="236" cy="164" rx="12" ry="30" fill="#ffffff" opacity=".5"/>
+    </g>
+    <circle cx="246" cy="176" r="40" fill="none" class="ink" stroke-width="2.4" opacity=".55"/>
+    <circle cx="246" cy="176" r="44" fill="none" class="ink" stroke-width="2.4" opacity=".55"/>
+    <circle cx="246" cy="176" r="42" fill="none" stroke="#0969da" stroke-width="9"/>
+  </g>
+</svg>

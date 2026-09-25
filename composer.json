@@ -1,7 +1,7 @@
 {
     "name": "erikwang2013/webman-scout",
-    "description": "Scout-style full-text search for Webman, Laravel, ThinkPHP, and Hyperf (Eloquent models, multiple engines).",
-    "keywords": ["algolia", "webman", "laravel", "thinkphp", "hyperf", "scout", "search", "opensearch", "elasticsearch"],
+    "description": "Scout-style full-text search for Eloquent models on Webman, Laravel, Hyperf, ThinkPHP, Yii2 and Yii3 — 9 engines (OpenSearch, Elasticsearch, Meilisearch, Typesense, Algolia, XunSearch, Database, Collection, Null) with time ranges, geo distance, vector/KNN, aggregations and facets.",
+    "keywords": ["algolia", "webman", "laravel", "thinkphp", "hyperf", "yii", "yii2", "scout", "search", "opensearch", "elasticsearch", "meilisearch", "typesense", "xunsearch"],
     "license": "MIT",
     "support": {
         "issues": "https://github.com/erikwang2013/webman-scout/issues",
@@ -18,6 +18,7 @@
         "illuminate/bus": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
         "illuminate/contracts": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
         "illuminate/database": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/events": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
         "illuminate/http": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
         "illuminate/pagination": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
         "illuminate/queue": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
@@ -55,6 +56,10 @@
         }
     },
     "suggest": {
+        "illuminate/log": "Useful when the host has no logger: routes Support\\Log through the Illuminate Log facade instead of error_log().",
+        "illuminate/cache": "Useful when the host has no cache: routes Support\\Cache through the Illuminate Cache facade instead of the per-process array store.",
+        "psr/simple-cache": "Required to hand the package a PSR-16 cache via Support\\Cache::setPsr16Resolver() (Yii3 / custom hosts).",
+        "psr/log": "Required to hand the package a PSR-3 logger via Support\\Log::setLoggerResolver().",
         "algolia/algoliasearch-client-php": "Required to use the Algolia engine (^3.2).",
         "meilisearch/meilisearch-php": "Required to use the Meilisearch engine (^1.0).",
         "typesense/typesense-php": "Required to use the Typesense engine (^4.9).",

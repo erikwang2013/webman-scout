@@ -285,7 +285,8 @@ return [
         'host' => getenv('OPENSEARCH_HTTP_HOST') ?: 'https://127.0.0.1:6205',
         'username' => getenv('OPENSEARCH_USERNAME') ?: 'admin',
         'password' => getenv('OPENSEARCH_PASSWORD') ?: 'admin',
-        'ssl_verification' => (boolean)getenv('OPENSEARCH_SSL_VERIFICATION') ?: false,
+        // 默认校验证书；字符串形式的 'false' / '0' 也能正确解析（(bool)'false' 会变成 true）
+        'ssl_verification' => filter_var(getenv('OPENSEARCH_SSL_VERIFICATION') ?: true, FILTER_VALIDATE_BOOLEAN),
         'ssl_cert' => getenv('OPENSEARCH_SSL_CERT') ?: '',
         'ssl_key' => getenv('OPENSEARCH_SSL_KEY') ?: '',
         'connection_timeout' => getenv('OPENSEARCH_CONNECTION_TIMEOUT') ?: 10,

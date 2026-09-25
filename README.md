@@ -2,12 +2,19 @@
 
 <div style="position:fixed;left:12px;top:88px;width:min(288px,calc(100vw - 36px));max-height:min(520px,calc(100vh - 112px));overflow-y:auto;overflow-x:hidden;z-index:9998;padding:12px 14px;background:#f6f8fa;border:1px solid #d0d7de;border-radius:10px;font-size:12.5px;line-height:1.45;box-shadow:0 2px 14px rgba(31,35,40,.12)">
 
-**Navigate (top):** [Top](#webman-scout) · [Features](#features) · [Framework support](#framework-support) · [Requirements](#requirements) · [Installation](#installation) · [Framework-specific setup](#framework-specific-setup) · [Configuration](#configuration) · [Model setup](#model-setup) · [Basic usage](#basic-usage) · [Advanced builder](#advanced-builder-opensearch--elasticsearch-oriented) · [Artisan / Webman commands](#artisan--webman-commands) · [Queues](#queues) · [Builder reference](#builder-reference-extensions) · [References](#references) · [License](#license)
+**Navigate (top):** [Top](#webman-scout) · [Features](#features) · [Project structure](#project-structure) · [Architecture](#architecture) · [Feature design](#feature-design) · [Lifecycle](#lifecycle) · [Framework support](#framework-support) · [Plain PHP](#plain-php-no-framework) · [Requirements](#requirements) · [Installation](#installation) · [Framework-specific setup](#framework-specific-setup) · [Configuration](#configuration) · [Model setup](#model-setup) · [Basic usage](#basic-usage) · [Advanced builder](#advanced-builder-opensearch--elasticsearch-oriented) · [Artisan / Webman commands](#artisan--webman-commands) · [Queues](#queues) · [Builder reference](#builder-reference-extensions) · [Mascot](#mascot) · [References](#references) · [License](#license)
 
 <details open>
 <summary><strong>Left navigation (outline)</strong></summary>
 
 - [Features](#features)
+- [Project structure](#project-structure)
+- [Architecture](#architecture)
+- [Feature design](#feature-design)
+- [Lifecycle](#lifecycle)
+  - [Write path](#write-path-model--index)
+  - [Read path](#read-path-query--index--model)
+  - [Index states](#index-states)
 - [Framework support](#framework-support)
 - [Requirements](#requirements)
 - [Installation](#installation)
@@ -15,9 +22,12 @@
   - [Laravel / Hyperf / ThinkPHP (non-plugin layout)](#laravel--hyperf--thinkphp-non-plugin-layout)
 - [Framework-specific setup](#framework-specific-setup)
   - [Webman (1.x / 2.x)](#webman-1x--2x)
-  - [Laravel (7.x – 11.x)](#laravel-7x--11x)
+  - [Laravel (7.x – 12.x)](#laravel-7x--12x)
   - [Hyperf (2.x – 3.x)](#hyperf-2x--3x)
   - [ThinkPHP (6.x / 8.x)](#thinkphp-6x--8x)
+  - [Yii2 (2.x)](#yii2-2x)
+  - [Yii3 (3.x)](#yii3-3x)
+  - [Plain PHP (no framework)](#plain-php-no-framework)
   - [Quick checklist](#quick-checklist)
 - [Configuration](#configuration)
   - [OpenSearch example](#opensearch-example)
@@ -27,6 +37,7 @@
 - [Artisan / Webman commands](#artisan--webman-commands)
 - [Queues](#queues)
 - [Builder reference (extensions)](#builder-reference-extensions)
+- [Mascot](#mascot)
 - [References](#references)
 - [License](#license)
 
@@ -40,7 +51,16 @@
 
 # webman-scout
 
-Driver-based full-text search for **Eloquent** models, inspired by [Laravel Scout](https://laravel.com/docs/scout) and [shopwwi/webman-scout](https://github.com/shopwwi/webman-scout). This fork adds **time ranges, aggregations, OpenSearch**, vector / geo helpers, and clearer multi-framework configuration.
+<p align="center">
+  <img src="docs/images/pet.svg" width="168" alt="Sniffy — the webman-scout mascot: a scout dog holding a magnifier over an index card">
+</p>
+
+<p align="center">
+  <sub><b>Sniffy · 探探</b> — the scout dog. It sniffs out your documents, buries them in the index, and tracks them back down on demand.<br>
+  Meet it in person: <code>php webman scout:about</code> · <a href="#mascot">more about the mascot</a></sub>
+</p>
+
+Driver-based full-text search for **Eloquent** models, inspired by [Laravel Scout](https://laravel.com/docs/scout) and [shopwwi/webman-scout](https://github.com/shopwwi/webman-scout). One package, **six frameworks** (Webman · Laravel · Hyperf · ThinkPHP · Yii2 · Yii3) **plus plain PHP**, and **nine engines** (OpenSearch · Elasticsearch · Meilisearch · Typesense · Algolia · XunSearch · Database · Collection · Null), with a Scout-compatible API plus **time ranges, geo distance, vector / KNN search, aggregations and facets**.
 
 **Languages:** this file is English (default). [简体中文](docs/zh-CN/README.md)
 
@@ -49,8 +69,122 @@ Driver-based full-text search for **Eloquent** models, inspired by [Laravel Scou
 - Scout-like API for easy migration from Laravel Scout / shopwwi webman-scout
 - Engines: **OpenSearch**, Elasticsearch, Meilisearch, Typesense, Algolia, XunSearch, Database, Collection, Null
 - OpenSearch-first advanced queries: aggregations, facets, KNN, geo distance
-- Optional queue-driven indexing (Webman Redis Queue when available)
+- Runs on Webman, Laravel, Hyperf, ThinkPHP, Yii2, Yii3 **or plain PHP** ([`Scout::configure()`](#plain-php-no-framework), no container to bootstrap)
+- Optional queue-driven indexing (Webman Redis Queue when available), synchronous with a logged downgrade when not
 - Index settings sync, soft deletes, chunked import
+- Design docs with diagrams: [project structure](#project-structure) · [architecture](#architecture) · [feature design](#feature-design) · [lifecycle](#lifecycle)
+
+
+## Project structure
+
+```text
+webman-scout/
+├── src/
+│   ├── Searchable.php              # Eloquent trait: search(), searchable(), toSearchableArray(), metadata
+│   ├── ModelObserver.php           # saved / deleted / restored / forceDeleted → index sync
+│   ├── SearchableScope.php         # chunkById-based searchable()/unsearchable() macros + progress events
+│   ├── Builder.php                 # chainable query builder: basic + advanced conditions, pagination
+│   ├── EngineManager.php           # driver resolution (createXxxDriver) + instance cache + extend()
+│   ├── Manager.php                 # generic driver manager (driver(), forgetDrivers(), __call)
+│   ├── Scout.php                   # VERSION + Scout::engine($name) + Scout::configure() for plain PHP
+│   ├── ScoutConfig.php             # cross-framework config root resolution (SCOUT_CONFIG_KEY / plugin / Yii / array)
+│   ├── Install.php                 # Webman plugin installer (copies config + queue consumers)
+│   ├── XunSearchClient.php         # XunSearch connection wrapper (XS)
+│   ├── Engines/                    # 16 engine classes, all extending Engines\Engine
+│   ├── Command/                    # 8 Symfony commands (scout:import, scout:about, …)
+│   ├── Jobs/search/                # Webman Redis Queue consumers, copied into app/queue/redis/search
+│   ├── Support/                    # Cache / Log adapters: Webman, Illuminate, Yii, PSR-16/PSR-3 + ArrayStore fallback
+│   ├── Attributes/                 # #[SearchUsingFullText], #[SearchUsingPrefix]
+│   ├── Concerns/                   # model resolution, pagination restore helpers
+│   ├── Contracts/ Events/ Exceptions/
+│   ├── Yii/                        # console bridge (yii scout/*)
+│   ├── Yii3/                       # ScoutConfigProvider + config integration
+│   └── config/plugin/erikwang2013/webman-scout/
+│       ├── app.php                 # all Scout options (driver, prefix, queue, chunk, engine blocks)
+│       ├── command.php             # command registration for Webman
+│       └── ini/                    # XunSearch ini snippets
+├── tests/                          # PHPUnit suite: engines, commands, events, jobs, framework stubs
+├── helpers.php                     # app() / event() / config() / scout_config() + container bindings
+└── docs/
+    ├── images/                     # pet.svg + architecture.svg + features.svg + lifecycle.svg
+    └── zh-CN/README.md             # Chinese documentation
+```
+
+Where to start when changing something:
+
+| I want to … | Start at |
+|-------------|----------|
+| Search / paginate a model | `Searchable::search()` → `src/Builder.php` |
+| Add a query capability | `src/Builder.php` + that engine's `search()` |
+| Add a search engine | `EngineManager::createXxxDriver()` + `extends Engines\Engine` |
+| Change when the index is written | `src/ModelObserver.php` |
+| Change how config is resolved | `src/ScoutConfig.php` |
+| Configure without a framework | `Scout::configure()` → `src/ScoutConfig::setArraySource()` |
+| Add a host logger / cache | `Support\Log::setLoggerResolver()` / `Support\Cache::setPsr16Resolver()` |
+| Turn indexing into a background job | `src/Searchable.php` (`queueMakeSearchable`) + `src/Jobs/search/` |
+
+
+## Architecture
+
+<img src="docs/images/architecture.svg" alt="webman-scout architecture: host frameworks → bootstrap → model layer → builder / engine manager → engines, with cross-cutting commands, jobs, events, contracts and adapters" width="100%">
+
+Three layers do the actual work, and everything else is pluggable around them:
+
+1. **Bootstrap seam.** `helpers.php` defines `app()`, `event()`, `config()` and `scout_config()` only when the host does not already provide them, then binds `EngineManager` on the Illuminate container. `ScoutConfig` resolves the config root once — `SCOUT_CONFIG_KEY` → Webman plugin path → `scout` → Yii `params` → array registered with `Scout::configure()` (plain PHP) — so the same package code runs on every host. Eloquent has a `getenv('KEY') ?: 'default'` gotcha in `app.php` comments; follow it.
+2. **Model layer.** `use Searchable` boots three things: a global scope, a `ModelObserver`, and collection macros. The observer decides *whether* to write and delegates *how* to write; `SearchableScope` provides chunked `searchable()` / `unsearchable()` macros for imports and emits progress events.
+3. **Query + engine layer.** Every read path funnels through one `Builder`, which hands off to `EngineManager::driver()`; every engine implements the same `Engine` contract (`update` / `delete` / `search` / `paginate` / `map` / `flush` / `createIndex`), so switching engines never changes application code.
+
+Cross-cutting concerns stay out of that flow: commands, queue jobs, events, contracts and the framework cache/log adapters are registered on demand (see the right column of the diagram).
+
+
+## Feature design
+
+<img src="docs/images/features.svg" alt="webman-scout feature map: search API, advanced query, multi-engine, indexing, commands, multi-framework" width="100%">
+
+The six capability blocks are independent: an engine only has to implement the base contract, and the advanced builder methods degrade to `NotSupportedException` (or are ignored) where an engine cannot serve them. Practical consequences:
+
+- **Search API** mirrors Scout, so migration is mostly a `use Searchable` swap; pagination works on the engine side or falls back to the database when an engine cannot count.
+- **Advanced queries** (`whereRange`, `whereGeoDistance`, `fulltextSearch`, `vectorSearch`, `aggregate`, `facet`) are OpenSearch/Elasticsearch-first but implemented per engine where the backend supports them.
+- **Indexing** is observer-driven and synchronous by default; enable the queue and the same calls become `scout_make` / `scout_remove` jobs. Missing `webman/redis-queue` is logged and downgraded to synchronous instead of silently dropping writes.
+
+
+## Lifecycle
+
+<img src="docs/images/lifecycle.svg" alt="webman-scout lifecycle: write path, read path and the four index states" width="100%">
+
+### Write path (model → index)
+
+```
+save()/delete()/restore()        scalar writes on the model
+   └─ ModelObserver::saved()     or SearchableScope::searchable() for bulk imports
+        ├─ syncingDisabledFor()?  withoutSyncingToSearch() → skip
+        ├─ searchIndexShouldBeUpdated() / shouldBeSearchable()  → decide index / unindex
+        └─ searchable() / unsearchable()
+             ├─ queue = true  → Redis Queue scout_make / scout_remove  (falls back to sync)
+             └─ queue = false → syncMakeSearchable() → EngineManager::driver()->update($models)
+                                                         └─ toSearchableArray() → document upsert
+```
+
+### Read path (query → index → model)
+
+```
+Model::search($query, $callback)   → Builder (where / orderBy / take / advance conditions)
+   └─ engine->search($builder)      → backend query (hits + total + aggregations/facets)
+        └─ mapIds()                 → primary keys
+             └─ queryScoutModelsByIds()  → Eloquent hydration (or whereIntegerInRaw fallback)
+                  └─ get() / paginate() / cursor()
+```
+
+The index stores documents, not rows: results are fetched by primary key from the database, so `total` and pagination fall back to a database count whenever an engine cannot provide one.
+
+### Index states
+
+| State | Meaning | Reached by |
+|-------|---------|-----------|
+| Not indexed | No document in the index | initial state · `flush()` · `scout:delete-index` · `scout:import --fresh` |
+| Indexed | Document present | `save()` · `scout:import` · `restore()` |
+| Soft-deleted | `__soft_deleted = 1`, document kept | `delete()` when `soft_delete = true` |
+| Removed | Document deleted | `forceDelete()` · `unsearchable()` |
 
 
 ## Framework support
@@ -65,15 +199,17 @@ Runtime integration targets applications that expose Laravel’s **`config()` he
 | **ThinkPHP** | 6.x / 8.x | Use when the app loads **Illuminate** `config` / `app()` (e.g. hybrid setups or `illuminate/database` Eloquent models). Native `think\Model` is **not** wired to the `Searchable` trait; call engine APIs manually or use Eloquent models for indexed entities. |
 | **Yii2** | 2.x | `config()` polyfill reads `Yii::$app->params['scout']`; cache/log route through `Yii::$app->cache` and `Yii::info\|warning\|error`; console bridge `yii scout/*`. |
 | **Yii3** | 3.x | Config plugin (`ScoutConfigProvider`) injects default `scout` params; PSR-16 cache + PSR-3 logger; register the Symfony commands under `yiisoft/yii-console`. |
+| **Plain PHP** | 8.0+ | No framework and no container bootstrap needed: `Scout::configure([...])` (or a path to a file returning the array) supplies the config, `helpers.php` supplies `app()` / `event()` / `config()`. Add your own Eloquent bootstrap (e.g. `Illuminate\Database\Capsule\Manager`). See [Plain PHP](#plain-php-no-framework). |
 
-Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **^5.4 – ^7.0** so dependency resolution matches your framework stack.
+Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **^5.4 – ^7.0** so dependency resolution matches your framework stack. `illuminate/events` is a direct requirement (the model observer and the import progress events dispatch through `Illuminate\Events\Dispatcher`).
 
 
 ## Requirements
 
 - PHP **^8.0**
 - Eloquent models for the `Searchable` trait
-- `illuminate/bus`, `contracts`, `database`, `http`, `pagination`, `queue`, `support` (versions aligned with your Laravel / Hyperf / ThinkPHP stack)
+- `illuminate/bus`, `contracts`, `database`, **`events`**, `http`, `pagination`, `queue`, `support` (versions aligned with your Laravel / Hyperf / ThinkPHP stack)
+- Optional: `illuminate/log` / `illuminate/cache` / `psr/simple-cache` / `psr/log` if you want the host logger and cache instead of the built-in `error_log()` and per-process array store
 
 
 ## Installation
@@ -82,7 +218,7 @@ Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **
 composer require erikwang2013/webman-scout
 ```
 
-The Composer **autoload `files`** entry loads `helpers.php`, which defines `app()`, `event()`, `config()` (Yii2/Yii3 only), and `scout_config()` when needed and registers `EngineManager`.
+The Composer **autoload `files`** entry loads `helpers.php`, which defines `app()`, `event()`, `config()` (Yii2/Yii3 and plain PHP) and `scout_config()` when the host does not provide them, and binds `EngineManager` on the container.
 
 ### Webman
 
@@ -137,6 +273,7 @@ The following sections assume `composer require erikwang2013/webman-scout` is al
          \Erikwang2013\WebmanScout\Command\DeleteAllIndexesCommand::class,
          \Erikwang2013\WebmanScout\Command\QueueImportCommand::class,
          \Erikwang2013\WebmanScout\Command\SyncIndexSettingsCommand::class,
+         \Erikwang2013\WebmanScout\Command\AboutCommand::class,
      ];
      ```
 
@@ -207,6 +344,52 @@ The following sections assume `composer require erikwang2013/webman-scout` is al
 3. **Models**: same as Yii2 — Eloquent models via an `illuminate/database` Capsule.
 4. **Queues**: same as other frameworks — `'queue' => false` or custom async jobs.
 
+### Plain PHP (no framework)
+
+No framework at all — CLI scripts, cron jobs, queue workers, or a custom host. Only `illuminate/*` (installed with this package) and your own Eloquent bootstrap are needed: `helpers.php` already provides `app()`, `event()` and `config()`, so there is no container or config repository to wire up.
+
+```php
+require __DIR__.'/vendor/autoload.php';
+
+use Erikwang2013\WebmanScout\Scout;
+use Illuminate\Database\Capsule\Manager as Capsule;
+
+// 1. Scout config: an array, or a path to a PHP file that returns one.
+Scout::configure([
+    'driver' => 'opensearch',          // or database / collection / null
+    'prefix' => 'app_',
+    'queue' => false,                  // no Webman Redis Queue here → stays synchronous
+    'opensearch' => [
+        'host' => 'https://127.0.0.1:9200',
+        'username' => 'admin',
+        'password' => 'admin',
+    ],
+]);
+// Scout::configure(__DIR__.'/scout.php');   // same thing, from a file
+// Scout::configure($config, 'my-root');     // publish under a custom root key
+
+// 2. Eloquent (models, observers and the index hydration all need it).
+$capsule = new Capsule;
+$capsule->addConnection(['driver' => 'mysql', 'host' => '127.0.0.1', 'database' => 'app',
+                         'username' => 'root', 'password' => '', 'charset' => 'utf8mb4']);
+$capsule->setAsGlobal();
+$capsule->bootEloquent();
+
+// 3. Search like anywhere else.
+$products = Product::search('phone')->where('status', 1)->paginate(15);
+
+// 4. Commands work too: `php vendor/bin/…` or Symfony's Application with the scout:* commands.
+```
+
+Behaviour on this path:
+
+- **Config** — `Scout::configure()` pins the root to `scout`, so `scout_config('driver')` and `config('scout.driver')` read your array. If the driver is missing/empty, the `null` engine is used instead of silently hitting a service.
+- **Logging** — with no logger component, `Support\Log` writes to `error_log()` (prefix `[webman-scout]`) instead of throwing. Hand it a PSR-3 logger instead: `Log::setLoggerResolver(fn () => $myLogger)`.
+- **Cache** — with no cache component, `Support\Cache` falls back to a per-process array store (`Support\ArrayStore`). Hand it a real cache instead: `Cache::setPsr16Resolver(fn () => $myPsr16Cache)`.
+- **Certificate paths** — relative `ssl_cert` / `ssl_key` paths resolve against `base_path()` when the host provides one, otherwise against the current working directory.
+- **Queue** — leave `'queue' => false`; the Webman Redis Queue path is skipped automatically (and logged) when the queue class is absent.
+- **Events** — `Illuminate\Events\Dispatcher` is bound on the container, so `ModelsImported` / `ModelsFlushed` progress events fire and `scout:import` works.
+
 ### Quick checklist
 
 | Step | Webman | Laravel | Hyperf | ThinkPHP (Eloquent/hybrid) | Yii2 | Yii3 |
@@ -223,11 +406,12 @@ All Scout options are read via **`scout_config('key')`**, which respects the res
 
 | Key | Purpose |
 |-----|---------|
-| `driver` | Default engine: `opensearch`, `elasticsearch`, `meilisearch`, `typesense`, `algolia`, `database`, `collection`, `null`, … |
+| `driver` | Default engine: `opensearch`, `elasticsearch`, `meilisearch`, `typesense`, `algolia`, `xunsearch`, `database`, `collection`, `null`. Add an `advanced_` prefix where a variant exists (`advanced_opensearch` is an alias of `opensearch`, which already ships the advanced implementation; `advanced_elasticsearch` / `advanced_meilisearch` / `advanced_typesense` / `advanced_xunsearch` unlock aggregations, facets, highlights and vectors) |
 | `prefix` | Index name prefix |
 | `queue` | Enable async indexing (Webman Redis Queue when installed) |
 | `chunk.searchable` / `chunk.unsearchable` | Chunk sizes for bulk import/remove |
 | `soft_delete` | Keep soft-deleted rows in the index |
+| `after_commit` | Defer index writes until open transactions commit (requires the host to register a database transaction manager) |
 
 ### OpenSearch example
 
@@ -237,7 +421,8 @@ All Scout options are read via **`scout_config('key')`**, which respects the res
     'username' => getenv('OPENSEARCH_USERNAME') ?: 'admin',
     'password' => getenv('OPENSEARCH_PASSWORD') ?: 'admin',
     'prefix' => getenv('OPENSEARCH_INDEX_PREFIX') ?: '',
-    'ssl_verification' => (bool) (getenv('OPENSEARCH_SSL_VERIFICATION') ?: false),
+    // 默认校验证书；字符串形式的 'false' / '0' 也会被正确解析
+    'ssl_verification' => filter_var(getenv('OPENSEARCH_SSL_VERIFICATION') ?: true, FILTER_VALIDATE_BOOLEAN),
     'indices' => [
         'products' => [
             'settings' => [ /* ... */ ],
@@ -305,7 +490,7 @@ Product::search('keyword')
     ->where('status', 1)
     ->whereIn('category_id', [1, 2, 3])
     ->orderBy('created_at', 'desc')
-    ->limit(20)
+    ->take(20)
     ->get();
 
 // Indexing
@@ -352,7 +537,8 @@ $results = $builder->get();
 $aggregations = $builder->getAggregations();
 $facets = $builder->getFacets();
 
-$engine = app(\Erikwang2013\WebmanScout\EngineManager::class)->engine();
+// 引擎可以按需切换：advanced_* 驱动解锁聚合 / 分面 / 高亮 / 向量
+$engine = app(\Erikwang2013\WebmanScout\EngineManager::class)->engine('advanced_elasticsearch');
 $engine->updateIndexMappings('products', [
     'properties' => [
         'new_field' => ['type' => 'keyword'],
@@ -378,6 +564,7 @@ On **Webman**, use `php webman …`. On **Laravel**, register the command classe
 | `php webman scout:queue-import` | Queue-based import |
 | `php webman scout:sync-index-settings` | Sync index settings |
 | `php webman scout:delete-all-indexes` | Delete all managed indexes (dangerous) |
+| `php webman scout:about` | Mascot + resolved config + engine availability self-check |
 
 Use `--help` on each command for options.
 
@@ -403,6 +590,44 @@ With `queue` enabled, `searchable()` / `unsearchable()` dispatch to **Webman Red
 | `clearAdvancedConditions()` | Reset advanced state |
 
 Engines such as OpenSearch expose `updateIndexMappings(string $index, array $mappings)`.
+
+
+## Mascot
+
+**Sniffy** (探探) is the project mascot: a scout dog with a magnifier — it sniffs out documents, buries them in the index, and tracks them back down. The vector art lives at [`docs/images/pet.svg`](docs/images/pet.svg) and is also the visual anchor of the [architecture](#architecture), [feature](#feature-design) and [lifecycle](#lifecycle) diagrams.
+
+It is wired into the package as a console command, which doubles as a self-check for environment problems:
+
+```bash
+php webman scout:about      # php artisan scout:about on Laravel
+```
+
+```
+   __        __      ___
+  /  \______/  \    /   \
+  |            |   | --  |
+  |   o    o   |    \   /
+  |     __     |       |
+  \    \__/    /       |
+   \__________/
+
+  Scout · webman-scout v2.1.0  sniff out your data · 嗅出你的数据
+
+  config root 配置根        plugin.erikwang2013.webman-scout.app
+  driver 引擎               opensearch
+  prefix 索引前缀           app_
+  queue 队列                off（请求内同步索引）
+  soft delete 软删除        on（保留 __soft_deleted 文档）
+  after commit 事务后提交   off
+  chunk 分块                searchable=500 / unsearchable=500
+
+  engines 引擎可用性 （composer require 对应客户端后即可用）
+  algolia        ✘  collection     ✔  database       ✔
+  elasticsearch  ✘  meilisearch    ✔  null           ✔
+  opensearch     ✔  typesense      ✔  xunsearch      ✘
+```
+
+Implementation: [`src/Command/AboutCommand.php`](src/Command/AboutCommand.php) (mascot art + engine availability probe).
 
 
 ## References

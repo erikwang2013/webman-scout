@@ -303,7 +303,10 @@ class ElasticSearchEngine extends Engine
      */
     public function mapIds($results)
     {
-        return collect($results['hits']['hits'])->pluck('_id')->values();
+        // 同 OpenSearch：兼容高级引擎处理过的扁平 hits 结构
+        return collect($results['hits']['hits'] ?? $results['hits'] ?? [])
+            ->pluck('_id')
+            ->values();
     }
 
     /**

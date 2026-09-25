@@ -683,7 +683,9 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
                 $params['body'][] = [
                     'doc' => [
                         'vector' => $vectors[$index],
-                        'vector_updated_at' => now()->toISOString(),
+                        // 不能用 now()：它是 laravel/framework 的 helper，Webman / ThinkPHP /
+                        // Hyperf / Yii / 原生 PHP 下不存在（Carbon 由 illuminate/support 保证）
+                        'vector_updated_at' => \Carbon\Carbon::now()->toISOString(),
                     ],
                     'doc_as_upsert' => true,
                 ];
@@ -944,18 +946,28 @@ class AdvancedOpenSearchEngine extends OpenSearchEngine
         $idPositions = array_flip($ids);
 
         $models = $model->getScoutModelsByIds($builder, $ids)
-            ->filter(fn($model) => in_array($model->getScoutKey(), $ids))
+            ->filter(fn($model) => isset($idPositions[$model->getScoutKey()]))
             ->sortBy(fn($model) => $idPositions[$model->getScoutKey()])
             ->values();
 
-        // 添加额外的元数据
-        foreach ($models as $index => $model) {
-            if (isset($hits[$index])) {
-                $hit = $hits[$index];
-                $model->_score = $hit['_score'] ?? null;
-                $model->_highlight = $hit['_highlight'] ?? null;
-                $model->_vector_score = $hit['_vector_score'] ?? null;
+        // 按 scout key 对齐元数据：模型被过滤/排序后下标与 hits 不再一一对应，
+        // 若按下标取值会把别的文档的 score / highlight 挂到当前模型上。
+        $hitsByKey = collect($hits)->keyBy('_id')->all();
+
+        foreach ($models as $model) {
+            $hit = $hitsByKey[$model->getScoutKey()] ?? null;
+
+            if ($hit === null) {
+                continue;
             }
+
+            $model->_score = $hit['_score'] ?? null;
+            $model->_highlight = $hit['_highlight'] ?? null;
+            $model->_vector_score = $hit['_vector_score'] ?? null;
+            // 记为原始值，避免下次 save() 把它们当成列写回数据库
+            $model->syncOriginalAttribute('_score');
+            $model->syncOriginalAttribute('_highlight');
+            $model->syncOriginalAttribute('_vector_score');
         }
 
         return $models;

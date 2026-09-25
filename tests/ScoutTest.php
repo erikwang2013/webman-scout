@@ -17,7 +17,9 @@ class ScoutTest extends TestCase
 
     public function testVersionConstant(): void
     {
-        $this->assertSame('10.23.0', Scout::VERSION);
+        // 断言版本号格式而不是具体值：发布流程会自动 +1，具体值每次都要改
+        $this->assertMatchesRegularExpression('/^\d+\.\d+\.\d+$/', Scout::VERSION);
+        $this->assertSame(Scout::VERSION, (new \ReflectionClass(Scout::class))->getConstant('VERSION'));
     }
 
     public function testEngineReturnsEngineFromManager(): void

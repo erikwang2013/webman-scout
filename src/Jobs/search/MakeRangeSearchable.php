@@ -46,7 +46,14 @@ class MakeRangeSearchable implements Consumer
                 return;
             }
 
-            $models->first()->makeSearchableUsing($models)->first()->searchableUsing()->update($models);
+            // 与 MakeSearchable / syncMakeSearchable 保持一致：回调可能过滤掉全部模型
+            $models = $models->first()->makeSearchableUsing($models);
+
+            if ($models->isEmpty()) {
+                return;
+            }
+
+            $models->first()->searchableUsing()->update($models);
         } catch (Throwable $e) {
             $attempts = (int) ($data['attempts'] ?? 1);
             if ($attempts < 5) {

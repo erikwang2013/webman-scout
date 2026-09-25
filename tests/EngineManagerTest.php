@@ -157,6 +157,24 @@ class EngineManagerTest extends TestCase
         (new EngineManager($this->container))->driver('opensearch');
     }
 
+    public function testAdvancedElasticsearchDriverIsResolvable(): void
+    {
+        // 之前只有 advanced_meilisearch / advanced_typesense / advanced_xunsearch，
+        // AdvancedElasticsearchEngine 无法通过驱动名拿到
+        $this->expectException(ScoutException::class);
+        $this->expectExceptionMessage('Please install the ElasticSearch client: elasticsearch/elasticsearch.');
+
+        (new EngineManager($this->container))->driver('advanced_elasticsearch');
+    }
+
+    public function testAdvancedOpensearchDriverAliasesTheDefaultOpensearchDriver(): void
+    {
+        $this->expectException(ScoutException::class);
+        $this->expectExceptionMessage('Please install the OpenSearch client (^2.0): opensearch-project/opensearch-php.');
+
+        (new EngineManager($this->container))->driver('advanced_opensearch');
+    }
+
     public function testXunsearchDriver(): void
     {
         $manager = new EngineManager($this->container);
