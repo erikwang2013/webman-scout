@@ -1,4 +1,81 @@
-# webman-scout 项目审查报告
+# webman-scout 审查报告
+
+**本轮审查 / 修复**: 2026-09-26  
+**上一轮**: 2026-08-02（见文末附录）  
+**状态**: 本轮 18 项已修复；7 项列为待决策（见「三」）
+
+---
+
+## 一、本轮修复
+
+| # | 问题 | 影响面 | 状态 |
+|---|------|--------|------|
+| 1 | `AdvancedOpenSearchEngine` 使用 `now()`（laravel/framework 的 helper，非必需依赖） | Webman / Hyperf / ThinkPHP / Yii2 / Yii3 / 原生 PHP 下向量写入直接 fatal | ✅ 改用 Carbon |
+| 2 | `mapIds()` 只认原始 `hits.hits`，而高级引擎返回扁平 `hits` | 默认 opensearch 驱动 `keys()` 恒空；带 `queryCallback` 的 `paginate()` total 恒为 0 | ✅ 两种结构都支持 |
+| 3 | `mapAdvancedResults()` 按数组下标挂 `_score` / `_highlight` | 命中数与模型数不一致时分数错挂到别的文档；脏属性会被 `save()` 写回数据库 | ✅ 按 `_id` 对齐 + `syncOriginalAttribute` |
+| 4 | `vectorSearch()` 选项名与引擎读取名不一致 | 传 `top_k` 不生效（OpenSearch 读 `k`）；非数组向量被静默忽略 | ✅ 互为别名 + 不再按类型分叉 |
+| 5 | `Builder::get()` 漏调 `applyAfterRawSearchCallback()` | 高级引擎下 `withRawResults()` 失效（`paginate()` 却生效） | ✅ |
+| 6 | `EngineManager` 未守卫 `base_path()` | OpenSearch 证书相对路径在无该 helper 的宿主 fatal | ✅ `resolvePath()` |
+| 7 | 包内 `app.php` 调用 `base_path('config/xunsearch')` | 同上，加载配置即 fatal（影响复制该配置的所有非 Webman 宿主） | ✅ helpers.php 提供 polyfill |
+| 8 | `illuminate/events` 不是直接依赖 | `illuminate/*` ^8.0 组合不会传递引入，`scout:import` / 分块导入崩 | ✅ 提为 require |
+| 9 | `Support\Log` / `Support\Cache` 直接回退到 Illuminate facade | 未装 illuminate/log / illuminate/cache 的宿主抛异常而不是降级 | ✅ 退回 `error_log()` / 进程内 `ArrayStore` |
+| 10 | 进度事件走全局 `event()` | 宿主同名的 `event()`（Webman event 插件 / Laravel helpers）签名不同，事件被吞 | ✅ 直接走容器里的 `Dispatcher` |
+| 11 | OpenSearch `ssl_verification` 默认 false，且 `(bool)'false'` 为 true | 默认不校验证书；想开校验反而写错 | ✅ 默认校验 + `filter_var` 解析 |
+| 12 | `MakeRangeSearchable` 缺空集合守卫 | `makeSearchableUsing()` 过滤空后空指针，还会重试 5 次 | ✅ 与兄弟类一致 |
+| 13 | XunSearch 排序方向未取默认值 | `orderByVectorSimilarity` / `orderByGeoDistance` 报 undefined key 并走错排序分支 | ✅ 缺省 asc |
+| 14 | XunSearch 高级缓存键不含分面 / 聚合配置 | 不同分面配置互相命中缓存 | ✅ 纳入缓存键 |
+| 15 | `AdvancedElasticsearchEngine`（942 行）无法通过驱动名使用 | ES 用户拿不到聚合 / 分面 / 高亮 / 向量 | ✅ 新增 `advanced_elasticsearch`、`advanced_opensearch` |
+| 16 | 无框架宿主无法提供配置 | 只能落到 `null` 引擎 | ✅ `Scout::configure()` / `ScoutConfig::setArraySource()` |
+| 17 | CI 从未通过：库提交了 lock、phpstan 全红 | 5 个 PHP 版本的任务全部失败 | ✅ 不提交 lock（按 PHP 版本解析）+ phpstan 基线 + 可选依赖符号桩 |
+| 18 | 测试覆盖 | — | ✅ 465 → 486 用例（原生 PHP 配置 / 兜底 / 端到端冒烟、引擎结果结构、驱动解析） |
+
+### 变更文件（本轮）
+
+| 文件 | 变更 |
+|------|------|
+| `src/Scout.php` | `configure()`；`VERSION` 与 tag 对齐（10.23.0 → 2.1.0） |
+| `src/ScoutConfig.php` | `setArraySource()` 数组配置源 |
+| `src/Support/ArrayStore.php` | 新增 — 进程内缓存兜底（Illuminate Store 契约） |
+| `src/Support/Log.php` / `Cache.php` | facade 失败后降级，不再抛异常 |
+| `src/EngineManager.php` | `resolvePath()`；`advanced_elasticsearch` / `advanced_opensearch`；ES 客户端构建去重 |
+| `src/Builder.php` | 高级分支补 raw 回调；`vectorSearch()` 选项别名与结构修正；`mapResults()` 用 `isset` 替代 `in_array` |
+| `src/Engines/AdvancedOpenSearchEngine.php` | `now()` → Carbon；元数据按 `_id` 对齐 |
+| `src/Engines/OpenSearchEngine.php` / `ElasticSearchEngine.php` / `XunSearchEngine.php` | `mapIds()` 兼容高级结果结构 |
+| `src/SearchableScope.php` | 进度事件走容器 Dispatcher |
+| `src/Jobs/search/MakeRangeSearchable.php` | 空集合守卫 |
+| `src/config/.../app.php` | `ssl_verification` 默认值 / 解析 |
+| `helpers.php` | `base_path()` polyfill |
+| `phpstan.neon` + `phpstan-baseline.neon` | 基线 + `scanFiles` 符号桩 |
+| `.github/workflows/ci.yml` | phpstan 只在 8.4 运行；不依赖提交的 lock |
+| `README.md` / `docs/zh-CN/README.md` | 项目结构、架构、功能设计、生命周期、原生 PHP、宠物；修正 `limit()` 等笔误 |
+| `docs/images/*.svg` | 吉祥物 + 三张设计图 |
+
+---
+
+## 二、当前质量状态
+
+- **测试**：486 用例 / 1301 断言；CI 在 PHP **8.0 / 8.1 / 8.2 / 8.3 / 8.4** 全绿
+- **静态分析**：phpstan level 4，0 错误（基线收敛了 379 条历史告警）
+- **支持矩阵**：Webman 1.x/2.x · Laravel 7–12 · Hyperf 2.x/3.x · ThinkPHP 6/8 · Yii2 · Yii3 · **原生 PHP 8.0+**
+- **引擎**：16 个实现（含 5 个 Advanced 变体），9 类后端
+
+---
+
+## 三、待决策（本轮未改，均有取舍）
+
+| # | 事项 | 为什么没动 |
+|---|------|-----------|
+| 1 | `$callback` 在各引擎拿到的东西不同：OpenSearch 传 `Builder`，Meilisearch / Typesense / XunSearch 传查询字符串，Database / Collection 当查询构造器回调 | 统一签名会破坏现有调用方，需要一次显式的破坏性变更 + 文档迁移说明 |
+| 2 | `scout.queue.connection` / `queue.queue` 配置无人读取（队列名硬编码 `scout_make` / `scout_remove`） | Webman Redis Queue 没有 connection 概念；改名要与宿主消费者登记的名字同步，属行为变更 |
+| 3 | XunSearch 高级搜索缓存默认开启、写入后不失效（TTL 300s 内可能命中旧结果） | 需要缓存失效策略（按索引打版本号），影响面比一个补丁大 |
+| 4 | `getAggregations()` / `getFacets()` 每次都重新打一次引擎 | 结果其实已在 `get()` / `paginate()` 的返回值里，但改成「复用上次结果」要引入状态，容易出隐蔽 bug |
+| 5 | `after_commit` 需要宿主注册数据库事务管理器才生效 | 与 Laravel Scout 行为一致，已在 README 标注前提 |
+| 6 | `xunsearch.search.batch_size`、`xunsearch.index_templates` 配置无消费者 | 需要先确认 XunSearch 侧的预期语义 |
+| 7 | phpstan 基线中的 379 条历史告警 | 建议按文件逐步清理，而不是一次性改动 |
+
+---
+
+# 附录：2026-08-02 审查与修复记录（存档）
 
 **审查日期**: 2026-08-02  
 **修复日期**: 2026-08-02  

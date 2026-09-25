@@ -107,7 +107,8 @@ webman-scout/
 │       ├── command.php             # Webman 命令注册
 │       └── ini/                    # XunSearch ini 片段
 ├── tests/                          # PHPUnit 测试：引擎、命令、事件、队列、框架桩
-├── helpers.php                     # app() / event() / config() / scout_config() 与容器绑定
+├── REVIEW_REPORT.md                # 逐轮审查报告：发现、修复与待决策项
+├── helpers.php                     # app() / event() / config() / base_path() / scout_config() 与容器绑定
 └── docs/
     ├── images/                     # pet.svg + architecture.svg + features.svg + lifecycle.svg
     └── zh-CN/README.md             # 中文文档（本文件）
@@ -620,7 +621,7 @@ php webman scout:about      # Laravel 下为 php artisan scout:about
   \    \__/    /       |
    \__________/
 
-  Scout · webman-scout v2.1.0  sniff out your data · 嗅出你的数据
+  Scout · webman-scout v2.1.3  sniff out your data · 嗅出你的数据
 
   config root 配置根        plugin.erikwang2013.webman-scout.app
   driver 引擎               opensearch
@@ -642,6 +643,7 @@ php webman scout:about      # Laravel 下为 php artisan scout:about
 
 - [Laravel Scout 文档](https://laravel.com/docs/scout)
 - [shopwwi/webman-scout](https://github.com/shopwwi/webman-scout)
+- [审查报告 REVIEW_REPORT.md](../REVIEW_REPORT.md) —— 逐轮记录发现、修复与待决策项
 
 
 ## 开源不易，欢迎支持 / Support this project
