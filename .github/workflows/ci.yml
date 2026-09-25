@@ -18,4 +18,7 @@ jobs:
           coverage: none
       - run: composer install --prefer-dist --no-progress
       - run: vendor/bin/phpunit
+      # 静态分析只在最新栈上跑一次：PHPStan 的结论依赖解析到的依赖版本
+      # （PHP 8.0/8.1 会装到 illuminate 8/9，类型推断不同会报出另一批"undefined method"）
       - run: vendor/bin/phpstan analyse
+        if: matrix.php == '8.4'
