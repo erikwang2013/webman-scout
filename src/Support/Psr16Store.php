@@ -70,6 +70,22 @@ class Psr16Store implements Store
         return $this->cache->set($key, $value, null);
     }
 
+    /**
+     * Illuminate Store 契约在 Laravel 13 新增。PSR-16 没有 touch，
+     * 用哨兵对象区分"键不存在"与"值为 null"，再原值重写以延长 TTL。
+     */
+    public function touch($key, $seconds)
+    {
+        $miss = new \stdClass();
+        $value = $this->cache->get($key, $miss);
+
+        if ($value === $miss) {
+            return false;
+        }
+
+        return $this->cache->set($key, $value, $seconds);
+    }
+
     public function forget($key)
     {
         return $this->cache->delete($key);

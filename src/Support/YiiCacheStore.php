@@ -69,6 +69,21 @@ class YiiCacheStore implements Store
         return $this->cache->set($key, $value, 0);
     }
 
+    /**
+     * Illuminate Store 契约在 Laravel 13 新增。Yii2 缓存没有 touch，
+     * 用原值重写延长 TTL（get() 以 false 表示未命中，见上）。
+     */
+    public function touch($key, $seconds)
+    {
+        $value = $this->cache->get($key);
+
+        if ($value === false) {
+            return false;
+        }
+
+        return $this->cache->set($key, $value, $seconds === null ? 0 : max(0, (int) $seconds));
+    }
+
     public function forget($key)
     {
         return $this->cache->delete($key);

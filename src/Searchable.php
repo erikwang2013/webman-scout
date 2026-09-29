@@ -37,9 +37,21 @@ trait Searchable
     {
         static::addGlobalScope(new SearchableScope);
 
-        static::observe(new ModelObserver);
+        // Laravel 13 起 Model::__construct 会触发 boot，而 observe() 内部要 new static，
+        // 在 boot 过程中重入会被 bootIfNotBooted() 的重入保护抛 LogicException。
+        // 推迟到 booted 之后执行（Booted 回调触发时 $booted 已置位）；旧版没有
+        // whenBooted()，退回原先的立即执行。
+        $whenBooted = function () {
+            static::observe(new ModelObserver);
 
-        (new static)->registerSearchableMacros();
+            (new static)->registerSearchableMacros();
+        };
+
+        if (method_exists(static::class, 'whenBooted')) {
+            static::whenBooted($whenBooted);
+        } else {
+            $whenBooted();
+        }
     }
 
     /**

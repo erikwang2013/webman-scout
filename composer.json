@@ -15,24 +15,24 @@
     ],
     "require": {
         "php": "^8.0",
-        "illuminate/bus": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/contracts": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/database": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/events": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/http": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/pagination": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/queue": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
-        "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0",
+        "illuminate/bus": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/contracts": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/database": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/events": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/http": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/pagination": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/queue": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+        "illuminate/support": "^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
         "symfony/console": "^5.4|^6.0|^7.0|^8.0"
     },
     "require-dev": {
         "algolia/algoliasearch-client-php": "^3.2|^4.0",
-        "typesense/typesense-php": "^4.9.3",
         "meilisearch/meilisearch-php": "^1.0",
         "mockery/mockery": "^1.0",
-        "orchestra/testbench": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0",
+        "orchestra/testbench": "^5.0|^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
         "php-http/guzzle7-adapter": "^1.0",
-        "phpstan/phpstan": "^1.10"
+        "phpstan/phpstan": "^2.2",
+        "typesense/typesense-php": "^4.9.3"
     },
     "conflict": {
         "algolia/algoliasearch-client-php": "<3.2.0|>=5.0.0"

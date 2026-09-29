@@ -98,6 +98,20 @@ class ArrayStore implements Store
         return $this->put($key, $value, 0);
     }
 
+    /**
+     * Illuminate Store 契约在 Laravel 13 新增；键不存在或已过期返回 false。
+     */
+    public function touch($key, $seconds)
+    {
+        $value = $this->get($key); // 顺带清掉已过期项
+
+        if (! array_key_exists($key, static::$items)) {
+            return false;
+        }
+
+        return $this->put($key, $value, $seconds);
+    }
+
     public function forget($key)
     {
         unset(static::$items[$key]);

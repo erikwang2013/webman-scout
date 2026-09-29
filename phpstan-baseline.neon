@@ -1,1286 +1,1573 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to an undefined method TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Call to an undefined method TModel of Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^Call to an undefined method TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method TModel of Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^Call to an undefined method TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:queryScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method TModel of Illuminate\\Database\\Eloquent\\Model\:\:queryScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^Call to an undefined method TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableUsing\\(\\)\\.$#"
+			message: '#^Call to an undefined method TModel of Illuminate\\Database\\Eloquent\\Model\:\:searchableUsing\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Builder\\:\\:latest\\(\\) should return \\$this\\(Erikwang2013\\\\WebmanScout\\\\Builder\\<TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\) but returns Erikwang2013\\\\WebmanScout\\\\Builder\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Builder\:\:latest\(\) should return \$this\(Erikwang2013\\WebmanScout\\Builder\<TModel of Illuminate\\Database\\Eloquent\\Model\>\) but returns Erikwang2013\\WebmanScout\\Builder\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Builder\\:\\:oldest\\(\\) should return \\$this\\(Erikwang2013\\\\WebmanScout\\\\Builder\\<TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\) but returns Erikwang2013\\\\WebmanScout\\\\Builder\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Builder\:\:oldest\(\) should return \$this\(Erikwang2013\\WebmanScout\\Builder\<TModel of Illuminate\\Database\\Eloquent\\Model\>\) but returns Erikwang2013\\WebmanScout\\Builder\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Builder\\:\\:orderByDesc\\(\\) should return \\$this\\(Erikwang2013\\\\WebmanScout\\\\Builder\\<TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\) but returns Erikwang2013\\\\WebmanScout\\\\Builder\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Builder\:\:orderByDesc\(\) should return \$this\(Erikwang2013\\WebmanScout\\Builder\<TModel of Illuminate\\Database\\Eloquent\\Model\>\) but returns Erikwang2013\\WebmanScout\\Builder\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Builder.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$manager$#"
+			message: '#^If condition is always false\.$#'
+			identifier: if.alwaysFalse
+			count: 1
+			path: src/Command/AboutCommand.php
+
+		-
+			message: '#^PHPDoc tag @param references unknown parameter\: \$manager$#'
+			identifier: parameter.notFound
 			count: 1
 			path: src/Command/DeleteAllIndexesCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/DeleteAllIndexesCommand.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$manager$#"
+			message: '#^PHPDoc tag @param references unknown parameter\: \$manager$#'
+			identifier: parameter.notFound
 			count: 1
 			path: src/Command/DeleteIndexCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/DeleteIndexCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/FlushCommand.php
 
 		-
-			message: "#^PHPDoc tag @throws with type Erikwang2013\\\\WebmanScout\\\\Command\\\\ScoutException is not subtype of Throwable$#"
+			message: '#^PHPDoc tag @throws with type Erikwang2013\\WebmanScout\\Command\\ScoutException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
 			count: 1
 			path: src/Command/FlushCommand.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$events$#"
+			message: '#^PHPDoc tag @param references unknown parameter\: \$events$#'
+			identifier: parameter.notFound
 			count: 1
 			path: src/Command/ImportCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/ImportCommand.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$manager$#"
+			message: '#^PHPDoc tag @param references unknown parameter\: \$manager$#'
+			identifier: parameter.notFound
 			count: 1
 			path: src/Command/IndexCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/IndexCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/QueueImportCommand.php
 
 		-
-			message: "#^PHPDoc tag @throws with type Erikwang2013\\\\WebmanScout\\\\Command\\\\ScoutException is not subtype of Throwable$#"
+			message: '#^PHPDoc tag @throws with type Erikwang2013\\WebmanScout\\Command\\ScoutException is not subtype of Throwable$#'
+			identifier: throws.notThrowable
 			count: 1
 			path: src/Command/QueueImportCommand.php
 
 		-
-			message: "#^PHPDoc tag @param references unknown parameter\\: \\$manager$#"
+			message: '#^PHPDoc tag @param references unknown parameter\: \$manager$#'
+			identifier: parameter.notFound
 			count: 1
 			path: src/Command/SyncIndexSettingsCommand.php
 
 		-
-			message: "#^PHPDoc tag @return with type void is incompatible with native type int\\.$#"
+			message: '#^PHPDoc tag @return with type void is incompatible with native type int\.$#'
+			identifier: return.phpDocType
 			count: 1
 			path: src/Command/SyncIndexSettingsCommand.php
 
 		-
-			message: "#^Call to method create\\(\\) on an unknown class OpenSearch\\\\GuzzleClientFactory\\.$#"
+			message: '#^Call to function is_object\(\) with Illuminate\\Foundation\\Application will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Concerns/ResolvesScoutModel.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Illuminate\\Foundation\\Application and ''getNamespace'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/Concerns/ResolvesScoutModel.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Illuminate\\Contracts\\Container\\Container and ''bound'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/EngineManager.php
 
 		-
-			message: "#^Call to static method create\\(\\) on an unknown class Elastic\\\\Elasticsearch\\\\ClientBuilder\\.$#"
+			message: '#^Call to method create\(\) on an unknown class OpenSearch\\GuzzleClientFactory\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/EngineManager.php
 
 		-
-			message: "#^Comparison operation \"\\>\\=\" between 1 and 0 is always true\\.$#"
+			message: '#^Call to static method create\(\) on an unknown class Elastic\\Elasticsearch\\ClientBuilder\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/EngineManager.php
 
 		-
-			message: "#^Instantiated class OpenSearch\\\\GuzzleClientFactory not found\\.$#"
+			message: '#^Comparison operation "\>\=" between 1 and 0 is always true\.$#'
+			identifier: greaterOrEqual.alwaysTrue
 			count: 1
 			path: src/EngineManager.php
 
 		-
-			message: "#^Ternary operator condition is always true\\.$#"
+			message: '#^Instantiated class OpenSearch\\GuzzleClientFactory not found\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/EngineManager.php
 
 		-
-			message: "#^Class Erikwang2013\\\\WebmanScout\\\\Engines\\\\ElasticSearchEngine referenced with incorrect case\\: Erikwang2013\\\\WebmanScout\\\\Engines\\\\ElasticsearchEngine\\.$#"
+			message: '#^Strict comparison using \!\=\= between mixed and null will always evaluate to true\.$#'
+			identifier: notIdentical.alwaysTrue
+			count: 4
+			path: src/EngineManager.php
+
+		-
+			message: '#^Ternary operator condition is always true\.$#'
+			identifier: ternary.alwaysTrue
+			count: 1
+			path: src/EngineManager.php
+
+		-
+			message: '#^Class Erikwang2013\\WebmanScout\\Engines\\ElasticSearchEngine referenced with incorrect case\: Erikwang2013\\WebmanScout\\Engines\\ElasticsearchEngine\.$#'
+			identifier: class.nameCase
 			count: 1
 			path: src/Engines/AdvancedElasticsearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:error\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:error\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 5
 			path: src/Engines/AdvancedMeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:warning\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:warning\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Engines/AdvancedMeilisearchEngine.php
 
 		-
-			message: "#^Property Erikwang2013\\\\WebmanScout\\\\Builder\\<Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:\\$query \\(string\\) on left side of \\?\\? is not nullable\\.$#"
+			message: '#^Property Erikwang2013\\WebmanScout\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$query \(string\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
 			count: 1
 			path: src/Engines/AdvancedMeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/AdvancedOpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:error\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:error\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Engines/AdvancedOpenSearchEngine.php
 
 		-
-			message: "#^Call to method cluster\\(\\) on an unknown class OpenSearch\\\\Client\\.$#"
+			message: '#^Call to method cluster\(\) on an unknown class OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedOpenSearchEngine.php
 
 		-
-			message: "#^Call to method info\\(\\) on an unknown class OpenSearch\\\\Client\\.$#"
+			message: '#^Call to method info\(\) on an unknown class OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedOpenSearchEngine.php
 
 		-
-			message: "#^Call to method search\\(\\) on an unknown class OpenSearch\\\\Client\\.$#"
+			message: '#^Call to method search\(\) on an unknown class OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 4
 			path: src/Engines/AdvancedOpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Typesense\\\\Client\\:\\:getConfiguration\\(\\)\\.$#"
+			message: '#^Call to an undefined method Typesense\\Client\:\:getConfiguration\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/AdvancedTypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Typesense\\\\Operations\\:\\:health\\(\\)\\.$#"
+			message: '#^Call to an undefined method Typesense\\Operations\:\:health\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/AdvancedTypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:error\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:error\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 7
 			path: src/Engines/AdvancedTypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:warning\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:warning\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Engines/AdvancedTypesenseEngine.php
 
 		-
-			message: "#^Property Erikwang2013\\\\WebmanScout\\\\Builder\\<Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:\\$query \\(string\\) on left side of \\?\\? is not nullable\\.$#"
+			message: '#^Property Erikwang2013\\WebmanScout\\Builder\<Illuminate\\Database\\Eloquent\\Model\>\:\:\$query \(string\) on left side of \?\? is not nullable\.$#'
+			identifier: nullCoalesce.property
 			count: 1
 			path: src/Engines/AdvancedTypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 4
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:debug\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:debug\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:error\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:error\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 3
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:info\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:info\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:warning\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:warning\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 10
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to function method_exists\\(\\) with 'XSSearch' and 'getFacets' will always evaluate to false\\.$#"
+			message: '#^Call to function method_exists\(\) with ''XSSearch'' and ''getFacets'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to function method_exists\\(\\) with 'XSSearch' and 'setPinyin' will always evaluate to false\\.$#"
+			message: '#^Call to function method_exists\(\) with ''XSSearch'' and ''setPinyin'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to function method_exists\\(\\) with 'XSSearch' and 'setSemantic' will always evaluate to false\\.$#"
+			message: '#^Call to function method_exists\(\) with ''XSSearch'' and ''setSemantic'' will always evaluate to false\.$#'
+			identifier: function.impossibleType
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method addRange\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method clean\\(\\) on an unknown class XSIndex\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method count\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method flushIndex\\(\\) on an unknown class XSIndex\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getDbTotal\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getExpandedQuery\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getFacets\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getHotQuery\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getIndex\\(\\) on an unknown class XS\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getLastCost\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getLastCount\\(\\) on an unknown class XSSearch\\.$#"
-			count: 1
-			path: src/Engines/AdvancedXunSearchEngine.php
-
-		-
-			message: "#^Call to method getLastTime\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to function method_exists\(\) with Erikwang2013\\WebmanScout\\Builder and ''getAdvancedWheres'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method getQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to function method_exists\(\) with Erikwang2013\\WebmanScout\\Builder and ''getAggregationConfig'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Erikwang2013\\WebmanScout\\Builder and ''getFacetConfig'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 3
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to function method_exists\(\) with Erikwang2013\\WebmanScout\\Builder and ''getResultProcessors'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method getRelatedQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to function method_exists\(\) with Erikwang2013\\WebmanScout\\Builder and ''getSorts'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method getSearch\\(\\) on an unknown class XS\\.$#"
+			message: '#^Call to method addRange\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method clean\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method count\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method flushIndex\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getDbTotal\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getExpandedQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getFacets\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getHotQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getIndex\(\) on an unknown class XS\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getLastCost\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getLastCount\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getLastTime\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getRelatedQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Engines/AdvancedXunSearchEngine.php
+
+		-
+			message: '#^Call to method getSearch\(\) on an unknown class XS\.$#'
+			identifier: class.notFound
 			count: 4
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method getSearchLog\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getSearchLog\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method getTerms\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getTerms\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method optimize\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method optimize\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method search\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method search\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setAutoSynonyms\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setAutoSynonyms\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setCollapse\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setCollapse\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setFuzzy\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setFuzzy\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setLimit\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setLimit\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setPinyin\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setPinyin\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 3
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setRange\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setRange\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setSemantic\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setSemantic\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setSort\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setSort\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to method setWeight\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setWeight\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Class XSSearch not found\\.$#"
+			message: '#^Class XSSearch not found\.$#'
+			identifier: class.notFound
 			count: 3
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:getIndex\\(\\) has invalid return type XSIndex\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:getIndex\(\) has invalid return type XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:getSearch\\(\\) has invalid return type XSSearch\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:getSearch\(\) has invalid return type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:applyAdvancedConditions\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:applyAdvancedConditions\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:applyAdvancedSorts\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:applyAdvancedSorts\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:applySearchOptions\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:applySearchOptions\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:applyWheres\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:applyWheres\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:buildAggregations\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:buildAggregations\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:buildFacets\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:buildFacets\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:calculateRanges\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:calculateRanges\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:calculateStats\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:calculateStats\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\AdvancedXunSearchEngine\\:\\:processAdvancedResults\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\AdvancedXunSearchEngine\:\:processAdvancedResults\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/AdvancedXunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:indexableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:indexableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:scoutMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:scoutMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:pushSoftDeleteMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:pushSoftDeleteMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to static method create\\(\\) on an unknown class Algolia\\\\AlgoliaSearch\\\\Config\\\\SearchConfig\\.$#"
+			message: '#^Call to static method create\(\) on an unknown class Algolia\\AlgoliaSearch\\Config\\SearchConfig\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to static method createWithConfig\\(\\) on an unknown class Algolia\\\\AlgoliaSearch\\\\SearchClient\\.$#"
+			message: '#^Call to static method createWithConfig\(\) on an unknown class Algolia\\AlgoliaSearch\\SearchClient\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia3Engine\\:\\:make\\(\\) has invalid return type Algolia\\\\AlgoliaSearch\\\\SearchClient\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\Algolia3Engine\:\:make\(\) has invalid return type Algolia\\AlgoliaSearch\\SearchClient\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia3Engine\\:\\:make\\(\\) should return static\\(Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia3Engine\\<TAlgoliaClient of Algolia\\\\AlgoliaSearch\\\\SearchClient\\>\\) but returns static\\(Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia3Engine\\<Algolia\\\\AlgoliaSearch\\\\SearchClient\\>\\)\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\Algolia3Engine\:\:make\(\) should return static\(Erikwang2013\\WebmanScout\\Engines\\Algolia3Engine\<TAlgoliaClient of Algolia\\AlgoliaSearch\\SearchClient\>\) but returns static\(Erikwang2013\\WebmanScout\\Engines\\Algolia3Engine\<Algolia\\AlgoliaSearch\\SearchClient\>\)\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^PHPDoc tag @template TAlgoliaClient for class Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia3Engine has invalid bound type Algolia\\\\AlgoliaSearch\\\\SearchClient\\.$#"
+			message: '#^PHPDoc tag @template TAlgoliaClient for class Erikwang2013\\WebmanScout\\Engines\\Algolia3Engine has invalid bound type Algolia\\AlgoliaSearch\\SearchClient\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Parameter \\$algolia of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia3Engine\\:\\:__construct\\(\\) has invalid type Algolia\\\\AlgoliaSearch\\\\SearchClient\\.$#"
+			message: '#^Parameter \$algolia of method Erikwang2013\\WebmanScout\\Engines\\Algolia3Engine\:\:__construct\(\) has invalid type Algolia\\AlgoliaSearch\\SearchClient\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
 			count: 1
 			path: src/Engines/Algolia3Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:indexableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:indexableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:scoutMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:scoutMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:pushSoftDeleteMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:pushSoftDeleteMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia4Engine\\:\\:make\\(\\) should return static\\(Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia4Engine\\<TAlgoliaClient of Algolia\\\\AlgoliaSearch\\\\Api\\\\SearchClient\\>\\) but returns static\\(Erikwang2013\\\\WebmanScout\\\\Engines\\\\Algolia4Engine\\<Algolia\\\\AlgoliaSearch\\\\Api\\\\SearchClient\\>\\)\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\Algolia4Engine\:\:make\(\) should return static\(Erikwang2013\\WebmanScout\\Engines\\Algolia4Engine\<TAlgoliaClient of Algolia\\AlgoliaSearch\\Api\\SearchClient\>\) but returns static\(Erikwang2013\\WebmanScout\\Engines\\Algolia4Engine\<Algolia\\AlgoliaSearch\\Api\\SearchClient\>\)\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
 			count: 1
 			path: src/Engines/Algolia4Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/AlgoliaEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:queryScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:queryScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/AlgoliaEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:queryScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:queryScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:onlyTrashed\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:onlyTrashed\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:withTrashed\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:withTrashed\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:withoutTrashed\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:withoutTrashed\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Cannot call method makeSearchableUsing\\(\\) on stdClass\\.$#"
+			message: '#^Cannot call method makeSearchableUsing\(\) on stdClass\.$#'
+			identifier: method.nonObject
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\CollectionEngine\\:\\:searchModels\\(\\) should return Illuminate\\\\Database\\\\Eloquent\\\\Collection but returns Illuminate\\\\Support\\\\Collection\\<int, stdClass\\>\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\CollectionEngine\:\:searchModels\(\) should return Illuminate\\Database\\Eloquent\\Collection but returns Illuminate\\Support\\Collection\<int, stdClass\>\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Engines/CollectionEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:onlyTrashed\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:onlyTrashed\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/DatabaseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:withTrashed\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:withTrashed\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/DatabaseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\:\\:withoutTrashed\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\:\:withoutTrashed\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/DatabaseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 5
 			path: src/Engines/DatabaseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/DatabaseEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\DatabaseEngine\\:\\:orderByRelevance\\(\\) should return Illuminate\\\\Database\\\\Eloquent\\\\Builder but returns Illuminate\\\\Database\\\\Query\\\\Builder\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\DatabaseEngine\:\:orderByRelevance\(\) should return Illuminate\\Database\\Eloquent\\Builder but returns Illuminate\\Database\\Query\\Builder\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Engines/DatabaseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:unsearchable\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:unsearchable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:pushSoftDeleteMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:pushSoftDeleteMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to method bulk\\(\\) on an unknown class Elastic\\\\Elasticsearch\\\\Client\\.$#"
+			message: '#^Call to method bulk\(\) on an unknown class Elastic\\Elasticsearch\\Client\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to method indices\\(\\) on an unknown class Elastic\\\\Elasticsearch\\\\Client\\.$#"
+			message: '#^Call to method indices\(\) on an unknown class Elastic\\Elasticsearch\\Client\.$#'
+			identifier: class.notFound
 			count: 6
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Call to method search\\(\\) on an unknown class Elastic\\\\Elasticsearch\\\\Client\\.$#"
+			message: '#^Call to method search\(\) on an unknown class Elastic\\Elasticsearch\\Client\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\ElasticSearchEngine\\:\\:lazyMap\\(\\) should return Illuminate\\\\Support\\\\LazyCollection but returns Illuminate\\\\Support\\\\Collection\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\ElasticSearchEngine\:\:lazyMap\(\) should return Illuminate\\Support\\LazyCollection but returns Illuminate\\Support\\Collection\<\(int\|string\), Illuminate\\Database\\Eloquent\\Model\>\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Parameter \\$elasticsearch of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\ElasticSearchEngine\\:\\:__construct\\(\\) has invalid type Elastic\\\\Elasticsearch\\\\Client\\.$#"
+			message: '#^Parameter \$elasticsearch of method Erikwang2013\\WebmanScout\\Engines\\ElasticSearchEngine\:\:__construct\(\) has invalid type Elastic\\Elasticsearch\\Client\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Property Erikwang2013\\\\WebmanScout\\\\Engines\\\\ElasticSearchEngine\\:\\:\\$elasticsearch has unknown class Elastic\\\\Elasticsearch\\\\Client as its type\\.$#"
+			message: '#^Property Erikwang2013\\WebmanScout\\Engines\\ElasticSearchEngine\:\:\$elasticsearch has unknown class Elastic\\Elasticsearch\\Client as its type\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/ElasticSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\Engine\\:\\:cursor\\(\\) should return Illuminate\\\\Database\\\\Eloquent\\\\Collection but returns Illuminate\\\\Support\\\\LazyCollection\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\Engine\:\:cursor\(\) should return Illuminate\\Database\\Eloquent\\Collection but returns Illuminate\\Support\\LazyCollection\.$#'
+			identifier: return.type
 			count: 1
 			path: src/Engines/Engine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 7
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:indexableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:indexableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:queryScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:queryScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:scoutMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:scoutMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:pushSoftDeleteMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:pushSoftDeleteMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Constant Meilisearch\\\\Search\\\\SearchResult not found\\.$#"
+			message: '#^Constant Meilisearch\\Search\\SearchResult not found\.$#'
+			identifier: constant.notFound
 			count: 1
 			path: src/Engines/MeilisearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:error\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:error\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 7
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:info\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:info\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 3
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:warning\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:warning\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to method bulk\\(\\) on an unknown class OpenSearch\\\\Client\\.$#"
+			message: '#^Call to function method_exists\(\) with Erikwang2013\\WebmanScout\\Builder and ''getSorts'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to method indices\\(\\) on an unknown class OpenSearch\\\\Client\\.$#"
+			message: '#^Call to method bulk\(\) on an unknown class OpenSearch\\Client\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Engines/OpenSearchEngine.php
+
+		-
+			message: '#^Call to method indices\(\) on an unknown class OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 9
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to method search\\(\\) on an unknown class OpenSearch\\\\Client\\.$#"
+			message: '#^Call to method search\(\) on an unknown class OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\OpenSearchEngine\\:\\:getClient\\(\\) has invalid return type OpenSearch\\\\Client\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\OpenSearchEngine\:\:getClient\(\) has invalid return type OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Parameter \\$opensearch of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\OpenSearchEngine\\:\\:__construct\\(\\) has invalid type OpenSearch\\\\Client\\.$#"
+			message: '#^Parameter \$opensearch of method Erikwang2013\\WebmanScout\\Engines\\OpenSearchEngine\:\:__construct\(\) has invalid type OpenSearch\\Client\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Property Erikwang2013\\\\WebmanScout\\\\Engines\\\\OpenSearchEngine\\:\\:\\$opensearch has unknown class OpenSearch\\\\Client as its type\\.$#"
+			message: '#^Property Erikwang2013\\WebmanScout\\Engines\\OpenSearchEngine\:\:\$opensearch has unknown class OpenSearch\\Client as its type\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/OpenSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:indexableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:indexableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:queryScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:queryScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:scoutMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:scoutMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<int, Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:pushSoftDeleteMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\:\:pushSoftDeleteMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$value with type array\\|string is not subtype of native type array\\.$#"
+			message: '#^PHPDoc tag @param for parameter \$value with type array\|string is not subtype of native type array\.$#'
+			identifier: parameter.phpDocType
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Variable \\$totalFound might not be defined\\.$#"
+			message: '#^Variable \$totalFound might not be defined\.$#'
+			identifier: variable.undefined
 			count: 1
 			path: src/Engines/TypesenseEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutModelsByIds\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutModelsByIds\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableAs\(\)\.$#'
+			identifier: method.notFound
 			count: 5
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:toSearchableArray\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:toSearchableArray\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:pushSoftDeleteMetadata\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Database\\Eloquent\\Collection\>\:\:pushSoftDeleteMetadata\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:error\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:error\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 4
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:info\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:info\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to an undefined static method Erikwang2013\\\\WebmanScout\\\\Support\\\\Log\\:\\:warning\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Erikwang2013\\WebmanScout\\Support\\Log\:\:warning\(\)\.$#'
+			identifier: staticMethod.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method addRange\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method addRange\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method addSynonym\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method addSynonym\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method clean\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method clean\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method del\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method del\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method flushIndex\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method flushIndex\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 5
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getCustomData\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method getCustomData\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getDocCount\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method getDocCount\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getHotQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getHotQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getIndex\\(\\) on an unknown class XS\\.$#"
+			message: '#^Call to method getIndex\(\) on an unknown class XS\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getLastCost\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getLastCost\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getLastCount\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getLastCount\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getLastError\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method getLastError\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getLastTime\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getLastTime\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getRelatedQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getRelatedQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getSearch\\(\\) on an unknown class XS\\.$#"
+			message: '#^Call to method getSearch\(\) on an unknown class XS\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getSearchLog\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method getSearchLog\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method getTotalTerms\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method getTotalTerms\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method setFields\\(\\) on an unknown class XSDocument\\.$#"
+			message: '#^Call to method setFields\(\) on an unknown class XSDocument\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method setQuery\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setQuery\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 3
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method setSort\\(\\) on an unknown class XSSearch\\.$#"
+			message: '#^Call to method setSort\(\) on an unknown class XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Call to method update\\(\\) on an unknown class XSIndex\\.$#"
+			message: '#^Call to method update\(\) on an unknown class XSIndex\.$#'
+			identifier: class.notFound
 			count: 2
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Instantiated class XSDocument not found\\.$#"
+			message: '#^Instantiated class XSDocument not found\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:getIndex\\(\\) has invalid return type XSIndex\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:getIndex\(\) has invalid return type XSIndex\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:getSearch\\(\\) has invalid return type XSSearch\\.$#"
+			message: '#^Method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:getSearch\(\) has invalid return type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:applyInCondition\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:applyInCondition\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:applyNotInCondition\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:applyNotInCondition\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:applyOrCondition\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:applyOrCondition\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:applySorts\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:applySorts\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:applyWheres\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:applyWheres\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Parameter \\$search of method Erikwang2013\\\\WebmanScout\\\\Engines\\\\XunSearchEngine\\:\\:processSearchResults\\(\\) has invalid type XSSearch\\.$#"
+			message: '#^Parameter \$search of method Erikwang2013\\WebmanScout\\Engines\\XunSearchEngine\:\:processSearchResults\(\) has invalid type XSSearch\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Variable \\$page on left side of \\?\\? always exists and is not nullable\\.$#"
+			message: '#^Variable \$page on left side of \?\? always exists and is not nullable\.$#'
+			identifier: nullCoalesce.variable
 			count: 1
 			path: src/Engines/XunSearchEngine.php
 
 		-
-			message: "#^Function copy_dir not found\\.$#"
-			count: 1
-			path: src/Install.php
-
-		-
-			message: "#^Function remove_dir not found\\.$#"
-			count: 1
-			path: src/Install.php
-
-		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<\\(int\\|string\\), Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:getScoutKey\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, static\(Erikwang2013\\WebmanScout\\Jobs\\RemoveableScoutCollection\)\>\:\:getScoutKey\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Jobs/RemoveableScoutCollection.php
 
 		-
-			message: "#^Call to static method send\\(\\) on an unknown class Webman\\\\RedisQueue\\\\Redis\\.$#"
-			count: 1
-			path: src/Jobs/search/MakeRangeSearchable.php
-
-		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:makeSearchableUsing\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:makeSearchableUsing\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Jobs/search/MakeSearchable.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableUsing\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchableUsing\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/Jobs/search/RemoveFromSearch.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
+			message: '#^Call to function is_null\(\) with string will always evaluate to false\.$#'
+			identifier: function.impossibleType
 			count: 1
 			path: src/Manager.php
 
 		-
-			message: "#^PHPDoc tag @param for parameter \\$container with type Illuminate\\\\Contracts\\\\Container\\\\Container is not subtype of native type Illuminate\\\\Container\\\\Container\\.$#"
+			message: '#^PHPDoc tag @param for parameter \$container with type Illuminate\\Contracts\\Container\\Container is not subtype of native type Illuminate\\Container\\Container\.$#'
+			identifier: parameter.phpDocType
 			count: 2
 			path: src/Manager.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchIndexShouldBeUpdated\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchIndexShouldBeUpdated\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/ModelObserver.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchable\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:searchable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/ModelObserver.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:shouldBeSearchable\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:shouldBeSearchable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/ModelObserver.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:unsearchable\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:unsearchable\(\)\.$#'
+			identifier: method.notFound
 			count: 3
 			path: src/ModelObserver.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:wasSearchableBeforeDelete\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:wasSearchableBeforeDelete\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/ModelObserver.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:wasSearchableBeforeUpdate\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:wasSearchableBeforeUpdate\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/ModelObserver.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKeyName\\(\\)\\.$#"
+			message: '#^Trait Erikwang2013\\WebmanScout\\Searchable is used zero times and is not analysed\.$#'
+			identifier: trait.unused
+			count: 1
+			path: src/Searchable.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Model\:\:getScoutKeyName\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/SearchableScope.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:chunkByIdArguments\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Database\\Query\\Builder\:\:chunkByIdArguments\(\)\.$#'
+			identifier: method.notFound
 			count: 2
 			path: src/SearchableScope.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\Collection\\<int, Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:unsearchable\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\:\:unsearchable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/SearchableScope.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Support\\\\HigherOrderCollectionProxy\\<int, Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\:\\:shouldBeSearchable\\(\\)\\.$#"
+			message: '#^Call to an undefined method Illuminate\\Support\\HigherOrderCollectionProxy\<string, Illuminate\\Database\\Eloquent\\Model, Illuminate\\Support\\Collection\<int, Illuminate\\Database\\Eloquent\\Model\>\>\:\:shouldBeSearchable\(\)\.$#'
+			identifier: method.notFound
 			count: 1
 			path: src/SearchableScope.php
 
 		-
-			message: "#^Unsafe usage of new static\\(\\)\\.$#"
+			message: '#^Call to an undefined static method Illuminate\\Database\\Eloquent\\Relations\\HasManyThrough\<TRelatedModel of Illuminate\\Database\\Eloquent\\Model, TIntermediateModel of Illuminate\\Database\\Eloquent\\Model, TDeclaringModel of Illuminate\\Database\\Eloquent\\Model\>\:\:dispatch\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/SearchableScope.php
+
+		-
+			message: '#^Call to an undefined static method Illuminate\\Database\\Query\\Builder\:\:dispatch\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: src/SearchableScope.php
+
+		-
+			message: '#^Call to function method_exists\(\) with ''Illuminate\\\\Database\\\\Eloquent\\\\Relations\\\\HasManyThrough'' and ''chunkById'' will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
+			count: 1
+			path: src/SearchableScope.php
+
+		-
+			message: '#^Call to function is_numeric\(\) with int will always evaluate to true\.$#'
+			identifier: function.alreadyNarrowedType
 			count: 1
 			path: src/Support/ArrayStore.php
 
 		-
-			message: "#^Access to static property \\$app on an unknown class Yii\\.$#"
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			identifier: new.static
+			count: 1
+			path: src/Support/ArrayStore.php
+
+		-
+			message: '#^Access to static property \$app on an unknown class Yii\.$#'
+			identifier: class.notFound
 			count: 3
 			path: src/Support/Cache.php
 
 		-
-			message: "#^Class yii\\\\caching\\\\Cache not found\\.$#"
+			message: '#^Dead catch \- Throwable is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
 			count: 1
 			path: src/Support/Cache.php
 
 		-
-			message: "#^Dead catch \\- Throwable is never thrown in the try block\\.$#"
-			count: 1
-			path: src/Support/Cache.php
-
-		-
-			message: "#^Access to static property \\$app on an unknown class Yii\\.$#"
+			message: '#^Access to static property \$app on an unknown class Yii\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Support/Log.php
 
 		-
-			message: "#^Call to static method error\\(\\) on an unknown class Yii\\.$#"
+			message: '#^Call to static method error\(\) on an unknown class Yii\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Support/Log.php
 
 		-
-			message: "#^Call to static method info\\(\\) on an unknown class Yii\\.$#"
+			message: '#^Call to static method info\(\) on an unknown class Yii\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Support/Log.php
 
 		-
-			message: "#^Call to static method warning\\(\\) on an unknown class Yii\\.$#"
+			message: '#^Call to static method warning\(\) on an unknown class Yii\.$#'
+			identifier: class.notFound
 			count: 1
 			path: src/Support/Log.php
 
 		-
-			message: "#^Dead catch \\- Throwable is never thrown in the try block\\.$#"
+			message: '#^Dead catch \- Throwable is never thrown in the try block\.$#'
+			identifier: catch.neverThrown
 			count: 1
 			path: src/Support/Log.php
 
 		-
-			message: "#^Call to method delete\\(\\) on an unknown class yii\\\\caching\\\\Cache\\.$#"
-			count: 1
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Call to method flush\\(\\) on an unknown class yii\\\\caching\\\\Cache\\.$#"
-			count: 1
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Call to method get\\(\\) on an unknown class yii\\\\caching\\\\Cache\\.$#"
-			count: 1
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Call to method set\\(\\) on an unknown class yii\\\\caching\\\\Cache\\.$#"
-			count: 3
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Parameter \\$cache of method Erikwang2013\\\\WebmanScout\\\\Support\\\\YiiCacheStore\\:\\:__construct\\(\\) has invalid type yii\\\\caching\\\\Cache\\.$#"
-			count: 1
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Property Erikwang2013\\\\WebmanScout\\\\Support\\\\YiiCacheStore\\:\\:\\$cache has unknown class yii\\\\caching\\\\Cache as its type\\.$#"
-			count: 1
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between int and null will always evaluate to false\\.$#"
-			count: 1
-			path: src/Support/YiiCacheStore.php
-
-		-
-			message: "#^Call to method getIndex\\(\\) on an unknown class XS\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Call to method getSearch\\(\\) on an unknown class XS\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Instantiated class XS not found\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\XunSearchClient\\:\\:getSearch\\(\\) has invalid return type XSSearch\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\XunSearchClient\\:\\:refresh\\(\\) has invalid return type XS\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Method Erikwang2013\\\\WebmanScout\\\\XunSearchClient\\:\\:task\\(\\) has invalid return type XS\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Property Erikwang2013\\\\WebmanScout\\\\XunSearchClient\\:\\:\\$current has unknown class XS as its type\\.$#"
-			count: 1
-			path: src/XunSearchClient.php
-
-		-
-			message: "#^Class Yiisoft\\\\Config\\\\ConfigInterface not found\\.$#"
+			message: '#^Strict comparison using \=\=\= between int and null will always evaluate to false\.$#'
+			identifier: identical.alwaysFalse
 			count: 2
-			path: src/Yii3/ScoutConfigProvider.php
+			path: src/Support/YiiCacheStore.php
+
+		-
+			message: '#^Call to method getIndex\(\) on an unknown class XS\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
+
+		-
+			message: '#^Call to method getSearch\(\) on an unknown class XS\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
+
+		-
+			message: '#^Instantiated class XS not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
+
+		-
+			message: '#^Method Erikwang2013\\WebmanScout\\XunSearchClient\:\:getSearch\(\) has invalid return type XSSearch\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
+
+		-
+			message: '#^Method Erikwang2013\\WebmanScout\\XunSearchClient\:\:refresh\(\) has invalid return type XS\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
+
+		-
+			message: '#^Method Erikwang2013\\WebmanScout\\XunSearchClient\:\:task\(\) has invalid return type XS\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
+
+		-
+			message: '#^Property Erikwang2013\\WebmanScout\\XunSearchClient\:\:\$current has unknown class XS as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/XunSearchClient.php
