@@ -36,7 +36,7 @@ class SyncIndexSettingsCommand extends Command
      */
     protected static $defaultDescription = 'Sync your configured index settings with your search engine (Meilisearch)';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('driver', '--driver', InputOption::VALUE_REQUIRED, 'The search driver to sync (Defaults to the configured default driver)');
     }

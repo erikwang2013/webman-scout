@@ -34,7 +34,7 @@ class DeleteIndexCommand extends Command
      */
     protected static $defaultDescription = 'Delete an index';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the index');
     }

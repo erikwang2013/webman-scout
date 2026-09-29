@@ -34,7 +34,7 @@ class FlushCommand extends Command
      */
     protected static $defaultDescription = "Flush all of the model's records from the index";
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('model', InputArgument::OPTIONAL, '模型');
     }

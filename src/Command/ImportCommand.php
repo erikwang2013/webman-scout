@@ -37,7 +37,7 @@ class ImportCommand extends Command
      */
     protected static $defaultDescription = 'Import the given model into the search index';
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('model', InputArgument::OPTIONAL, 'Class name of model to bulk import');
         $this->addOption('fresh', '--fresh', InputOption::VALUE_NONE, 'Remove all indexed models before importing');

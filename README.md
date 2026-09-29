@@ -202,7 +202,7 @@ Runtime integration targets applications that expose Laravel’s **`config()` he
 | **Yii3** | 3.x | Config plugin (`ScoutConfigProvider`) injects default `scout` params; PSR-16 cache + PSR-3 logger; register the Symfony commands under `yiisoft/yii-console`. |
 | **Plain PHP** | 8.0+ | No framework and no container bootstrap needed: `Scout::configure([...])` (or a path to a file returning the array) supplies the config, `helpers.php` supplies `app()` / `event()` / `config()`. Add your own Eloquent bootstrap (e.g. `Illuminate\Database\Capsule\Manager`). See [Plain PHP](#plain-php-no-framework). |
 
-Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **^5.4 – ^7.0** so dependency resolution matches your framework stack. `illuminate/events` is a direct requirement (the model observer and the import progress events dispatch through `Illuminate\Events\Dispatcher`).
+Composer **requires** `illuminate/*` **^7.0 – ^12.0** and `symfony/console` **^5.4 – ^8.0** so dependency resolution matches your framework stack. `illuminate/events` is a direct requirement (the model observer and the import progress events dispatch through `Illuminate\Events\Dispatcher`).
 
 
 ## Requirements

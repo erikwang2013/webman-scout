@@ -41,7 +41,7 @@ class IndexCommand extends Command
     protected static $defaultDescription = 'Create an index';
 
 
-    protected function configure()
+    protected function configure(): void
     {
         $this->addArgument('name', InputArgument::REQUIRED, 'The name of the index');
         $this->addOption('key', '--key', InputOption::VALUE_REQUIRED, 'The name of the primary key');

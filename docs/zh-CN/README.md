@@ -205,7 +205,7 @@ Model::search($query, $callback)   → Builder（where / orderBy / take / 高级
 | **Yii3** | 3.x | `ScoutConfigProvider` 注入默认 `scout` 参数；PSR-16 缓存 + PSR-3 日志；在 `yiisoft/yii-console` 注册 Symfony 命令。 |
 | **原生 PHP** | 8.0+ | 不需要框架与容器引导：`Scout::configure([...])`（或返回数组的文件路径）提供配置，`helpers.php` 提供 `app()` / `event()` / `config()`；Eloquent 自备引导（如 `Illuminate\Database\Capsule\Manager`）。见[原生 PHP（无框架）](#原生-php无框架)。 |
 
-Composer 依赖 **`illuminate/*` ^7.0–^12.0**、**`symfony/console` ^5.4–^7.0**，与上述框架的传递依赖对齐。其中 **`illuminate/events` 是直接依赖**：模型观察者与导入进度事件都通过 `Illuminate\Events\Dispatcher` 派发。
+Composer 依赖 **`illuminate/*` ^7.0–^12.0**、**`symfony/console` ^5.4–^8.0**，与上述框架的传递依赖对齐。其中 **`illuminate/events` 是直接依赖**：模型观察者与导入进度事件都通过 `Illuminate\Events\Dispatcher` 派发。
 
 
 ## 环境要求

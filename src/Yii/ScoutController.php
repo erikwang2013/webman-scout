@@ -96,7 +96,9 @@ class ScoutController extends \yii\console\Controller
         $command = new $commandClass();
 
         $application = new Application();
-        $application->add($command);
+        // addCommands() is the one entry point that survives symfony/console 5.4 -> 8.x
+        // (add() was deprecated in 7.4 and removed in 8.0)
+        $application->addCommands([$command]);
         $application->setAutoExit(false);
 
         $input = new ArrayInput(array_merge(['command' => $command->getName()], $options, $arguments));
