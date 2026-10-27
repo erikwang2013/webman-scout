@@ -51,6 +51,8 @@
 
 # webman-scout
 
+> 官网 / Website: [https://package.erik.xyz/scout/](https://package.erik.xyz/scout/)
+
 <p align="center">
   <img src="docs/images/pet.svg" width="168" alt="Sniffy — the webman-scout mascot: a scout dog holding a magnifier over an index card">
 </p>

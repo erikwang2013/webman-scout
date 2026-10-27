@@ -1,6 +1,7 @@
 {
     "name": "erikwang2013/webman-scout",
     "description": "Scout-style full-text search for Eloquent models on Webman, Laravel, Hyperf, ThinkPHP, Yii2 and Yii3 — 9 engines (OpenSearch, Elasticsearch, Meilisearch, Typesense, Algolia, XunSearch, Database, Collection, Null) with time ranges, geo distance, vector/KNN, aggregations and facets.",
+    "homepage": "https://package.erik.xyz/scout/",
     "keywords": ["algolia", "webman", "laravel", "thinkphp", "hyperf", "yii", "yii2", "scout", "search", "opensearch", "elasticsearch", "meilisearch", "typesense", "xunsearch"],
     "license": "MIT",
     "support": {
